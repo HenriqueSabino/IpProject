@@ -25,11 +25,12 @@ int main()
     allegro_init();
     install_keyboard();
     install_timer();
-    set_color_depth(32);
+    set_color_depth(desktop_color_depth());
     set_gfx_mode(GFX_AUTODETECT_WINDOWED, 600, 400, 0, 0);
 
     LOCK_VARIABLE(close_game);
     LOCK_FUNCTION(close_program);
+    set_close_button_callback(close_program);
 
     LOCK_VARIABLE(counter);
     LOCK_FUNCTION(increment);
@@ -42,6 +43,10 @@ int main()
     ball.velocity = create_vector(0, -10);
     ball.pos = create_vector(SCREEN_W / 2, SCREEN_H / 2);
     BITMAP *buffer = create_bitmap(SCREEN_W, SCREEN_H);
+
+    BITMAP *image_test = load_bitmap("../assets/BackgroundTeste.bmp", NULL);
+    if (image_test == NULL)
+        allegro_message("error");
 
     while (!close_game)
     {
@@ -66,10 +71,15 @@ int main()
 
         //DRAWING
         draw_ball(buffer, ball);
+        draw_sprite(buffer, image_test, 0, 0);
 
         draw_sprite(screen, buffer, 0, 0);
         clear(buffer);
     }
+
+    destroy_bitmap(buffer);
+    destroy_bitmap(image_test);
+
     return 0;
 }
 END_OF_MAIN();
