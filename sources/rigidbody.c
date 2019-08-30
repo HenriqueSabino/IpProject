@@ -42,3 +42,11 @@ void update_limit_pos(RigidBody *rb, Vector min, Vector max)
         rb->velocity.y = 0;
     }
 }
+
+void apply_force(RigidBody *rb, float x, float y)
+{
+    //force = mass * acceleration
+    //mass = 1, for now, so force = acceleration
+    rb->acceleration.x += x;
+    rb->acceleration.y += y;
+}

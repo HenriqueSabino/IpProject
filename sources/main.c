@@ -1,7 +1,7 @@
 #include <allegro.h>
 #include <stdio.h>
 #include "../headers/constants.h"
-#include "../headers/rigidbody.h"
+#include "../headers/player.h"
 #include "../headers/keyboard.h"
 
 volatile int close_game = FALSE;
@@ -18,7 +18,7 @@ void increment()
 }
 END_OF_FUNCTION(increment)
 
-void draw_ball(BITMAP *bmp, RigidBody rb);
+void draw_player(BITMAP *bmp, BITMAP *sprite, Player player);
 
 int main()
 {
@@ -27,6 +27,8 @@ int main()
     install_timer();
     set_color_depth(desktop_color_depth());
     set_gfx_mode(GFX_AUTODETECT_WINDOWED, 600, 400, 0, 0);
+
+    printf("%i", screen->w);
 
     LOCK_VARIABLE(close_game);
     LOCK_FUNCTION(close_program);
@@ -37,15 +39,14 @@ int main()
 
     install_int_ex(increment, MSEC_TO_TIMER(1.0 / FPS * 1000));
 
-    RigidBody ball;
-    ball.gravity_scale = 0.1f;
-    ball.acceleration = create_vector(0, 0);
-    ball.velocity = create_vector(0, -10);
-    ball.pos = create_vector(SCREEN_W / 2, SCREEN_H / 2);
+    Player player;
+    init_player(&player);
+    player.rb.pos = create_vector(SCREEN_W / 2, 0);
+
     BITMAP *buffer = create_bitmap(SCREEN_W, SCREEN_H);
 
-    BITMAP *image_test = load_bitmap("../assets/BackgroundTeste.bmp", NULL);
-    if (image_test == NULL)
+    BITMAP *player_sprite = load_bitmap(PLAYER_SPRITE_SHEET, NULL);
+    if (player_sprite == NULL)
         allegro_message("error");
 
     while (!close_game)
@@ -57,34 +58,41 @@ int main()
         {
             close_program();
         }
-        if (key_down(KEY_W))
+        if (key_down(KEY_W) || key_down(KEY_SPACE))
         {
-            ball.velocity.y += -10;
+            set_velocity_axis(&player, "vertical", -10);
+        }
+        if (key_down(KEY_A))
+        {
+            set_velocity_axis(&player, "horizontal", -5);
+        }
+        if (key_down(KEY_D))
+        {
+            set_velocity_axis(&player, "horizontal", 5);
         }
 
         //UPDATE
         while (counter > 0)
         {
-            update_limit_pos(&ball, create_vector(0, 0), create_vector(SCREEN_W, SCREEN_H));
+            update_player(&player);
             counter--;
         }
 
         //DRAWING
-        draw_ball(buffer, ball);
-        draw_sprite(buffer, image_test, 0, 0);
-
+        draw_player(buffer, player_sprite, player);
         draw_sprite(screen, buffer, 0, 0);
         clear(buffer);
     }
 
     destroy_bitmap(buffer);
-    destroy_bitmap(image_test);
+    destroy_bitmap(player_sprite);
 
     return 0;
 }
 END_OF_MAIN();
 
-void draw_ball(BITMAP *bmp, RigidBody rb)
+void draw_player(BITMAP *bmp, BITMAP *sprite, Player player)
 {
-    circlefill(bmp, rb.pos.x, rb.pos.y, 10, makecol(255, 0, 0));
+    //draw the a part of the sprite sheet to the screen and scales it
+    masked_stretch_blit(sprite, bmp, 0, 0, 50, 50, player.rb.pos.x, player.rb.pos.y, 100, 100);
 }

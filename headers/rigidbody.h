@@ -12,5 +12,6 @@ typedef struct rigidbody
 void update(RigidBody *rb);
 void update_all(RigidBody rbs[], int amount);
 void update_limit_pos(RigidBody *rb, Vector min, Vector max);
+void apply_force(RigidBody *rb, float x, float y);
 
 #endif // !RIGIDBODY_H
