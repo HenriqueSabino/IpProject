@@ -13,6 +13,12 @@ void init_player(Player *player)
     player->rb.gravity_scale = 0.1f;
     player->rb.pos = create_vector(0, 0);
     player->rb.velocity = create_vector(0, 0);
+    player->rb.cb.width = 100;
+    player->rb.cb.height = 100;
+    player->rb.cb.min = create_vector(player->rb.pos.x, player->rb.pos.y);
+    player->rb.cb.max = create_vector(player->rb.pos.x + player->rb.cb.width, player->rb.pos.y + player->rb.cb.height);
+    player->rb.cb.solid = 1;
+    player->rb.cb.tag = "player";
 }
 
 void set_velocity_axis(Player *player, char *axis, float s)

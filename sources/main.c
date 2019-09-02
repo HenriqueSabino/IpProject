@@ -28,8 +28,6 @@ int main()
     set_color_depth(desktop_color_depth());
     set_gfx_mode(GFX_AUTODETECT_WINDOWED, 600, 400, 0, 0);
 
-    printf("%i", screen->w);
-
     LOCK_VARIABLE(close_game);
     LOCK_FUNCTION(close_program);
     set_close_button_callback(close_program);
@@ -42,6 +40,32 @@ int main()
     Player player;
     init_player(&player);
     player.rb.pos = create_vector(SCREEN_W / 2, 0);
+
+    RigidBody ground;
+    ground.gravity_scale = 0;
+    ground.velocity = create_vector(0, 0);
+    ground.acceleration = create_vector(0, 0);
+    ground.pos = create_vector(60, SCREEN_H / 2);
+    ground.cb.width = 500;
+    ground.cb.height = 20;
+    ground.cb.min = create_vector(60, SCREEN_H / 2);
+    ground.cb.max = create_vector(ground.cb.min.x + ground.cb.width, ground.cb.min.y + ground.cb.height);
+    ground.cb.tag = "ground";
+    ground.cb.solid = 0;
+
+    RigidBody wall;
+    wall.gravity_scale = 0;
+    wall.velocity = create_vector(0, 0);
+    wall.acceleration = create_vector(0, 0);
+    wall.pos = create_vector(SCREEN_W / 2, SCREEN_H / 2 - 20);
+    wall.cb.width = 20;
+    wall.cb.height = 20;
+    wall.cb.min = create_vector(SCREEN_W / 2, SCREEN_H / 2 - 20);
+    wall.cb.max = create_vector(wall.cb.min.x + wall.cb.width, wall.cb.min.y + wall.cb.height);
+    wall.cb.tag = "wall";
+    wall.cb.solid = 0;
+
+    RigidBody *rbs[] = {&player.rb, &ground, &wall};
 
     BITMAP *buffer = create_bitmap(SCREEN_W, SCREEN_H);
 
@@ -62,24 +86,36 @@ int main()
         {
             set_velocity_axis(&player, "vertical", -10);
         }
-        if (key_down(KEY_A))
+        if (key_holding(KEY_A) || key_holding(KEY_D))
         {
-            set_velocity_axis(&player, "horizontal", -5);
+            if (key_holding(KEY_A))
+            {
+                set_velocity_axis(&player, "horizontal", -5);
+            }
+            else
+            {
+                set_velocity_axis(&player, "horizontal", 5);
+            }
         }
-        if (key_down(KEY_D))
+        else
         {
-            set_velocity_axis(&player, "horizontal", 5);
+            set_velocity_axis(&player, "horizontal", 0);
         }
 
         //UPDATE
         while (counter > 0)
         {
-            update_player(&player);
+            //update_player(&player);
+            update_all(rbs, 3);
             counter--;
         }
 
         //DRAWING
         draw_player(buffer, player_sprite, player);
+
+        rect(buffer, player.rb.cb.min.x, player.rb.cb.min.y, player.rb.cb.max.x, player.rb.cb.max.y, makecol(255, 0, 0));
+        rectfill(buffer, ground.cb.min.x, ground.cb.min.y, ground.cb.max.x, ground.cb.max.y, makecol(255, 0, 0));
+        rectfill(buffer, wall.cb.min.x, wall.cb.min.y, wall.cb.max.x, wall.cb.max.y, makecol(255, 0, 0));
         draw_sprite(screen, buffer, 0, 0);
         clear(buffer);
     }

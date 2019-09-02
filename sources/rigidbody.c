@@ -1,5 +1,6 @@
 #include "../headers/rigidbody.h"
 #include "../headers/constants.h"
+#include <stdio.h>
 
 void update(RigidBody *rb)
 {
@@ -8,13 +9,85 @@ void update(RigidBody *rb)
     rb->velocity.y += rb->acceleration.y;
     rb->pos.x += rb->velocity.x;
     rb->pos.y += rb->velocity.y;
+
+    rb->cb.min.x = rb->pos.x;
+    rb->cb.min.y = rb->pos.y;
+    rb->cb.max.x = rb->cb.min.x + rb->cb.width;
+    rb->cb.max.y = rb->cb.min.y + rb->cb.height;
 }
 
-void update_all(RigidBody rbs[], int amount)
+void update_all(RigidBody *rbs[], int amount)
 {
+    CollisionBox prev_cb[amount];
     for (int i = 0; i < amount; i++)
     {
-        update(&rbs[i]);
+        prev_cb[i] = rbs[i]->cb;
+        update(rbs[i]);
+    }
+    for (int i = 0; i < amount; i++)
+    {
+        for (int j = 0; j < amount; j++)
+        {
+            if (i == j)
+            {
+                continue;
+            }
+            if (collided(rbs[i]->cb, rbs[j]->cb) && rbs[i]->cb.solid)
+            {
+                if (prev_cb[i].min.x >= rbs[j]->cb.max.x)
+                {
+                    rbs[i]->pos.x = prev_cb[i].min.x - (prev_cb[i].min.x - rbs[j]->cb.max.x);
+
+                    rbs[i]->cb.min.x = rbs[i]->pos.x;
+                    rbs[i]->cb.min.y = rbs[i]->pos.y;
+                    rbs[i]->cb.max.x = rbs[i]->cb.min.x + rbs[i]->cb.width;
+                    rbs[i]->cb.max.y = rbs[i]->cb.min.y + rbs[i]->cb.height;
+                }
+                if (prev_cb[i].max.x <= rbs[j]->cb.min.x)
+                {
+                    rbs[i]->pos.x = prev_cb[i].min.x + rbs[j]->cb.min.x - prev_cb[i].max.x;
+
+                    rbs[i]->cb.min.x = rbs[i]->pos.x;
+                    rbs[i]->cb.min.y = rbs[i]->pos.y;
+                    rbs[i]->cb.max.x = rbs[i]->cb.min.x + rbs[i]->cb.width;
+                    rbs[i]->cb.max.y = rbs[i]->cb.min.y + rbs[i]->cb.height;
+                }
+                if (prev_cb[i].min.y >= rbs[j]->cb.max.y)
+                {
+                    if (*rbs[i]->cb.tag == *"player" && *rbs[j]->cb.tag == *"ground")
+                    {
+                        rbs[i]->velocity.y = 0;
+                    }
+                    else if (*rbs[i]->cb.tag == *"ground" && *rbs[j]->cb.tag == *"player")
+                    {
+                        rbs[j]->velocity.y = 0;
+                    }
+                    rbs[i]->pos.y = prev_cb[i].min.y - (prev_cb[i].min.y - rbs[j]->cb.max.y);
+
+                    rbs[i]->cb.min.x = rbs[i]->pos.x;
+                    rbs[i]->cb.min.y = rbs[i]->pos.y;
+                    rbs[i]->cb.max.x = rbs[i]->cb.min.x + rbs[i]->cb.width;
+                    rbs[i]->cb.max.y = rbs[i]->cb.min.y + rbs[i]->cb.height;
+                }
+                if (prev_cb[i].max.y <= rbs[j]->cb.min.y)
+                {
+                    if (*rbs[i]->cb.tag == *"player" && *rbs[j]->cb.tag == *"ground")
+                    {
+                        rbs[i]->velocity.y = 0;
+                    }
+                    else if (*rbs[i]->cb.tag == *"ground" && *rbs[j]->cb.tag == *"player")
+                    {
+                        rbs[j]->velocity.y = 0;
+                    }
+                    rbs[i]->pos.y = prev_cb[i].min.y + rbs[j]->cb.min.y - prev_cb[i].max.y;
+
+                    rbs[i]->cb.min.x = rbs[i]->pos.x;
+                    rbs[i]->cb.min.y = rbs[i]->pos.y;
+                    rbs[i]->cb.max.x = rbs[i]->cb.min.x + rbs[i]->cb.width;
+                    rbs[i]->cb.max.y = rbs[i]->cb.min.y + rbs[i]->cb.height;
+                }
+            }
+        }
     }
 }
 
