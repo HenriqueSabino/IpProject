@@ -6,7 +6,7 @@
 typedef struct collision_box
 {
     Vector min, max, offset;
-    char *tag;
+    char tag[50];
     int solid, width, height;
 } CollisionBox;
 

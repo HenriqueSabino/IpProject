@@ -36,16 +36,6 @@ void update_all(RigidBody *rbs[], int amount)
             {
                 if (prev_cb[i].min.x >= rbs[j]->cb.max.x)
                 {
-
-                    if (*rbs[i]->cb.tag == *"player" && *rbs[j]->cb.tag == *"ground")
-                    {
-                        rbs[i]->velocity.x = 0;
-                    }
-                    else if (*rbs[i]->cb.tag == *"ground" && *rbs[j]->cb.tag == *"player")
-                    {
-                        rbs[j]->velocity.x = 0;
-                    }
-
                     rbs[i]->pos.x = (prev_cb[i].min.x) - (prev_cb[i].min.x - rbs[j]->cb.max.x) - prev_cb[i].offset.x;
 
                     rbs[i]->cb.min.x = rbs[i]->pos.x + rbs[i]->cb.offset.x;
@@ -55,14 +45,6 @@ void update_all(RigidBody *rbs[], int amount)
                 }
                 else if (prev_cb[i].max.x <= rbs[j]->cb.min.x)
                 {
-                    if (*rbs[i]->cb.tag == *"player" && *rbs[j]->cb.tag == *"ground")
-                    {
-                        rbs[i]->velocity.x = 0;
-                    }
-                    else if (*rbs[i]->cb.tag == *"ground" && *rbs[j]->cb.tag == *"player")
-                    {
-                        rbs[j]->velocity.x = 0;
-                    }
 
                     rbs[i]->pos.x = prev_cb[i].min.x + rbs[j]->cb.min.x - prev_cb[i].max.x - prev_cb[i].offset.x;
 
@@ -76,10 +58,12 @@ void update_all(RigidBody *rbs[], int amount)
                     if (*rbs[i]->cb.tag == *"player" && *rbs[j]->cb.tag == *"ground")
                     {
                         rbs[i]->velocity.y = 0;
+                        (rbs[i]->onCollisionEnter)(*rbs[j]);
                     }
                     else if (*rbs[i]->cb.tag == *"ground" && *rbs[j]->cb.tag == *"player")
                     {
                         rbs[j]->velocity.y = 0;
+                        (rbs[j]->onCollisionEnter)(*rbs[i]);
                     }
                     rbs[i]->pos.y = prev_cb[i].min.y - (prev_cb[i].min.y - rbs[j]->cb.max.y) - prev_cb[i].offset.y;
 
@@ -93,10 +77,12 @@ void update_all(RigidBody *rbs[], int amount)
                     if (*rbs[i]->cb.tag == *"player" && *rbs[j]->cb.tag == *"ground")
                     {
                         rbs[i]->velocity.y = 0;
+                        (rbs[i]->onCollisionEnter)(*rbs[j]);
                     }
                     else if (*rbs[i]->cb.tag == *"ground" && *rbs[j]->cb.tag == *"player")
                     {
                         rbs[j]->velocity.y = 0;
+                        (rbs[j]->onCollisionEnter)(*rbs[i]);
                     }
                     rbs[i]->pos.y = prev_cb[i].min.y + rbs[j]->cb.min.y - prev_cb[i].max.y - prev_cb[i].offset.y;
 

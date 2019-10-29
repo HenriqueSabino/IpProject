@@ -1,5 +1,6 @@
 #include <allegro.h>
 #include <stdio.h>
+#include <string.h>
 #include <math.h>
 #include "../headers/constants.h"
 #include "../headers/player.h"
@@ -21,7 +22,7 @@ void increment()
 }
 END_OF_FUNCTION(increment)
 
-void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player);
+void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player, Vector camera);
 
 int main()
 {
@@ -41,9 +42,15 @@ int main()
 
     install_int_ex(increment, MSEC_TO_TIMER(1.0 / FPS * 1000));
 
+    Vector camera;
+
     Player player;
     init_player(&player);
     player.rb.pos = create_vector(SCREEN_W / 2, 0);
+
+    camera = player.rb.pos;
+    camera.x -= 100;
+    camera.y -= 200;
 
     RigidBody ground;
     ground.gravity_scale = 0;
@@ -55,7 +62,7 @@ int main()
     ground.cb.offset = create_vector(0, 0);
     ground.cb.min = create_vector(60, SCREEN_H / 2);
     ground.cb.max = create_vector(ground.cb.min.x + ground.cb.width, ground.cb.min.y + ground.cb.height);
-    ground.cb.tag = "ground";
+    strcpy(ground.cb.tag, "ground");
     ground.cb.solid = 0;
 
     RigidBody wall;
@@ -68,7 +75,7 @@ int main()
     wall.cb.offset = create_vector(0, 0);
     wall.cb.min = create_vector(SCREEN_W / 2, SCREEN_H / 2 - 20);
     wall.cb.max = create_vector(wall.cb.min.x + wall.cb.width, wall.cb.min.y + wall.cb.height);
-    wall.cb.tag = "wall";
+    strcpy(wall.cb.tag, "ground");
     wall.cb.solid = 0;
 
     RigidBody *rbs[] = {&player.rb, &ground, &wall};
@@ -116,6 +123,10 @@ int main()
             //update_player(&player);
             update_all(rbs, 3);
 
+            //linear interpolation between camera and player's position
+            camera.x = 0.9f * camera.x + 0.1f * (player.rb.pos.x - 100);
+            camera.y = 0.9f * camera.y + 0.1f * (player.rb.pos.y - 200);
+
             if (player.animation_frame >= 0 && player.animation_frame <= 7)
             {
                 if (game_timer % 4 == 0)
@@ -129,11 +140,11 @@ int main()
         }
 
         //DRAWING
-        draw_player(buffer, player_sprite, &player);
+        draw_player(buffer, player_sprite, &player, camera);
 
-        rect(buffer, player.rb.cb.min.x, player.rb.cb.min.y, player.rb.cb.max.x, player.rb.cb.max.y, makecol(255, 0, 0));
-        rectfill(buffer, ground.cb.min.x, ground.cb.min.y, ground.cb.max.x, ground.cb.max.y, makecol(255, 0, 0));
-        rectfill(buffer, wall.cb.min.x, wall.cb.min.y, wall.cb.max.x, wall.cb.max.y, makecol(255, 0, 0));
+        rect(buffer, player.rb.cb.min.x - camera.x, player.rb.cb.min.y - camera.y, player.rb.cb.max.x - camera.x, player.rb.cb.max.y - camera.y, makecol(255, 0, 0));
+        rectfill(buffer, ground.cb.min.x - camera.x, ground.cb.min.y - camera.y, ground.cb.max.x - camera.x, ground.cb.max.y - camera.y, makecol(255, 0, 0));
+        rectfill(buffer, wall.cb.min.x - camera.x, wall.cb.min.y - camera.y, wall.cb.max.x - camera.x, wall.cb.max.y - camera.y, makecol(255, 0, 0));
         draw_sprite(screen, buffer, 0, 0);
         clear(buffer);
     }
@@ -145,7 +156,7 @@ int main()
 }
 END_OF_MAIN();
 
-void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player)
+void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player, Vector camera)
 {
 
     BITMAP *player_sprite = create_bitmap(100, 100);
@@ -160,6 +171,11 @@ void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player)
         player->animation_frame = 8;
     }
 
+    if (abs(player->rb.velocity.y) > 0)
+    {
+        player->animation_frame = 4;
+    }
+
     int r_img_pos = player->animation_frame % PLAYER_SPRITE_COLS;
     int c_img_pos = player->animation_frame / PLAYER_SPRITE_COLS;
 
@@ -171,11 +187,11 @@ void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player)
 
     if (player->facing_right)
     {
-        draw_sprite_ex(bmp, player_sprite, player->rb.pos.x, player->rb.pos.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+        draw_sprite_ex(bmp, player_sprite, player->rb.pos.x - camera.x, player->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
     }
     else
     {
-        draw_sprite_ex(bmp, player_sprite, player->rb.pos.x, player->rb.pos.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
+        draw_sprite_ex(bmp, player_sprite, player->rb.pos.x - camera.x, player->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
     }
 
     destroy_bitmap(player_sprite);

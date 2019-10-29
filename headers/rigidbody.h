@@ -9,6 +9,9 @@ typedef struct rigidbody
     Vector pos, velocity, acceleration;
     float gravity_scale;
     CollisionBox cb;
+    void (*onCollisionEnter)(struct rigidbody);
+    void (*onCollisionStay)(struct rigidbody);
+    void (*onCollisionExit)(struct rigidbody);
 } RigidBody;
 
 void update(RigidBody *rb);

@@ -1,6 +1,28 @@
 #include <allegro.h>
+#include <string.h>
+#include <stdio.h>
 #include "../headers/player.h"
 #include "../headers/vector.h"
+
+void set_velocity_axis(Player *player, char *axis, float s)
+{
+    if (strcmp(axis, "horizontal") == 0)
+    {
+        player->rb.velocity.x = s;
+    }
+    else if (strcmp(axis, "vertical") == 0)
+    {
+        player->rb.velocity.y = s;
+    }
+}
+
+void onCollisionEnter(RigidBody other)
+{
+    if (strcmp(other.cb.tag, "ground") == 0)
+    {
+        //printf("Collided with ground.");
+    }
+}
 
 void init_player(Player *player)
 {
@@ -18,17 +40,7 @@ void init_player(Player *player)
     player->rb.cb.min = create_vector(player->rb.pos.x + player->rb.cb.offset.x, player->rb.pos.y + player->rb.cb.offset.y);
     player->rb.cb.max = create_vector(player->rb.cb.min.x + player->rb.cb.width, player->rb.cb.min.y + player->rb.cb.height);
     player->rb.cb.solid = 1;
-    player->rb.cb.tag = "player";
-}
+    strcpy(player->rb.cb.tag, "player");
 
-void set_velocity_axis(Player *player, char *axis, float s)
-{
-    if (*axis == *"horizontal")
-    {
-        player->rb.velocity.x = s;
-    }
-    else if (*axis == *"vertical")
-    {
-        player->rb.velocity.y = s;
-    }
+    player->rb.onCollisionEnter = onCollisionEnter;
 }
