@@ -34,9 +34,9 @@ void init_player(Player *player)
     player->rb.pos = create_vector(0, 0);
     player->rb.velocity = create_vector(0, 0);
 
-    player->rb.cb.width = 42;
-    player->rb.cb.height = 50;
-    player->rb.cb.offset = create_vector(29, 31);
+    player->rb.cb.width = 54;
+    player->rb.cb.height = 65;
+    player->rb.cb.offset = create_vector(37, 39);
     player->rb.cb.min = create_vector(player->rb.pos.x + player->rb.cb.offset.x, player->rb.pos.y + player->rb.cb.offset.y);
     player->rb.cb.max = create_vector(player->rb.cb.min.x + player->rb.cb.width, player->rb.cb.min.y + player->rb.cb.height);
     player->rb.cb.solid = 1;

@@ -159,7 +159,7 @@ END_OF_MAIN();
 void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player, Vector camera)
 {
 
-    BITMAP *player_sprite = create_bitmap(100, 100);
+    BITMAP *player_sprite = create_bitmap(128, 128);
     clear(player_sprite);
 
     if (abs(player->rb.velocity.x) > 0 && player->animation_frame > 7)
@@ -173,17 +173,17 @@ void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player, Vector camera)
 
     if (abs(player->rb.velocity.y) > 0)
     {
-        player->animation_frame = 4;
+        player->animation_frame = 10;
     }
 
     int r_img_pos = player->animation_frame % PLAYER_SPRITE_COLS;
     int c_img_pos = player->animation_frame / PLAYER_SPRITE_COLS;
 
-    r_img_pos *= PLAYER_TILE_SIZE;
-    c_img_pos *= PLAYER_TILE_SIZE;
+    r_img_pos *= PLAYER_TILE_SIZE + PLAYER_SPRITESHEET_OFFSET;
+    c_img_pos *= PLAYER_TILE_SIZE + PLAYER_SPRITESHEET_OFFSET;
 
     //draw the a part of the sprite sheet to the screen and scales it
-    masked_stretch_blit(sprite, player_sprite, r_img_pos, c_img_pos, 50, 50, 0, 0, 100, 100);
+    masked_stretch_blit(sprite, player_sprite, r_img_pos, c_img_pos, 50, 50, 0, 0, 128, 128);
 
     if (player->facing_right)
     {
