@@ -1,9 +1,11 @@
 #ifndef LIST_H
 #define LIST_H
 
+#include "rigidbody.h"
+
 typedef struct dataNode
 {
-    int value;
+    RigidBody *value;
 } DataNode;
 
 typedef struct node
