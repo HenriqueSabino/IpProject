@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "vector.h": "c",
+        "list.h": "c",
+        "string.h": "c"
+    }
+}

@@ -3,15 +3,17 @@
 
 #include "vector.h"
 #include "collisionbox.h"
+#include "list.h"
 
 typedef struct rigidbody
 {
     Vector pos, velocity, acceleration;
     float gravity_scale;
     CollisionBox cb;
-    void (*onCollisionEnter)(struct rigidbody);
-    void (*onCollisionStay)(struct rigidbody);
-    void (*onCollisionExit)(struct rigidbody);
+    List *collidingWith;
+    void (*onCollisionEnter)(struct rigidbody *self, struct rigidbody *other);
+    void (*onCollisionStay)(struct rigidbody *self, struct rigidbody *other);
+    void (*onCollisionExit)(struct rigidbody *self, struct rigidbody *other);
 } RigidBody;
 
 void update(RigidBody *rb);

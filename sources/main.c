@@ -5,6 +5,7 @@
 #include "../headers/constants.h"
 #include "../headers/player.h"
 #include "../headers/keyboard.h"
+#include "../headers/list.h"
 
 volatile int close_game = FALSE;
 void close_program()
@@ -64,6 +65,10 @@ int main()
     ground.cb.max = create_vector(ground.cb.min.x + ground.cb.width, ground.cb.min.y + ground.cb.height);
     strcpy(ground.cb.tag, "ground");
     ground.cb.solid = 0;
+    ground.collidingWith = createList();
+    ground.onCollisionEnter = NULL;
+    ground.onCollisionExit = NULL;
+    ground.onCollisionStay = NULL;
 
     RigidBody wall;
     wall.gravity_scale = 0;
@@ -77,6 +82,10 @@ int main()
     wall.cb.max = create_vector(wall.cb.min.x + wall.cb.width, wall.cb.min.y + wall.cb.height);
     strcpy(wall.cb.tag, "ground");
     wall.cb.solid = 0;
+    wall.collidingWith = createList();
+    wall.onCollisionEnter = NULL;
+    wall.onCollisionExit = NULL;
+    wall.onCollisionStay = NULL;
 
     RigidBody *rbs[] = {&player.rb, &ground, &wall};
 
@@ -89,15 +98,17 @@ int main()
     while (!close_game)
     {
         keyboard_input();
-
         //USER INPUT
         if (key_down(KEY_ESC))
         {
             close_program();
         }
-        if (player.rb.velocity.y == 0 && (key_down(KEY_W) || key_down(KEY_SPACE)))
+        if ((key_down(KEY_W) || key_down(KEY_SPACE)))
         {
-            set_velocity_axis(&player, "vertical", -10);
+            if (player.can_jump)
+            {
+                set_velocity_axis(&player, "vertical", -10);
+            }
         }
         if (key_holding(KEY_A) || key_holding(KEY_D))
         {
@@ -152,6 +163,11 @@ int main()
     destroy_bitmap(buffer);
     destroy_bitmap(player_sprite);
 
+    for (int i = 0; i < 3; i++)
+    {
+        destroy_list(rbs[i]->collidingWith);
+    }
+
     return 0;
 }
 END_OF_MAIN();
@@ -171,7 +187,7 @@ void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player, Vector camera)
         player->animation_frame = 8;
     }
 
-    if (abs(player->rb.velocity.y) > 0)
+    if (!player->can_jump || player->rb.velocity.y != 0)
     {
         player->animation_frame = 10;
     }

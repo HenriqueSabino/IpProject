@@ -1,8 +1,9 @@
 #include <allegro.h>
 #include <string.h>
-#include <stdio.h>
 #include "../headers/player.h"
 #include "../headers/vector.h"
+
+Player *player_ref;
 
 void set_velocity_axis(Player *player, char *axis, float s)
 {
@@ -16,11 +17,38 @@ void set_velocity_axis(Player *player, char *axis, float s)
     }
 }
 
-void onCollisionEnter(RigidBody other)
+void onCollisionEnter(RigidBody *self, RigidBody *other)
 {
-    if (strcmp(other.cb.tag, "ground") == 0)
+    if (strcmp(other->cb.tag, "ground") == 0)
     {
-        //printf("Collided with ground.");
+        if (self->cb.max.y == other->cb.min.y || self->cb.min.y == other->cb.max.y)
+        {
+            if (self->cb.max.y == other->cb.min.y)
+            {
+                player_ref->can_jump = 1;
+            }
+            self->velocity.y = 0;
+        }
+    }
+}
+
+void onCollisionStay(RigidBody *self, RigidBody *other)
+{
+    if (strcmp(other->cb.tag, "ground") == 0)
+    {
+        if (self->cb.max.y == other->cb.min.y || self->cb.min.y == other->cb.max.y)
+        {
+            self->velocity.y = 0;
+            player_ref->can_jump = 1;
+        }
+    }
+}
+
+void onCollisionExit(RigidBody *self, RigidBody *other)
+{
+    if (strcmp(other->cb.tag, "ground") == 0)
+    {
+        player_ref->can_jump = 0;
     }
 }
 
@@ -43,4 +71,10 @@ void init_player(Player *player)
     strcpy(player->rb.cb.tag, "player");
 
     player->rb.onCollisionEnter = onCollisionEnter;
+    player->rb.onCollisionExit = onCollisionExit;
+    player->rb.onCollisionStay = onCollisionStay;
+    player->rb.collidingWith = createList();
+    player->can_jump = 0;
+
+    player_ref = player;
 }

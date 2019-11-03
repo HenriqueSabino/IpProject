@@ -82,24 +82,19 @@ Node *atpos(List *list, int index)
     return NULL;
 }
 
-int indexof(List *list, Node *node)
+int indexof(List *list, DataNode node)
 {
-    if (node != NULL)
+    Node *pointer = list->head;
+
+    int index = 0;
+
+    while (pointer != NULL && pointer->data.value != node.value)
     {
-        Node *pointer = list->head;
-
-        int index = 0;
-
-        while (pointer != node && pointer != NULL)
-        {
-            pointer = pointer->next;
-            index++;
-        }
-
-        return index;
+        pointer = pointer->next;
+        index++;
     }
 
-    return -1;
+    return (index >= list->size) ? -1 : index;
 }
 
 void remove_at(List *list, int index)
