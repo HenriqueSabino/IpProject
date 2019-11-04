@@ -7,6 +7,7 @@
 #include "../headers/enemy.h"
 #include "../headers/keyboard.h"
 #include "../headers/list.h"
+#include "../headers/ground.h"
 
 volatile int close_game = FALSE;
 void close_program()
@@ -59,41 +60,23 @@ int main()
     camera.x -= 100;
     camera.y -= 200;
 
-    RigidBody ground;
-    ground.gravity_scale = 0;
-    ground.velocity = create_vector(0, 0);
-    ground.acceleration = create_vector(0, 0);
-    ground.pos = create_vector(60, SCREEN_H / 2);
-    ground.cb.width = 500;
-    ground.cb.height = 20;
-    ground.cb.offset = create_vector(0, 0);
-    ground.cb.min = create_vector(60, SCREEN_H / 2);
-    ground.cb.max = create_vector(ground.cb.min.x + ground.cb.width, ground.cb.min.y + ground.cb.height);
-    strcpy(ground.cb.tag, "ground");
-    ground.cb.solid = 0;
-    ground.collidingWith = createList();
-    ground.onCollisionEnter = NULL;
-    ground.onCollisionExit = NULL;
-    ground.onCollisionStay = NULL;
+    Ground ground;
+    init_ground(&ground);
 
-    RigidBody wall;
-    wall.gravity_scale = 0;
-    wall.velocity = create_vector(0, 0);
-    wall.acceleration = create_vector(0, 0);
-    wall.pos = create_vector(SCREEN_W / 2, SCREEN_H / 2 - 20);
-    wall.cb.width = 20;
-    wall.cb.height = 20;
-    wall.cb.offset = create_vector(0, 0);
-    wall.cb.min = create_vector(SCREEN_W / 2, SCREEN_H / 2 - 20);
-    wall.cb.max = create_vector(wall.cb.min.x + wall.cb.width, wall.cb.min.y + wall.cb.height);
-    strcpy(wall.cb.tag, "ground");
-    wall.cb.solid = 0;
-    wall.collidingWith = createList();
-    wall.onCollisionEnter = NULL;
-    wall.onCollisionExit = NULL;
-    wall.onCollisionStay = NULL;
+    Ground wall;
+    init_ground(&wall);
+    wall.rb.pos = create_vector(SCREEN_W / 2, SCREEN_H / 2 - 20);
+    wall.rb.cb.width = 20;
+    wall.rb.cb.height = 300;
+    wall.rb.cb.offset = create_vector(0, 0);
+    wall.rb.cb.min = create_vector(SCREEN_W / 2, SCREEN_H / 2 - 20);
+    wall.rb.cb.max = create_vector(wall.rb.cb.min.x + wall.rb.cb.width, wall.rb.cb.min.y + wall.rb.cb.height);
+    strcpy(wall.rb.cb.tag, "ground");
+    wall.rb.cb.solid = 0;
+    wall.rb.collidingWith = createList();
+    
 
-    RigidBody *rbs[] = {&player.rb, &ground, &wall};
+    RigidBody *rbs[] = {&player.rb, &ground.rb, &wall.rb};
 
     BITMAP *buffer = create_bitmap(SCREEN_W, SCREEN_H);
 
@@ -174,8 +157,8 @@ int main()
 
         rect(buffer, player.rb.cb.min.x - camera.x, player.rb.cb.min.y - camera.y, player.rb.cb.max.x - camera.x, player.rb.cb.max.y - camera.y, makecol(255, 0, 0));
         rect(buffer, bat.rb.cb.min.x - camera.x, bat.rb.cb.min.y - camera.y, bat.rb.cb.max.x - camera.x, bat.rb.cb.max.y - camera.y, makecol(255, 0, 0));
-        rectfill(buffer, ground.cb.min.x - camera.x, ground.cb.min.y - camera.y, ground.cb.max.x - camera.x, ground.cb.max.y - camera.y, makecol(255, 0, 0));
-        rectfill(buffer, wall.cb.min.x - camera.x, wall.cb.min.y - camera.y, wall.cb.max.x - camera.x, wall.cb.max.y - camera.y, makecol(255, 0, 0));
+        rectfill(buffer, ground.rb.cb.min.x - camera.x, ground.rb.cb.min.y - camera.y, ground.rb.cb.max.x - camera.x, ground.rb.cb.max.y - camera.y, makecol(255, 0, 0));
+        rectfill(buffer, wall.rb.cb.min.x - camera.x, wall.rb.cb.min.y - camera.y, wall.rb.cb.max.x - camera.x, wall.rb.cb.max.y - camera.y, makecol(255, 0, 0));
         draw_sprite(screen, buffer, 0, 0);
         clear(buffer);
     }
