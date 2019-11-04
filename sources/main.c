@@ -29,6 +29,8 @@ void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player, Vector camera);
 
 void draw_bat(BITMAP *bmp, BITMAP *sprite, Enemy* bat, Vector camera);
 
+void draw_ground(BITMAP *bmp, BITMAP *sprite, Ground *ground, Vector camera);
+
 int main()
 {
     allegro_init();
@@ -50,33 +52,18 @@ int main()
     Vector camera;
 
     Player player;
-    init_player(&player);
-    player.rb.pos = create_vector(SCREEN_W / 2, 0);
-
+    init_player(&player, create_vector(SCREEN_W / 2, 0));
+    
     Enemy bat;
-    init_enemy(&bat);
+    init_enemy(&bat, create_vector(SCREEN_W / 2 + 128, SCREEN_H / 2 - 128));
 
-    camera = player.rb.pos;
-    camera.x -= 100;
-    camera.y -= 200;
+    camera = sum(player.rb.pos, create_vector(-100, -200));
 
     Ground ground;
-    init_ground(&ground);
-
-    Ground wall;
-    init_ground(&wall);
-    wall.rb.pos = create_vector(SCREEN_W / 2, SCREEN_H / 2 - 20);
-    wall.rb.cb.width = 20;
-    wall.rb.cb.height = 300;
-    wall.rb.cb.offset = create_vector(0, 0);
-    wall.rb.cb.min = create_vector(SCREEN_W / 2, SCREEN_H / 2 - 20);
-    wall.rb.cb.max = create_vector(wall.rb.cb.min.x + wall.rb.cb.width, wall.rb.cb.min.y + wall.rb.cb.height);
-    strcpy(wall.rb.cb.tag, "ground");
-    wall.rb.cb.solid = 0;
-    wall.rb.collidingWith = createList();
+    init_ground(&ground, create_vector(SCREEN_W / 2, SCREEN_H / 2), 5);
     
 
-    RigidBody *rbs[] = {&player.rb, &ground.rb, &wall.rb};
+    RigidBody *rbs[] = {&player.rb, &ground.rb/*, &wall.rb*/};
 
     BITMAP *buffer = create_bitmap(SCREEN_W, SCREEN_H);
 
@@ -86,6 +73,10 @@ int main()
     
     BITMAP *bat_sprite = load_bitmap(BAT, NULL);
     if (bat_sprite == NULL)
+        allegro_message("error");
+
+    BITMAP *ground_sprite = load_bitmap(OVER_WORLD_GROUND, NULL);
+    if (ground_sprite == NULL)
         allegro_message("error");
 
     while (!close_game)
@@ -125,7 +116,7 @@ int main()
         while (counter > 0)
         {
             //update_player(&player);
-            update_all(rbs, 3);
+            update_all(rbs, 2);
 
             //linear interpolation between camera and player's position
             camera.x = 0.9f * camera.x + 0.1f * (player.rb.pos.x - 100);
@@ -154,11 +145,10 @@ int main()
         //DRAWING
         draw_player(buffer, player_sprite, &player, camera);
         draw_bat(buffer, bat_sprite, &bat, camera);
+        draw_ground(buffer, ground_sprite, &ground, camera);
 
         rect(buffer, player.rb.cb.min.x - camera.x, player.rb.cb.min.y - camera.y, player.rb.cb.max.x - camera.x, player.rb.cb.max.y - camera.y, makecol(255, 0, 0));
         rect(buffer, bat.rb.cb.min.x - camera.x, bat.rb.cb.min.y - camera.y, bat.rb.cb.max.x - camera.x, bat.rb.cb.max.y - camera.y, makecol(255, 0, 0));
-        rectfill(buffer, ground.rb.cb.min.x - camera.x, ground.rb.cb.min.y - camera.y, ground.rb.cb.max.x - camera.x, ground.rb.cb.max.y - camera.y, makecol(255, 0, 0));
-        rectfill(buffer, wall.rb.cb.min.x - camera.x, wall.rb.cb.min.y - camera.y, wall.rb.cb.max.x - camera.x, wall.rb.cb.max.y - camera.y, makecol(255, 0, 0));
         draw_sprite(screen, buffer, 0, 0);
         clear(buffer);
     }
@@ -166,8 +156,9 @@ int main()
     destroy_bitmap(buffer);
     destroy_bitmap(player_sprite);
     destroy_bitmap(bat_sprite);
+    destroy_bitmap(ground_sprite);
 
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 2; i++)
     {
         destroy_list(rbs[i]->collidingWith);
     }
@@ -240,4 +231,23 @@ void draw_bat(BITMAP *bmp, BITMAP *sprite, Enemy* bat, Vector camera)
         draw_sprite_ex(bmp, bat_sprite, bat->rb.pos.x - camera.x, bat->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
     }
     destroy_bitmap(bat_sprite);
+}
+
+void draw_ground(BITMAP *bmp, BITMAP *sprite, Ground *ground, Vector camera)
+{
+    BITMAP *ground_sprite = create_bitmap(128, 128);
+    clear(ground_sprite);
+
+    int r_img_pos = ground->animation_frame % GROUND_SPRITE_COLS;
+    int c_img_pos = ground->animation_frame / GROUND_SPRITE_COLS;
+
+    r_img_pos *= GROUND_TILE_SIZE + GROUND_SPRITESHEET_OFFSET;
+    c_img_pos *= GROUND_TILE_SIZE + GROUND_SPRITESHEET_OFFSET;
+
+    //draw the a part of the sprite sheet to the screen and scales it
+    masked_stretch_blit(sprite, ground_sprite, r_img_pos, c_img_pos, 32, 32, 0, 0, 128, 128);
+
+    draw_sprite_ex(bmp, ground_sprite, ground->rb.pos.x - camera.x, ground->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+
+    destroy_bitmap(ground_sprite);
 }

@@ -5,14 +5,14 @@
 
 Enemy *bat_ref;
 
-void init_enemy(Enemy *bat)
+void init_enemy(Enemy *bat, Vector pos)
 {
-    bat->animation_frame = 1;
+    bat->animation_frame = 0;
     bat->facing_right = 1;
 
     bat->rb.acceleration = create_vector(0, 0);
     bat->rb.gravity_scale = 0.1f;
-    bat->rb.pos = create_vector(0, 0);
+    bat->rb.pos = pos;
     bat->rb.velocity = create_vector(0, 0);
 
     bat->rb.cb.width = 52;

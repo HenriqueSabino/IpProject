@@ -52,14 +52,14 @@ void onCollisionExit(RigidBody *self, RigidBody *other)
     }
 }
 
-void init_player(Player *player)
+void init_player(Player *player, Vector pos)
 {
     player->animation_frame = 8;
     player->facing_right = 1;
 
     player->rb.acceleration = create_vector(0, 0);
     player->rb.gravity_scale = 0.1f;
-    player->rb.pos = create_vector(0, 0);
+    player->rb.pos = pos;
     player->rb.velocity = create_vector(0, 0);
 
     player->rb.cb.width = 54;

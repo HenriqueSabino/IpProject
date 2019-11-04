@@ -9,10 +9,10 @@
 typedef struct ground
 {
      RigidBody rb;    
-     int frame_position;
+     int animation_frame;
 } Ground;
 
 
-void init_ground(Ground *ground);
+void init_ground(Ground *ground, Vector pos, int animation_frame);
 //void set_velocity_axis(Player *player, char *axis, float s);
 #endif // "GROUND_H"

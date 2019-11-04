@@ -11,7 +11,7 @@ typedef struct enemy
     int animation_frame, facing_right;
 }Enemy;
 
-void init_enemy(Enemy* enemy);
+void init_enemy(Enemy* enemy, Vector pos);
 void atk();
 
 

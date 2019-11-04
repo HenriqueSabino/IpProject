@@ -11,7 +11,7 @@ typedef struct player
     int animation_frame, facing_right, can_jump;
 } Player;
 
-void init_player(Player *player);
+void init_player(Player *player, Vector pos);
 void set_velocity_axis(Player *player, char *axis, float s);
 
 #endif // !"PLAYER_H"
