@@ -36,7 +36,7 @@ int main()
 {
     FILE *mapPointer;
     char map[3][11];
-    readMap(3, 11, map, mapPointer, "C:/Users/HYAN.BATISTA/Documents/IpProject/sources/map.txt");
+    readMap(3, 11, map, mapPointer, "../sources/map.txt");
 
     allegro_init();
     install_keyboard();
