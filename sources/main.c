@@ -54,7 +54,6 @@ int main()
 
     Enemy bat;
     init_enemy(&bat);
-    bat.rb.pos = create_vector(50, 50);
 
     camera = player.rb.pos;
     camera.x -= 100;
