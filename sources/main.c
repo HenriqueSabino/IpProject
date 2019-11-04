@@ -4,6 +4,7 @@
 #include <math.h>
 #include "../headers/constants.h"
 #include "../headers/player.h"
+#include "../headers/enemy.h"
 #include "../headers/keyboard.h"
 #include "../headers/list.h"
 
@@ -24,6 +25,8 @@ void increment()
 END_OF_FUNCTION(increment)
 
 void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player, Vector camera);
+
+void draw_bat(BITMAP *bmp, BITMAP *sprite, Enemy* bat, Vector camera);
 
 int main()
 {
@@ -48,6 +51,10 @@ int main()
     Player player;
     init_player(&player);
     player.rb.pos = create_vector(SCREEN_W / 2, 0);
+
+    Enemy bat;
+    init_enemy(&bat);
+    bat.rb.pos = create_vector(50, 50);
 
     camera = player.rb.pos;
     camera.x -= 100;
@@ -93,6 +100,10 @@ int main()
 
     BITMAP *player_sprite = load_bitmap(PLAYER_SPRITE_SHEET, NULL);
     if (player_sprite == NULL)
+        allegro_message("error");
+    
+    BITMAP *bat_sprite = load_bitmap(BAT, NULL);
+    if (bat_sprite == NULL)
         allegro_message("error");
 
     while (!close_game)
@@ -146,14 +157,24 @@ int main()
                     player.animation_frame %= 8;
                 }
             }
+            if(bat.animation_frame >= 0 && bat.animation_frame <=3)
+            {
+                if (game_timer % 4 == 0)
+                {
+                    bat.animation_frame++;
+                    bat.animation_frame %= 4;
+                }
+            }
 
             counter--;
         }
 
         //DRAWING
         draw_player(buffer, player_sprite, &player, camera);
+        draw_bat(buffer, bat_sprite, &bat, camera);
 
         rect(buffer, player.rb.cb.min.x - camera.x, player.rb.cb.min.y - camera.y, player.rb.cb.max.x - camera.x, player.rb.cb.max.y - camera.y, makecol(255, 0, 0));
+        rect(buffer, bat.rb.cb.min.x - camera.x, bat.rb.cb.min.y - camera.y, bat.rb.cb.max.x - camera.x, bat.rb.cb.max.y - camera.y, makecol(255, 0, 0));
         rectfill(buffer, ground.cb.min.x - camera.x, ground.cb.min.y - camera.y, ground.cb.max.x - camera.x, ground.cb.max.y - camera.y, makecol(255, 0, 0));
         rectfill(buffer, wall.cb.min.x - camera.x, wall.cb.min.y - camera.y, wall.cb.max.x - camera.x, wall.cb.max.y - camera.y, makecol(255, 0, 0));
         draw_sprite(screen, buffer, 0, 0);
@@ -162,6 +183,7 @@ int main()
 
     destroy_bitmap(buffer);
     destroy_bitmap(player_sprite);
+    destroy_bitmap(bat_sprite);
 
     for (int i = 0; i < 3; i++)
     {
@@ -211,4 +233,29 @@ void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player, Vector camera)
     }
 
     destroy_bitmap(player_sprite);
+}
+
+void draw_bat(BITMAP *bmp, BITMAP *sprite, Enemy* bat, Vector camera)
+{
+    BITMAP *bat_sprite = create_bitmap(64, 64);
+    clear(bat_sprite);
+
+    int r_img_pos = bat->animation_frame % BAT_SPRITE_COLS;
+    int c_img_pos = bat->animation_frame / BAT_SPRITE_COLS;
+
+    r_img_pos *= BAT_TILE_SIZE + BAT_SPRITESHEET_OFFSET;
+    c_img_pos *= BAT_TILE_SIZE + BAT_SPRITESHEET_OFFSET;
+
+    //draw the a part of the sprite sheet to the screen and scales it
+    masked_stretch_blit(sprite, bat_sprite, r_img_pos, c_img_pos, 32, 32, 0, 0, 64, 64);
+
+    if (bat->facing_right)
+    {
+        draw_sprite_ex(bmp, bat_sprite, bat->rb.pos.x - camera.x, bat->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+    }
+    else
+    {
+        draw_sprite_ex(bmp, bat_sprite, bat->rb.pos.x - camera.x, bat->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
+    }
+    destroy_bitmap(bat_sprite);
 }
