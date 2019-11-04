@@ -21,9 +21,9 @@ void onCollisionEnter(RigidBody *self, RigidBody *other)
 {
     if (strcmp(other->cb.tag, "ground") == 0)
     {
-        if (self->cb.max.y == other->cb.min.y || self->cb.min.y == other->cb.max.y)
+        if (self->cb.max.y < other->cb.min.y || self->cb.min.y > other->cb.max.y)
         {
-            if (self->cb.max.y == other->cb.min.y)
+            if (self->cb.max.y < other->cb.min.y)
             {
                 player_ref->can_jump = 1;
             }
@@ -36,7 +36,7 @@ void onCollisionStay(RigidBody *self, RigidBody *other)
 {
     if (strcmp(other->cb.tag, "ground") == 0)
     {
-        if (self->cb.max.y == other->cb.min.y || self->cb.min.y == other->cb.max.y)
+        if (self->cb.max.y < other->cb.min.y || self->cb.min.y > other->cb.max.y)
         {
             self->velocity.y = 0;
             player_ref->can_jump = 1;

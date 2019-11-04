@@ -1,4 +1,6 @@
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 #include "../headers/rigidbody.h"
 #include "../headers/constants.h"
 #include "../headers/collisionbox.h"
@@ -17,17 +19,19 @@ void update(RigidBody *rb)
 
 void update_all(RigidBody *rbs[], int amount)
 {
-    CollisionBox prev_cb[amount];
+    CollisionBox rbs_before_update[amount];
+    CollisionBox rbs_after_update[amount];
     for (int i = 0; i < amount; i++)
     {
-        prev_cb[i] = rbs[i]->cb;
+        rbs_before_update[i] = rbs[i]->cb;
         update(rbs[i]);
+        rbs_after_update[i] = rbs[i]->cb;
     }
     for (int i = 0; i < amount; i++)
     {
         for (int j = 0; j < amount; j++)
         {
-            if (i == j)
+            if (i == j || strcmp(rbs[i]->cb.tag, "ground") == 0)
             {
                 continue;
             }
@@ -37,23 +41,22 @@ void update_all(RigidBody *rbs[], int amount)
 
             if (collided(rbs[i]->cb, rbs[j]->cb) && rbs[i]->cb.solid)
             {
-
-                if (prev_cb[i].min.x >= rbs[j]->cb.max.x)
+                
+                if (rbs_before_update[i].min.y >= rbs[j]->cb.max.y)
                 {
-                    rbs[i]->pos.x = (prev_cb[i].min.x) - (prev_cb[i].min.x - rbs[j]->cb.max.x) - prev_cb[i].offset.x;
+                    rbs[i]->pos.y = rbs_before_update[i].min.y - (rbs_before_update[i].min.y - rbs[j]->cb.max.y) - rbs_before_update[i].offset.y + 1;
                 }
-                else if (prev_cb[i].max.x <= rbs[j]->cb.min.x)
+                else if (rbs_before_update[i].max.y <= rbs[j]->cb.min.y)
                 {
-
-                    rbs[i]->pos.x = prev_cb[i].min.x + rbs[j]->cb.min.x - prev_cb[i].max.x - prev_cb[i].offset.x;
+                    rbs[i]->pos.y = rbs_before_update[i].min.y + rbs[j]->cb.min.y - rbs_before_update[i].max.y - rbs_before_update[i].offset.y - 1;
                 }
-                else if (prev_cb[i].min.y >= rbs[j]->cb.max.y)
+                else if (rbs_before_update[i].min.x >= rbs[j]->cb.max.x)
                 {
-                    rbs[i]->pos.y = prev_cb[i].min.y - (prev_cb[i].min.y - rbs[j]->cb.max.y) - prev_cb[i].offset.y;
+                    rbs[i]->pos.x = (rbs_before_update[i].min.x) - (rbs_before_update[i].min.x - rbs[j]->cb.max.x) - rbs_before_update[i].offset.x + 1;
                 }
-                else if (prev_cb[i].max.y <= rbs[j]->cb.min.y)
+                else if (rbs_before_update[i].max.x <= rbs[j]->cb.min.x)
                 {
-                    rbs[i]->pos.y = prev_cb[i].min.y + rbs[j]->cb.min.y - prev_cb[i].max.y - prev_cb[i].offset.y;
+                    rbs[i]->pos.x = rbs_before_update[i].min.x + rbs[j]->cb.min.x - rbs_before_update[i].max.x - rbs_before_update[i].offset.x - 1;
                 }
 
                 rbs[i]->cb.min = sum(rbs[i]->pos, rbs[i]->cb.offset);
@@ -77,14 +80,14 @@ void update_all(RigidBody *rbs[], int amount)
     {
         for (int j = 0; j < amount; j++)
         {
-            if (i == j)
+            if (i == j || strcmp(rbs[i]->cb.tag, "ground") == 0)
             {
                 continue;
             }
             DataNode other_cb;
             other_cb.value = &rbs[j]->cb;
 
-            if (collided(rbs[i]->cb, rbs[j]->cb) && rbs[i]->cb.solid)
+            if (collided(rbs_after_update[i], rbs_after_update[j]) && rbs[i]->cb.solid)
             {
                 if (indexof(rbs[i]->collidingWith, other_cb) != -1)
                 {
