@@ -2,6 +2,7 @@
 #define ENEMY_H
 
 #include "rigidbody.h"
+#include "vector.h"
 
 #define BAT "..\\assets\\Characters\\Bat.bmp"
 
@@ -12,7 +13,6 @@ typedef struct enemy
 }Enemy;
 
 void init_enemy(Enemy* enemy, Vector pos);
-void atk();
 
 
 

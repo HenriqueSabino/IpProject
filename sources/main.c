@@ -142,9 +142,10 @@ int main()
         {
             //update_player(&player);
             update_all(rbs, 13);
+
             //linear interpolation between camera and player's position
-            camera.x = 0.9f * camera.x + 0.1f * (player.rb.pos.x - 100);
-            camera.y = 0.9f * camera.y + 0.1f * (player.rb.pos.y - 200);
+            Vector offset_camera = create_vector(-100, -200);
+            camera = lerp(camera, sum(player.rb.pos, offset_camera), 0.9f);
 
             if (player.animation_frame >= 0 && player.animation_frame <= 7)
             {

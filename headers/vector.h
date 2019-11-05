@@ -10,6 +10,7 @@ typedef struct vector
 Vector create_vector(float x, float y);
 Vector sum(Vector a, Vector b);
 Vector diff(Vector a, Vector b);
+Vector lerp(Vector a, Vector b, float x);
 Vector mult(Vector a, float x);
 Vector normalized(Vector a);
 void setMag(Vector *a, float x);

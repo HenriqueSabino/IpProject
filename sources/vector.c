@@ -22,6 +22,11 @@ Vector mult(Vector a, float x)
     return create_vector(x * a.x, x * a.y);
 }
 
+Vector lerp(Vector a, Vector b, float x)
+{
+    return sum(mult(a, x), mult(b, 1 - x));
+}
+
 float getMag(Vector a)
 {
     return sqrtf(a.x * a.x + a.y * a.y);
