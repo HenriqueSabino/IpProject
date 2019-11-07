@@ -9,7 +9,7 @@ void init_enemy(Enemy *bat, Vector pos)
 {
     bat->animation_frame = 0;
     bat->facing_right = 0;
-    bat->player_pos = create_vector(128, -32);
+    bat->player_pos = create_vector(200, -32);
 
     bat->rb.acceleration = create_vector(0, 0);
     bat->rb.gravity_scale = 0;
@@ -23,6 +23,9 @@ void init_enemy(Enemy *bat, Vector pos)
     bat->rb.cb.max = create_vector(bat->rb.cb.min.x + bat->rb.cb.width, bat->rb.cb.min.y + bat->rb.cb.height);
     bat->rb.cb.solid = 0;
     bat->rb.collidingWith = createList();
+    bat-> rb.onCollisionEnter = NULL;
+    bat-> rb.onCollisionExit = NULL;
+    bat-> rb.onCollisionStay = NULL;
     strcpy(bat->rb.cb.tag, "bat");
 }
 
@@ -30,7 +33,17 @@ void atk(Enemy *enemy, RigidBody player)
 {
     Vector player_pos = mult(sum(player.cb.min, player.cb.max), 0.5f);
     Vector enemy_pos = mult(sum(enemy->rb.cb.min, enemy->rb.cb.max), 0.5f);
-    if (dist(enemy_pos, player_pos) <= 100){
+
+    if(player_pos.x >= enemy_pos.x)
+    {
+        enemy->facing_right = 0;
+    }
+    else
+    {
+        enemy->facing_right = 1;
+    }
+
+    if (dist(create_vector(enemy_pos.x, 0), create_vector(player_pos.x, 0)) <= 100){
         enemy->rb.acceleration = create_vector(0, 0);
     }
     else if(dist(enemy->rb.pos, player_pos) <= 400)

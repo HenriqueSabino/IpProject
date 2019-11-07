@@ -1,4 +1,4 @@
-#define GRAVITY 10.0f;
+#define GRAVITY 10.0f
 #define FPS 30
 #define PLAYER_SPRITE_COLS 4
 #define PLAYER_TILE_SIZE 50

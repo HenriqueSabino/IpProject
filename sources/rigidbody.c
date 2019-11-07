@@ -8,9 +8,7 @@
 
 void update(RigidBody *rb)
 {
-    if (rb->gravity_scale != 0)
-    rb->acceleration.y = rb->gravity_scale * GRAVITY;
-    rb->velocity = sum(rb->velocity, rb->acceleration);
+    rb->velocity = sum(rb->velocity, create_vector(rb->acceleration.x, rb->acceleration.y + GRAVITY * rb->gravity_scale));
     rb->pos = sum(rb->pos, rb->velocity);
 
     rb->cb.min = sum(rb->pos, rb->cb.offset);
@@ -40,28 +38,30 @@ void update_all(RigidBody *rbs[], int amount)
             DataNode other_cb;
             other_cb.value = &rbs[j]->cb;
 
-            if (collided(rbs[i]->cb, rbs[j]->cb) && rbs[i]->cb.solid)
+            if (collided(rbs[i]->cb, rbs[j]->cb))
             {
-                
-                if (rbs_before_update[i].min.y >= rbs[j]->cb.max.y)
-                {
-                    rbs[i]->pos.y = rbs_before_update[i].min.y - (rbs_before_update[i].min.y - rbs[j]->cb.max.y) - rbs_before_update[i].offset.y + 1;
-                }
-                else if (rbs_before_update[i].max.y <= rbs[j]->cb.min.y)
-                {
-                    rbs[i]->pos.y = rbs_before_update[i].min.y + rbs[j]->cb.min.y - rbs_before_update[i].max.y - rbs_before_update[i].offset.y - 1;
-                }
-                else if (rbs_before_update[i].min.x >= rbs[j]->cb.max.x)
-                {
-                    rbs[i]->pos.x = (rbs_before_update[i].min.x) - (rbs_before_update[i].min.x - rbs[j]->cb.max.x) - rbs_before_update[i].offset.x + 1;
-                }
-                else if (rbs_before_update[i].max.x <= rbs[j]->cb.min.x)
-                {
-                    rbs[i]->pos.x = rbs_before_update[i].min.x + rbs[j]->cb.min.x - rbs_before_update[i].max.x - rbs_before_update[i].offset.x - 1;
-                }
+                if (rbs[i]->cb.solid && rbs[j]->cb.solid)
+                {   
+                    if (rbs_before_update[i].min.y >= rbs[j]->cb.max.y)
+                    {
+                        rbs[i]->pos.y = rbs_before_update[i].min.y - (rbs_before_update[i].min.y - rbs[j]->cb.max.y) - rbs_before_update[i].offset.y + 1;
+                    }
+                    else if (rbs_before_update[i].max.y <= rbs[j]->cb.min.y)
+                    {
+                        rbs[i]->pos.y = rbs_before_update[i].min.y + rbs[j]->cb.min.y - rbs_before_update[i].max.y - rbs_before_update[i].offset.y - 1;
+                    }
+                    else if (rbs_before_update[i].min.x >= rbs[j]->cb.max.x)
+                    {
+                        rbs[i]->pos.x = (rbs_before_update[i].min.x) - (rbs_before_update[i].min.x - rbs[j]->cb.max.x) - rbs_before_update[i].offset.x + 1;
+                    }
+                    else if (rbs_before_update[i].max.x <= rbs[j]->cb.min.x)
+                    {
+                        rbs[i]->pos.x = rbs_before_update[i].min.x + rbs[j]->cb.min.x - rbs_before_update[i].max.x - rbs_before_update[i].offset.x - 1;
+                    }
 
-                rbs[i]->cb.min = sum(rbs[i]->pos, rbs[i]->cb.offset);
-                rbs[i]->cb.max = sum(rbs[i]->cb.min, create_vector(rbs[i]->cb.width, rbs[i]->cb.height));
+                    rbs[i]->cb.min = sum(rbs[i]->pos, rbs[i]->cb.offset);
+                    rbs[i]->cb.max = sum(rbs[i]->cb.min, create_vector(rbs[i]->cb.width, rbs[i]->cb.height));
+                }
             }
             else
             {
@@ -88,7 +88,7 @@ void update_all(RigidBody *rbs[], int amount)
             DataNode other_cb;
             other_cb.value = &rbs[j]->cb;
 
-            if (collided(rbs_after_update[i], rbs_after_update[j]) && rbs[i]->cb.solid)
+            if (collided(rbs_after_update[i], rbs_after_update[j]))
             {
                 if (indexof(rbs[i]->collidingWith, other_cb) != -1)
                 {
