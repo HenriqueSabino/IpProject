@@ -35,8 +35,8 @@ void onCollisionEnter(RigidBody *self, RigidBody *other)
     }
     if (strcmp(other->cb.tag, "bat") == 0)
     {
-        player_ref->count++;
-        printf("%i", player_ref->count);
+        player_ref->life--;
+
         if(player_ref->facing_right == 1)
         {
             player_ref->rb.acceleration.x = -10;
@@ -79,7 +79,7 @@ void init_player(Player *player, Vector pos)
 {
     player->animation_frame = 8;
     player->facing_right = 1;
-    player->count = 0;
+    player->life = 100;
 
     player->rb.acceleration = create_vector(0, 0);
     player->rb.gravity_scale = 0.1f;

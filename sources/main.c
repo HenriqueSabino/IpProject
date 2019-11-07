@@ -32,6 +32,8 @@ void draw_bat(BITMAP *bmp, BITMAP *sprite, Enemy *bat, Vector camera);
 
 void draw_ground(BITMAP *bmp, BITMAP *sprite, Ground *ground, Vector camera);
 
+void draw_lifebar(BITMAP *bmp, BITMAP *sprite, Player player);
+
 int main()
 {
     char *map;
@@ -73,6 +75,9 @@ int main()
     BITMAP *ground_sprite = load_bitmap(OVER_WORLD_GROUND, NULL);
     if (ground_sprite == NULL)
         allegro_message("error");
+
+    BITMAP *lifebar_sprite = load_bitmap("../assets/Canvas/LifeBar.bmp", NULL);
+
 
     int row = 0, col = 0, not_objs = 0, ground_count = 0;
 
@@ -195,6 +200,7 @@ int main()
         //DRAWING
         draw_player(buffer, player_sprite, &player, camera);
         draw_bat(buffer, bat_sprite, &bat, camera);
+        draw_lifebar(buffer, lifebar_sprite, player);
 
         for (int i = 0; i < ground_count; i++)
         {
@@ -306,4 +312,14 @@ void draw_ground(BITMAP *bmp, BITMAP *sprite, Ground *ground, Vector camera)
     draw_sprite_ex(bmp, ground_sprite, ground->rb.pos.x - camera.x, ground->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
 
     destroy_bitmap(ground_sprite);
+}
+
+void draw_lifebar(BITMAP *bmp, BITMAP *sprite, Player player)
+{
+    char player_life[4];
+    itoa(player.life, player_life, 10);
+    strcat(player_life, "%");
+    rectfill(bmp, 55, 30, 133, 53, makecol(255, 0, 0));
+    draw_sprite(bmp, sprite, 10, 10);
+    textout_ex(bmp, font, player_life, 64+20, 38, makecol(255, 255, 0), -1);
 }
