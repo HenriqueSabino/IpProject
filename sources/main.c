@@ -28,15 +28,14 @@ END_OF_FUNCTION(increment)
 
 void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player, Vector camera);
 
-void draw_bat(BITMAP *bmp, BITMAP *sprite, Enemy* bat, Vector camera);
+void draw_bat(BITMAP *bmp, BITMAP *sprite, Enemy *bat, Vector camera);
 
 void draw_ground(BITMAP *bmp, BITMAP *sprite, Ground *ground, Vector camera);
 
 int main()
 {
-    FILE *mapPointer;
-    char map[3][11];
-    readMap(3, 11, map, mapPointer, "../sources/map.txt");
+    char *map;
+    int map_size = readMap(&map, "../sources/map.txt");
 
     allegro_init();
     install_keyboard();
@@ -57,18 +56,16 @@ int main()
     Vector camera;
 
     Player player;
-    
-    Enemy bat;
-    init_enemy(&bat, create_vector(SCREEN_W / 2 + 128, SCREEN_H / 2 - 128));
 
-    Ground grounds[12];    
+    Enemy bat;
+    //init_enemy(&bat, create_vector(SCREEN_W / 2 + 128, SCREEN_H / 2 - 128));
 
     BITMAP *buffer = create_bitmap(SCREEN_W, SCREEN_H);
 
     BITMAP *player_sprite = load_bitmap(PLAYER_SPRITE_SHEET, NULL);
     if (player_sprite == NULL)
         allegro_message("error");
-    
+
     BITMAP *bat_sprite = load_bitmap(BAT, NULL);
     if (bat_sprite == NULL)
         allegro_message("error");
@@ -77,30 +74,56 @@ int main()
     if (ground_sprite == NULL)
         allegro_message("error");
 
+    int row = 0, col = 0, not_objs = 0, ground_count = 0;
 
-    
-    int ground_count = 0;
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < map_size; i++)
     {
-        for (int j = 0; j < 11; j++)
+        if (map[i] == 'G')
         {
-            if (map[i][j] == 'P')
-            {
-                init_player(&player, create_vector(j * 128, i * 128));
-                camera = sum(player.rb.pos, create_vector(-100, -200));
-            }
-            else if (map[i][j] == 'G')
-            {
-                init_ground(&grounds[ground_count], create_vector(j * 128, i * 128), 0);
-                ground_count++;
-            }
+            ground_count++;
         }
     }
 
-    RigidBody *rbs[14];
+    Ground grounds[ground_count];
+    ground_count = 0;
+
+    for (int i = 0; i < map_size; i++)
+    {
+        if (map[i] == 'P')
+        {
+            init_player(&player, create_vector(col * 128, row * 128));
+            camera = sum(player.rb.pos, create_vector(-100, -200));
+            col++;
+        }
+        else if (map[i] == 'B')
+        {
+            init_enemy(&bat, create_vector(col * 128, row * 128));
+            col++;
+        }
+        else if (map[i] == 'G')
+        {
+            init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 0);
+            ground_count++;
+            col++;
+        }
+        else if (map[i] == '*')
+        {
+            not_objs++;
+            col++;
+        }
+        else if (map[i] == '\n')
+        {
+            row++;
+            not_objs++;
+            col = 0;
+        }
+    }
+
+    RigidBody *rbs[map_size - not_objs];
     rbs[0] = &player.rb;
     rbs[1] = &bat.rb;
-    for (int i = 0; i < ground_count; i++){
+    for (int i = 0; i < ground_count; i++)
+    {
         rbs[i + 2] = &grounds[i].rb;
     }
 
@@ -141,14 +164,13 @@ int main()
 
         while (counter > 0)
         {
-            //update_player(&player);
-            update_all(rbs, 14);
+            update_all(rbs, map_size - not_objs);
 
             //linear interpolation between camera and player's position
             Vector offset_camera = create_vector(-100, -200);
             camera = lerp(camera, sum(player.rb.pos, offset_camera), 0.9f);
 
-            atk (&bat, player.rb);
+            atk(&bat, player.rb);
 
             if (player.animation_frame >= 0 && player.animation_frame <= 7)
             {
@@ -158,7 +180,7 @@ int main()
                     player.animation_frame %= 8;
                 }
             }
-            if(bat.animation_frame >= 0 && bat.animation_frame <=3)
+            if (bat.animation_frame >= 0 && bat.animation_frame <= 3)
             {
                 if (game_timer % 4 == 0)
                 {
@@ -186,12 +208,13 @@ int main()
         clear(buffer);
     }
 
+    free(map);
     destroy_bitmap(buffer);
     destroy_bitmap(player_sprite);
     destroy_bitmap(bat_sprite);
     destroy_bitmap(ground_sprite);
 
-    for (int i = 0; i < 14; i++)
+    for (int i = 0; i < map_size - not_objs; i++)
     {
         destroy_list(rbs[i]->collidingWith);
     }
@@ -241,7 +264,7 @@ void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player, Vector camera)
     destroy_bitmap(player_sprite);
 }
 
-void draw_bat(BITMAP *bmp, BITMAP *sprite, Enemy* bat, Vector camera)
+void draw_bat(BITMAP *bmp, BITMAP *sprite, Enemy *bat, Vector camera)
 {
     BITMAP *bat_sprite = create_bitmap(64, 64);
     clear_to_color(bat_sprite, makecol(255, 0, 255));
