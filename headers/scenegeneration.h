@@ -3,7 +3,8 @@
 
 #include <stdio.h>
 
-void readMap(int l, int c, char map[l][c], FILE *mapPointer, char *path);
-
+//Reads a file and puts the characters to an char array
+//returns the size of that array
+int readMap(char **map, char *path);
 
 #endif // !_SCENEGENERATION_H

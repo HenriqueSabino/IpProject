@@ -1,43 +1,39 @@
 #include <stdio.h>
+#include <allegro.h>
 #include "../headers/scenegeneration.h"
 
-void readMap(int l, int c, char map[l][c], FILE *mapPointer, char *path)
+int readMap(char **map, char *path)
 {
-    mapPointer = fopen(path, "r");
-    
-    if ( mapPointer == NULL )
+    FILE *mapPointer = fopen(path, "r");
+
+    if (mapPointer == NULL)
     {
-        printf("Map file faild to open.\n");
+        allegro_message("ERROR!\nMap file faild to open.");
+        return -1;
     }
     else
     {
-        printf("The file is now opened.\n");
+        int rows, cols;
+        fscanf(mapPointer, "%i\n", &rows);
+        fscanf(mapPointer, "%i", &cols);
 
-        for (int i = 0; i < l; i++)
+        char c = fgetc(mapPointer);
+        while (c == '\n')
         {
-            for (int j = 0; j < c; j++)
-            {
-                map[i][j] = '*';
-            }
+            c = fgetc(mapPointer);
         }
 
-        for (int i = 0; i < l; i++)
+        //creating an array the size of the map
+        *map = (char *)malloc(sizeof(char) * rows * cols);
+
+        for (int i = 0; i < rows * cols; i++)
         {
-            for (int j = 0; j < c; j++)
-            {
-                char c;
-                c = fgetc(mapPointer);
-
-                while (c == '\n')
-                {
-                    c = fgetc(mapPointer);
-                }
-                
-                map[i][j] = c;
-
-            }
+            (*map)[i] = c;
+            c = fgetc(mapPointer);
         }
 
         fclose(mapPointer);
+
+        return rows * cols;
     }
 }
