@@ -9,10 +9,13 @@
 typedef struct enemy
 {
     RigidBody rb;
-    int animation_frame, facing_right;
+    Vector player_pos;
+    int animation_frame, facing_right, live, atack;
 }Enemy;
 
 void init_enemy(Enemy* enemy, Vector pos);
+void atk(Enemy* enemy, RigidBody pos);
+
 
 
 

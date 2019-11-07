@@ -8,6 +8,7 @@
 
 void update(RigidBody *rb)
 {
+    if (rb->gravity_scale != 0)
     rb->acceleration.y = rb->gravity_scale * GRAVITY;
     rb->velocity = sum(rb->velocity, rb->acceleration);
     rb->pos = sum(rb->pos, rb->velocity);

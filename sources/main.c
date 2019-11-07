@@ -97,10 +97,11 @@ int main()
         }
     }
 
-    RigidBody *rbs[13];
+    RigidBody *rbs[14];
     rbs[0] = &player.rb;
+    rbs[1] = &bat.rb;
     for (int i = 0; i < ground_count; i++){
-        rbs[i + 1] = &grounds[i].rb;
+        rbs[i + 2] = &grounds[i].rb;
     }
 
     while (!close_game)
@@ -141,11 +142,13 @@ int main()
         while (counter > 0)
         {
             //update_player(&player);
-            update_all(rbs, 13);
+            update_all(rbs, 14);
 
             //linear interpolation between camera and player's position
             Vector offset_camera = create_vector(-100, -200);
             camera = lerp(camera, sum(player.rb.pos, offset_camera), 0.9f);
+
+            atk (&bat, player.rb);
 
             if (player.animation_frame >= 0 && player.animation_frame <= 7)
             {
@@ -188,7 +191,7 @@ int main()
     destroy_bitmap(bat_sprite);
     destroy_bitmap(ground_sprite);
 
-    for (int i = 0; i < 12; i++)
+    for (int i = 0; i < 14; i++)
     {
         destroy_list(rbs[i]->collidingWith);
     }
