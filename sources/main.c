@@ -319,7 +319,7 @@ void draw_lifebar(BITMAP *bmp, BITMAP *sprite, Player player)
     char player_life[4];
     itoa(player.life, player_life, 10);
     strcat(player_life, "%");
-    rectfill(bmp, 55, 30, 133, 53, makecol(255, 0, 0));
+    rectfill(bmp, 74, 34, 74 + floor(57 * player.life / 100.0f), 49, makecol(255, 0, 0));
     draw_sprite(bmp, sprite, 10, 10);
-    textout_ex(bmp, font, player_life, 64+20, 38, makecol(255, 255, 0), -1);
+    textout_ex(bmp, font, player_life, 64+25, 38, makecol(255, 255, 0), -1);
 }
