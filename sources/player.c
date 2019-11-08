@@ -10,13 +10,16 @@ Player *player_ref;
 
 void set_velocity_axis(Player *player, char *axis, float s)
 {
-    if (strcmp(axis, "horizontal") == 0)
+    if (!player_ref->taking_damage)
     {
-        player->rb.velocity.x = s;
-    }
-    else if (strcmp(axis, "vertical") == 0)
-    {
-        player->rb.velocity.y = s;
+        if (strcmp(axis, "horizontal") == 0)
+        {
+            player->rb.velocity.x = s;
+        }
+        else if (strcmp(axis, "vertical") == 0)
+        {
+            player->rb.velocity.y = s;
+        }
     }
 }
 
@@ -31,21 +34,24 @@ void onCollisionEnter(RigidBody *self, RigidBody *other)
                 player_ref->can_jump = 1;
             }
             self->velocity.y = 0;
+            player_ref->taking_damage = 0;
+            self->acceleration = create_vector(0, 0);
         }
     }
     if (strcmp(other->cb.tag, "bat") == 0)
     {
         player_ref->life--;
+        player_ref->taking_damage = 1;
 
-        if(player_ref->facing_right == 1)
+        if(other->pos.x > self->pos.x)
         {
-            player_ref->rb.acceleration.x = -10;
-            player_ref->rb.acceleration.y = -2;
+            player_ref->rb.velocity.x = -10;
+            player_ref->rb.velocity.y = -5;
         }
         else
         {
-            player_ref->rb.acceleration.x = 10;
-            player_ref->rb.acceleration.y = -2;
+            player_ref->rb.velocity.x = 10;
+            player_ref->rb.velocity.y = -5;
         }
 
     }
@@ -58,7 +64,9 @@ void onCollisionStay(RigidBody *self, RigidBody *other)
         if (self->cb.max.y < other->cb.min.y || self->cb.min.y > other->cb.max.y)
         {
             self->velocity.y = 0;
+            self->acceleration = create_vector(0, 0);
             player_ref->can_jump = 1;
+            player_ref->taking_damage = 0;
         }
     }
 }
@@ -69,16 +77,16 @@ void onCollisionExit(RigidBody *self, RigidBody *other)
     {
         player_ref->can_jump = 0;
     }
-    else if (strcmp(other->cb.tag, "bat") == 0)
-    {
-        player_ref->rb.acceleration = create_vector(0, 0);
-    }
+    // else if (strcmp(other->cb.tag, "bat") == 0){
+    //     player_ref->taking_damage = 0;
+    // }
 }
 
 void init_player(Player *player, Vector pos)
 {
     player->animation_frame = 8;
     player->facing_right = 1;
+    player->taking_damage = 0;
     player->life = 100;
 
     player->rb.acceleration = create_vector(0, 0);

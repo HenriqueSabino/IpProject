@@ -5,7 +5,7 @@
 #include "../headers/list.h"
 
 
-void init_enemy(Enemy *bat, Vector pos)
+void init_bat(Enemy *bat, Vector pos)
 {
     bat->animation_frame = 0;
     bat->facing_right = 0;

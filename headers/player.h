@@ -8,7 +8,7 @@
 typedef struct player
 {
     RigidBody rb;
-    int animation_frame, facing_right, can_jump, life;
+    int animation_frame, facing_right, can_jump, life, taking_damage;
 } Player;
 
 void init_player(Player *player, Vector pos);

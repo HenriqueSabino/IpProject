@@ -60,7 +60,6 @@ int main()
     Player player;
 
     Enemy bat;
-    //init_enemy(&bat, create_vector(SCREEN_W / 2 + 128, SCREEN_H / 2 - 128));
 
     BITMAP *buffer = create_bitmap(SCREEN_W, SCREEN_H);
 
@@ -102,7 +101,7 @@ int main()
         }
         else if (map[i] == 'B')
         {
-            init_enemy(&bat, create_vector(col * 128, row * 128));
+            init_bat(&bat, create_vector(col * 128, row * 128));
             col++;
         }
         else if (map[i] == 'G')
@@ -126,14 +125,21 @@ int main()
 
     RigidBody *rbs[map_size - not_objs];
     rbs[0] = &player.rb;
-    rbs[1] = &bat.rb;
     for (int i = 0; i < ground_count; i++)
     {
-        rbs[i + 2] = &grounds[i].rb;
+        rbs[i + 1] = &grounds[i].rb;
     }
+    rbs[map_size - not_objs - 1] = &bat.rb;
 
     while (!close_game)
     {
+
+        if (player.life <= 0)
+        {
+            close_program();
+            break;
+        }
+
         keyboard_input();
         //USER INPUT
         if (key_down(KEY_ESC))
