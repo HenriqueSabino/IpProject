@@ -4,7 +4,6 @@
 #include "../headers/vector.h"
 #include "../headers/list.h"
 
-
 void init_bat(Enemy *bat, Vector pos)
 {
     bat->animation_frame = 0;
@@ -23,9 +22,9 @@ void init_bat(Enemy *bat, Vector pos)
     bat->rb.cb.max = create_vector(bat->rb.cb.min.x + bat->rb.cb.width, bat->rb.cb.min.y + bat->rb.cb.height);
     bat->rb.cb.solid = 0;
     bat->rb.collidingWith = createList();
-    bat-> rb.onCollisionEnter = NULL;
-    bat-> rb.onCollisionExit = NULL;
-    bat-> rb.onCollisionStay = NULL;
+    bat->rb.onCollisionEnter = NULL;
+    bat->rb.onCollisionExit = NULL;
+    bat->rb.onCollisionStay = NULL;
     strcpy(bat->rb.cb.tag, "bat");
 }
 
@@ -34,7 +33,7 @@ void atk(Enemy *enemy, RigidBody player)
     Vector player_pos = mult(sum(player.cb.min, player.cb.max), 0.5f);
     Vector enemy_pos = mult(sum(enemy->rb.cb.min, enemy->rb.cb.max), 0.5f);
 
-    if(player_pos.x >= enemy_pos.x)
+    if (player_pos.x >= enemy_pos.x)
     {
         enemy->facing_right = 0;
     }
@@ -43,12 +42,14 @@ void atk(Enemy *enemy, RigidBody player)
         enemy->facing_right = 1;
     }
 
-    if (dist(create_vector(enemy_pos.x, 0), create_vector(player_pos.x, 0)) <= 100){
+    if (dist(create_vector(enemy_pos.x, 0), create_vector(player_pos.x, 0)) <= 100)
+    {
         enemy->rb.acceleration = create_vector(0, 0);
     }
-    else if(dist(enemy->rb.pos, player_pos) <= 400)
+    else if (dist(enemy->rb.pos, player_pos) <= 400)
     {
-        if (dist(enemy_pos, sum(player_pos, enemy->player_pos)) <= 10){
+        if (dist(enemy_pos, sum(player_pos, enemy->player_pos)) <= 10)
+        {
             enemy->player_pos.x *= -1;
             enemy->rb.acceleration = mult(normalized(diff(player_pos, enemy_pos)), 15);
         }

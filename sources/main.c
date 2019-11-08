@@ -59,8 +59,6 @@ int main()
 
     Player player;
 
-    Enemy bat;
-
     BITMAP *buffer = create_bitmap(SCREEN_W, SCREEN_H);
 
     BITMAP *player_sprite = load_bitmap(PLAYER_SPRITE_SHEET, NULL);
@@ -77,8 +75,7 @@ int main()
 
     BITMAP *lifebar_sprite = load_bitmap("../assets/Canvas/LifeBar.bmp", NULL);
 
-
-    int row = 0, col = 0, not_objs = 0, ground_count = 0;
+    int row = 0, col = 0, not_objs = 0, ground_count = 0, enemy_count = 0;
 
     for (int i = 0; i < map_size; i++)
     {
@@ -86,10 +83,17 @@ int main()
         {
             ground_count++;
         }
+        else if (map[i] == 'B')
+        {
+            enemy_count++;
+        }
     }
 
     Ground grounds[ground_count];
     ground_count = 0;
+
+    Enemy enemies[enemy_count];
+    enemy_count = 0;
 
     for (int i = 0; i < map_size; i++)
     {
@@ -101,7 +105,8 @@ int main()
         }
         else if (map[i] == 'B')
         {
-            init_bat(&bat, create_vector(col * 128, row * 128));
+            init_bat(&enemies[enemy_count], create_vector(col * 128, row * 128));
+            enemy_count++;
             col++;
         }
         else if (map[i] == 'G')
@@ -129,7 +134,11 @@ int main()
     {
         rbs[i + 1] = &grounds[i].rb;
     }
-    rbs[map_size - not_objs - 1] = &bat.rb;
+
+    for (int i = 0; i < enemy_count; i++)
+    {
+        rbs[i + ground_count + 1] = &enemies[i].rb;
+    }
 
     while (!close_game)
     {
@@ -181,7 +190,22 @@ int main()
             Vector offset_camera = create_vector(-100, -200);
             camera = lerp(camera, sum(player.rb.pos, offset_camera), 0.9f);
 
-            atk(&bat, player.rb);
+            for (int i = 0; i < enemy_count; i++)
+            {
+                if (strcmp(enemies[i].rb.cb.tag, "bat") == 0)
+                {
+                    atk(&enemies[i], player.rb);
+
+                    if (enemies[i].animation_frame >= 0 && enemies[i].animation_frame <= 3)
+                    {
+                        if (game_timer % 4 == 0)
+                        {
+                            enemies[i].animation_frame++;
+                            enemies[i].animation_frame %= 4;
+                        }
+                    }
+                }
+            }
 
             if (player.animation_frame >= 0 && player.animation_frame <= 7)
             {
@@ -191,31 +215,28 @@ int main()
                     player.animation_frame %= 8;
                 }
             }
-            if (bat.animation_frame >= 0 && bat.animation_frame <= 3)
-            {
-                if (game_timer % 4 == 0)
-                {
-                    bat.animation_frame++;
-                    bat.animation_frame %= 4;
-                }
-            }
 
             counter--;
         }
 
         //DRAWING
-        draw_player(buffer, player_sprite, &player, camera);
-        draw_bat(buffer, bat_sprite, &bat, camera);
         draw_lifebar(buffer, lifebar_sprite, player);
 
         for (int i = 0; i < ground_count; i++)
         {
             draw_ground(buffer, ground_sprite, &grounds[i], camera);
-            rect(buffer, grounds[i].rb.cb.min.x - camera.x, grounds[i].rb.cb.min.y - camera.y, grounds[i].rb.cb.max.x - camera.x, grounds[i].rb.cb.max.y - camera.y, makecol(255, 0, 0));
         }
 
-        rect(buffer, player.rb.cb.min.x - camera.x, player.rb.cb.min.y - camera.y, player.rb.cb.max.x - camera.x, player.rb.cb.max.y - camera.y, makecol(255, 0, 0));
-        rect(buffer, bat.rb.cb.min.x - camera.x, bat.rb.cb.min.y - camera.y, bat.rb.cb.max.x - camera.x, bat.rb.cb.max.y - camera.y, makecol(255, 0, 0));
+        draw_player(buffer, player_sprite, &player, camera);
+
+        for (int i = 0; i < enemy_count; i++)
+        {
+            if (strcmp(enemies[i].rb.cb.tag, "bat") == 0)
+            {
+                draw_bat(buffer, bat_sprite, &enemies[i], camera);
+            }
+        }
+
         draw_sprite(screen, buffer, 0, 0);
         clear(buffer);
     }
@@ -327,5 +348,5 @@ void draw_lifebar(BITMAP *bmp, BITMAP *sprite, Player player)
     strcat(player_life, "%");
     rectfill(bmp, 74, 34, 74 + floor(57 * player.life / 100.0f), 49, makecol(255, 0, 0));
     draw_sprite(bmp, sprite, 10, 10);
-    textout_ex(bmp, font, player_life, 64+25, 38, makecol(255, 255, 0), -1);
+    textout_ex(bmp, font, player_life, 64 + 25, 38, makecol(255, 255, 0), -1);
 }

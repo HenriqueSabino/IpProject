@@ -41,7 +41,7 @@ void update_all(RigidBody *rbs[], int amount)
             if (collided(rbs[i]->cb, rbs[j]->cb))
             {
                 if (rbs[i]->cb.solid && rbs[j]->cb.solid)
-                {   
+                {
                     if (rbs_before_update[i].min.y >= rbs[j]->cb.max.y)
                     {
                         rbs[i]->pos.y = rbs_before_update[i].min.y - (rbs_before_update[i].min.y - rbs[j]->cb.max.y) - rbs_before_update[i].offset.y + 1;

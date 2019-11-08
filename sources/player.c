@@ -6,8 +6,6 @@
 
 Player *player_ref;
 
-
-
 void set_velocity_axis(Player *player, char *axis, float s)
 {
     if (!player_ref->taking_damage)
@@ -43,7 +41,7 @@ void onCollisionEnter(RigidBody *self, RigidBody *other)
         player_ref->life--;
         player_ref->taking_damage = 1;
 
-        if(other->pos.x > self->pos.x)
+        if (other->pos.x > self->pos.x)
         {
             player_ref->rb.velocity.x = -10;
             player_ref->rb.velocity.y = -5;
@@ -53,7 +51,6 @@ void onCollisionEnter(RigidBody *self, RigidBody *other)
             player_ref->rb.velocity.x = 10;
             player_ref->rb.velocity.y = -5;
         }
-
     }
 }
 
@@ -77,9 +74,6 @@ void onCollisionExit(RigidBody *self, RigidBody *other)
     {
         player_ref->can_jump = 0;
     }
-    // else if (strcmp(other->cb.tag, "bat") == 0){
-    //     player_ref->taking_damage = 0;
-    // }
 }
 
 void init_player(Player *player, Vector pos)
