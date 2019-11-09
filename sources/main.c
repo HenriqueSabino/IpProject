@@ -30,6 +30,8 @@ void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player, Vector camera);
 
 void draw_bat(BITMAP *bmp, BITMAP *sprite, Enemy *bat, Vector camera);
 
+void draw_fox(BITMAP *bmp, BITMAP *sprite, Enemy *fox, Vector camera);
+
 void draw_ground(BITMAP *bmp, BITMAP *sprite, Ground *ground, Vector camera);
 
 void draw_lifebar(BITMAP *bmp, BITMAP *sprite, Player player);
@@ -69,11 +71,17 @@ int main()
     if (bat_sprite == NULL)
         allegro_message("error");
 
+    BITMAP *fox_sprite = load_bitmap(FOX, NULL);
+    if (fox_sprite == NULL)
+        allegro_message("error");
+
     BITMAP *ground_sprite = load_bitmap(OVER_WORLD_GROUND, NULL);
     if (ground_sprite == NULL)
         allegro_message("error");
 
     BITMAP *lifebar_sprite = load_bitmap("../assets/Canvas/LifeBar.bmp", NULL);
+    if (lifebar_sprite == NULL)
+        allegro_message("error");
 
     int row = 0, col = 0, not_objs = 0, ground_count = 0, enemy_count = 0;
 
@@ -83,7 +91,7 @@ int main()
         {
             ground_count++;
         }
-        else if (map[i] == 'B')
+        else if (map[i] == 'B' || map[i] == 'F')
         {
             enemy_count++;
         }
@@ -106,6 +114,12 @@ int main()
         else if (map[i] == 'B')
         {
             init_bat(&enemies[enemy_count], create_vector(col * 128, row * 128));
+            enemy_count++;
+            col++;
+        }
+        else if (map[i] == 'F')
+        {
+            init_fox(&enemies[enemy_count], create_vector(col * 128, row * 128));
             enemy_count++;
             col++;
         }
@@ -235,6 +249,10 @@ int main()
             {
                 draw_bat(buffer, bat_sprite, &enemies[i], camera);
             }
+            else if (strcmp(enemies[i].rb.cb.tag, "fox") == 0)
+            {
+                draw_fox(buffer, fox_sprite, &enemies[i], camera);
+            }
         }
 
         draw_sprite(screen, buffer, 0, 0);
@@ -245,6 +263,7 @@ int main()
     destroy_bitmap(buffer);
     destroy_bitmap(player_sprite);
     destroy_bitmap(bat_sprite);
+    destroy_bitmap(fox_sprite);
     destroy_bitmap(ground_sprite);
 
     for (int i = 0; i < map_size - not_objs; i++)
@@ -279,8 +298,8 @@ void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player, Vector camera)
     int r_img_pos = player->animation_frame % PLAYER_SPRITE_COLS;
     int c_img_pos = player->animation_frame / PLAYER_SPRITE_COLS;
 
-    r_img_pos *= PLAYER_TILE_SIZE + PLAYER_SPRITESHEET_OFFSET;
-    c_img_pos *= PLAYER_TILE_SIZE + PLAYER_SPRITESHEET_OFFSET;
+    r_img_pos *= PLAYER_TILE_SIZE;
+    c_img_pos *= PLAYER_TILE_SIZE;
 
     //draw the a part of the sprite sheet to the screen and scales it
     masked_stretch_blit(sprite, player_sprite, r_img_pos, c_img_pos, 50, 50, 0, 0, 128, 128);
@@ -305,8 +324,8 @@ void draw_bat(BITMAP *bmp, BITMAP *sprite, Enemy *bat, Vector camera)
     int r_img_pos = bat->animation_frame % BAT_SPRITE_COLS;
     int c_img_pos = bat->animation_frame / BAT_SPRITE_COLS;
 
-    r_img_pos *= BAT_TILE_SIZE + BAT_SPRITESHEET_OFFSET;
-    c_img_pos *= BAT_TILE_SIZE + BAT_SPRITESHEET_OFFSET;
+    r_img_pos *= BAT_TILE_SIZE;
+    c_img_pos *= BAT_TILE_SIZE;
 
     //draw the a part of the sprite sheet to the screen and scales it
     masked_stretch_blit(sprite, bat_sprite, r_img_pos, c_img_pos, 32, 32, 0, 0, 64, 64);
@@ -322,6 +341,33 @@ void draw_bat(BITMAP *bmp, BITMAP *sprite, Enemy *bat, Vector camera)
     destroy_bitmap(bat_sprite);
 }
 
+void draw_fox(BITMAP *bmp, BITMAP *sprite, Enemy *fox, Vector camera)
+{
+    BITMAP *fox_sprite = create_bitmap(96, 96);
+    clear_to_color(fox_sprite, makecol(255, 0, 255));
+
+    //rect(bmp, fox->rb.cb.min.x - camera.x, fox->rb.cb.min.y - camera.y, fox->rb.cb.max.x - camera.x, fox->rb.cb.max.y - camera.y, makecol(255,0,0));
+
+    int r_img_pos = fox->animation_frame % FOX_SPRITE_COLS;
+    int c_img_pos = fox->animation_frame / FOX_SPRITE_COLS;
+
+    r_img_pos *= FOX_TILE_SIZE;
+    c_img_pos *= FOX_TILE_SIZE;
+
+    //draw the a part of the sprite sheet to the screen and scales it
+    masked_stretch_blit(sprite, fox_sprite, r_img_pos, c_img_pos, 32, 32, 0, 0, 96, 96);
+
+    if (fox->facing_right)
+    {
+        draw_sprite_ex(bmp, fox_sprite, fox->rb.pos.x - camera.x, fox->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+    }
+    else
+    {
+        draw_sprite_ex(bmp, fox_sprite, fox->rb.pos.x - camera.x, fox->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
+    }
+    destroy_bitmap(fox_sprite);
+}
+
 void draw_ground(BITMAP *bmp, BITMAP *sprite, Ground *ground, Vector camera)
 {
     BITMAP *ground_sprite = create_bitmap(128, 128);
@@ -330,8 +376,8 @@ void draw_ground(BITMAP *bmp, BITMAP *sprite, Ground *ground, Vector camera)
     int r_img_pos = ground->animation_frame % GROUND_SPRITE_COLS;
     int c_img_pos = ground->animation_frame / GROUND_SPRITE_COLS;
 
-    r_img_pos *= GROUND_TILE_SIZE + GROUND_SPRITESHEET_OFFSET;
-    c_img_pos *= GROUND_TILE_SIZE + GROUND_SPRITESHEET_OFFSET;
+    r_img_pos *= GROUND_TILE_SIZE;
+    c_img_pos *= GROUND_TILE_SIZE;
 
     //draw the a part of the sprite sheet to the screen and scales it
     masked_stretch_blit(sprite, ground_sprite, r_img_pos, c_img_pos, 32, 32, 0, 0, 128, 128);

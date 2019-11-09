@@ -28,6 +28,54 @@ void init_bat(Enemy *bat, Vector pos)
     strcpy(bat->rb.cb.tag, "bat");
 }
 
+void onCollisionEnter_fox(RigidBody *self, RigidBody *other)
+{
+    if (strcmp(other->cb.tag, "ground") == 0)
+    {
+        if (self->cb.max.y < other->cb.min.y || self->cb.min.y > other->cb.max.y)
+        {
+            self->velocity.y = 0;
+            self->acceleration = create_vector(0, 0);
+        }
+    }
+}
+
+void onCollisionStay_fox(RigidBody *self, RigidBody *other)
+{
+    if (strcmp(other->cb.tag, "ground") == 0)
+    {
+        if (self->cb.max.y < other->cb.min.y || self->cb.min.y > other->cb.max.y)
+        {
+            self->velocity.y = 0;
+            self->acceleration = create_vector(0, 0);
+        }
+    }
+}
+
+void init_fox(Enemy *fox, Vector pos)
+{
+    fox->animation_frame = 0;
+    fox->facing_right = 1;
+    fox->player_pos = create_vector(0, 0);
+
+    fox->rb.acceleration = create_vector(0, 0);
+    fox->rb.gravity_scale = 0.1f;
+    fox->rb.pos = pos;
+    fox->rb.velocity = create_vector(0, 0);
+
+    fox->rb.cb.width = 90;
+    fox->rb.cb.height = 45;
+    fox->rb.cb.offset = create_vector(0, 51);
+    fox->rb.cb.min = create_vector(fox->rb.pos.x + fox->rb.cb.offset.x, fox->rb.pos.y + fox->rb.cb.offset.y);
+    fox->rb.cb.max = create_vector(fox->rb.cb.min.x + fox->rb.cb.width, fox->rb.cb.min.y + fox->rb.cb.height);
+    fox->rb.cb.solid = 1;
+    fox->rb.collidingWith = createList();
+    fox->rb.onCollisionEnter = onCollisionEnter_fox;
+    fox->rb.onCollisionExit = NULL;
+    fox->rb.onCollisionStay = onCollisionStay_fox;
+    strcpy(fox->rb.cb.tag, "fox");
+}
+
 void atk(Enemy *enemy, RigidBody player)
 {
     Vector player_pos = mult(sum(player.cb.min, player.cb.max), 0.5f);
