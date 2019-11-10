@@ -36,7 +36,7 @@ void onCollisionEnter(RigidBody *self, RigidBody *other)
             self->acceleration = create_vector(0, 0);
         }
     }
-    if (strcmp(other->cb.tag, "bat") == 0)
+    if (strcmp(other->cb.tag, "bat") == 0 || strcmp(other->cb.tag, "fox") == 0 && player_ref->taking_damage == 0)
     {
         player_ref->life--;
         player_ref->taking_damage = 1;

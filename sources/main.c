@@ -206,7 +206,7 @@ int main()
 
             for (int i = 0; i < enemy_count; i++)
             {
-                if (strcmp(enemies[i].rb.cb.tag, "bat") == 0)
+                if (strcmp(enemies[i].rb.cb.tag, "bat") == 0 || strcmp(enemies[i].rb.cb.tag, "fox") == 0)
                 {
                     atk(&enemies[i], player.rb);
 
@@ -304,13 +304,29 @@ void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player, Vector camera)
     //draw the a part of the sprite sheet to the screen and scales it
     masked_stretch_blit(sprite, player_sprite, r_img_pos, c_img_pos, 50, 50, 0, 0, 128, 128);
 
+    set_trans_blender(255, 255, 255, 128);
+
     if (player->facing_right)
     {
-        draw_sprite_ex(bmp, player_sprite, player->rb.pos.x - camera.x, player->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+        if(player->taking_damage == 1)
+        {
+            draw_sprite_ex(bmp, player_sprite, player->rb.pos.x - camera.x, player->rb.pos.y - camera.y, DRAW_SPRITE_TRANS, DRAW_SPRITE_NO_FLIP);  
+        }
+        else
+        {
+            draw_sprite_ex(bmp, player_sprite, player->rb.pos.x - camera.x, player->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+        }
     }
     else
     {
-        draw_sprite_ex(bmp, player_sprite, player->rb.pos.x - camera.x, player->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
+        if(player->taking_damage == 1)
+        {
+            draw_sprite_ex(bmp, player_sprite, player->rb.pos.x - camera.x, player->rb.pos.y - camera.y, DRAW_SPRITE_TRANS, DRAW_SPRITE_H_FLIP);  
+        }
+        else
+        {
+            draw_sprite_ex(bmp, player_sprite, player->rb.pos.x - camera.x, player->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
+        }
     }
 
     destroy_bitmap(player_sprite);

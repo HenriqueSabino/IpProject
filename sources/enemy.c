@@ -38,6 +38,17 @@ void onCollisionEnter_fox(RigidBody *self, RigidBody *other)
             self->acceleration = create_vector(0, 0);
         }
     }
+    if (strcmp(other->cb.tag, "player") == 0)
+    {
+        if (other->pos.x > self->pos.x)
+        {
+            self->velocity.x = -10;
+        }
+        else
+        {
+            self->velocity.x = 10;
+        }
+    }
 }
 
 void onCollisionStay_fox(RigidBody *self, RigidBody *other)
@@ -90,17 +101,38 @@ void atk(Enemy *enemy, RigidBody player)
         enemy->facing_right = 1;
     }
 
-    if (dist(create_vector(enemy_pos.x, 0), create_vector(player_pos.x, 0)) <= 100)
+    if(strcmp(enemy->rb.cb.tag, "bat") == 0)
     {
-        enemy->rb.acceleration = create_vector(0, 0);
-    }
-    else if (dist(enemy->rb.pos, player_pos) <= 400)
-    {
-        if (dist(enemy_pos, sum(player_pos, enemy->player_pos)) <= 10)
+        if (dist(create_vector(enemy_pos.x, 0), create_vector(player_pos.x, 0)) <= 100)
         {
-            enemy->player_pos.x *= -1;
-            enemy->rb.acceleration = mult(normalized(diff(player_pos, enemy_pos)), 15);
+            enemy->rb.acceleration = create_vector(0, 0);
         }
-        enemy->rb.velocity = mult(normalized(diff(sum(player_pos, enemy->player_pos), enemy_pos)), 5);
+        else if (dist(enemy->rb.pos, player_pos) <= 400)
+        {
+            if (dist(enemy_pos, sum(player_pos, enemy->player_pos)) <= 10)
+            {
+                enemy->player_pos.x *= -1;
+                enemy->rb.acceleration = mult(normalized(diff(player_pos, enemy_pos)), 15);
+            }
+            enemy->rb.velocity = mult(normalized(diff(sum(player_pos, enemy->player_pos), enemy_pos)), 5);
+        }
+    }
+    else if(strcmp(enemy->rb.cb.tag, "fox") == 0)
+    {
+        if (dist(create_vector(enemy_pos.x, 0), create_vector(player_pos.x, 0)) <= 100)
+        {
+            enemy->rb.acceleration = create_vector(0, 0);
+        }
+        else if (dist(enemy->rb.pos, player_pos) <= 400)
+        {
+            if (dist(enemy_pos, sum(player_pos, enemy->player_pos)) <= 10)
+            {
+                enemy->player_pos.x *= -1;
+                enemy->rb.acceleration = mult(normalized(diff(player_pos, enemy_pos)), 20);
+                enemy->rb.acceleration.y = 0;
+            }
+            enemy->rb.velocity = mult(normalized(diff(sum(player_pos, enemy->player_pos), enemy_pos)), 5);
+            enemy->rb.velocity.y = 0;
+        }
     }
 }
