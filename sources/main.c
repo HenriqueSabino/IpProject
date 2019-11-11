@@ -45,7 +45,7 @@ int main()
     install_keyboard();
     install_timer();
     set_color_depth(desktop_color_depth());
-    set_gfx_mode(GFX_AUTODETECT_WINDOWED, 600, 400, 0, 0);
+    set_gfx_mode(GFX_AUTODETECT_WINDOWED, 64 * 16, 64 * 9, 0, 0);
 
     LOCK_VARIABLE(close_game);
     LOCK_FUNCTION(close_program);
@@ -308,9 +308,9 @@ void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player, Vector camera)
 
     if (player->facing_right)
     {
-        if(player->taking_damage == 1)
+        if (player->taking_damage == 1)
         {
-            draw_sprite_ex(bmp, player_sprite, player->rb.pos.x - camera.x, player->rb.pos.y - camera.y, DRAW_SPRITE_TRANS, DRAW_SPRITE_NO_FLIP);  
+            draw_sprite_ex(bmp, player_sprite, player->rb.pos.x - camera.x, player->rb.pos.y - camera.y, DRAW_SPRITE_TRANS, DRAW_SPRITE_NO_FLIP);
         }
         else
         {
@@ -319,9 +319,9 @@ void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player, Vector camera)
     }
     else
     {
-        if(player->taking_damage == 1)
+        if (player->taking_damage == 1)
         {
-            draw_sprite_ex(bmp, player_sprite, player->rb.pos.x - camera.x, player->rb.pos.y - camera.y, DRAW_SPRITE_TRANS, DRAW_SPRITE_H_FLIP);  
+            draw_sprite_ex(bmp, player_sprite, player->rb.pos.x - camera.x, player->rb.pos.y - camera.y, DRAW_SPRITE_TRANS, DRAW_SPRITE_H_FLIP);
         }
         else
         {
