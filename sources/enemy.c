@@ -38,7 +38,7 @@ void onCollisionEnter_fox(RigidBody *self, RigidBody *other)
             self->acceleration = create_vector(0, 0);
         }
     }
-    if (strcmp(other->cb.tag, "player") == 0)
+    /*if (strcmp(other->cb.tag, "player") == 0)
     {
         if (other->pos.x > self->pos.x)
         {
@@ -48,7 +48,7 @@ void onCollisionEnter_fox(RigidBody *self, RigidBody *other)
         {
             self->velocity.x = 10;
         }
-    }
+    }*/
 }
 
 void onCollisionStay_fox(RigidBody *self, RigidBody *other)

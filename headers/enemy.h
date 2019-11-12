@@ -11,7 +11,7 @@ typedef struct enemy
 {
     RigidBody rb;
     Vector player_pos;
-    int animation_frame, facing_right, live, atack;
+    int animation_frame, facing_right, live, attack;
 } Enemy;
 
 void init_bat(Enemy *enemy, Vector pos);

@@ -40,7 +40,7 @@ void update_all(RigidBody *rbs[], int amount)
 
             if (collided(rbs[i]->cb, rbs[j]->cb))
             {
-                if (rbs[i]->cb.solid && rbs[j]->cb.solid)
+                if (rbs[i]->cb.solid && rbs[j]->cb.solid && strcmp(rbs[j]->cb.tag, "fox") != 0)
                 {
                     if (rbs_before_update[i].min.y >= rbs[j]->cb.max.y)
                     {
@@ -68,9 +68,9 @@ void update_all(RigidBody *rbs[], int amount)
                 int index = indexof(rbs[i]->collidingWith, other_cb);
                 if (index != -1)
                 {
+                    remove_at(rbs[i]->collidingWith, index);
                     if (rbs[i]->onCollisionExit != NULL)
                     {
-                        remove_at(rbs[i]->collidingWith, index);
                         (rbs[i]->onCollisionExit)(rbs[i], rbs[j]);
                     }
                 }
@@ -99,9 +99,9 @@ void update_all(RigidBody *rbs[], int amount)
                 }
                 else
                 {
+                    push(rbs[i]->collidingWith, other_cb);
                     if (rbs[i]->onCollisionEnter != NULL)
                     {
-                        push(rbs[i]->collidingWith, other_cb);
                         (rbs[i]->onCollisionEnter)(rbs[i], rbs[j]);
                     }
                 }
