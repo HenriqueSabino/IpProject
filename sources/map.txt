@@ -4,7 +4,7 @@
 
 ************
 P***102**F12
-1000A59000A3
+1000a59000a3
 455555555553
 
 
@@ -24,6 +24,6 @@ F => fox
 7 => ground sprite 7
 8 => ground sprite 8
 9 => ground sprite 9
-A => ground sprite 10
-B => ground sprite 11
-C => ground sprite 12
+a => ground sprite 10
+b => ground sprite 11
+c => ground sprite 12

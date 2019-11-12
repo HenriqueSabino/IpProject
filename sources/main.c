@@ -90,7 +90,7 @@ int main()
     {
         if (map[i] == '0' || map[i] == '1' || map[i] == '2' || map[i] == '3' || map[i] == '4' ||
             map[i] == '5' || map[i] == '6' || map[i] == '7' || map[i] == '8' || map[i] == '9' ||
-            map[i] == 'A' || map[i] == 'B' || map[i] == 'C')
+            map[i] == 'a' || map[i] == 'b' || map[i] == 'c')
         {
             ground_count++;
         }
@@ -187,19 +187,19 @@ int main()
             ground_count++;
             col++;
         }
-        else if (map[i] == 'A')
+        else if (map[i] == 'a')
         {
             init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 10);
             ground_count++;
             col++;
         }
-        else if (map[i] == 'B')
+        else if (map[i] == 'b')
         {
             init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 11);
             ground_count++;
             col++;
         }
-        else if (map[i] == 'C')
+        else if (map[i] == 'c')
         {
             init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 12);
             ground_count++;
