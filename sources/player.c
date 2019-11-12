@@ -81,6 +81,7 @@ void init_player(Player *player, Vector pos)
     player->animation_frame = 8;
     player->facing_right = 1;
     player->taking_damage = 0;
+    player->attacking = 0;
     player->life = 100;
 
     player->rb.acceleration = create_vector(0, 0);

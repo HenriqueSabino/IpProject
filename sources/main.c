@@ -194,6 +194,11 @@ int main()
             set_velocity_axis(&player, "horizontal", 0);
         }
 
+        if (key_down(KEY_F))
+        {
+            player.attacking = 1;
+        }
+
         //UPDATE
 
         while (counter > 0)
@@ -228,6 +233,23 @@ int main()
                     player.animation_frame++;
                     player.animation_frame %= 8;
                 }
+            }
+
+            if (player.animation_frame >= 12 && player.animation_frame <= 17)
+            {
+                if (game_timer % 2 == 0)
+                {
+                    player.animation_frame++;
+                    if (12 + player.animation_frame % 6 != 12)
+                    {
+                        player.animation_frame = 12 + player.animation_frame % 6;
+                    }
+                    else
+                    {
+                        player.animation_frame = 8;
+                        player.attacking = 0;
+                    }                    
+                }            
             }
 
             counter--;
@@ -285,9 +307,21 @@ void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player, Vector camera)
     {
         player->animation_frame = 0;
     }
-    else if (player->rb.velocity.x == 0)
+    else if (player->rb.velocity.x == 0 && player->attacking == 0)
     {
         player->animation_frame = 8;
+    }
+    else if (player->rb.velocity.x == 0 && player->attacking != 0)
+    {
+        if (player->animation_frame < 12)
+        {
+            player->animation_frame = 12;
+        }
+
+        if (player->animation_frame < 17)
+        {
+            player->attacking = 1;
+        }
     }
 
     if (!player->can_jump || player->rb.velocity.y != 0)
