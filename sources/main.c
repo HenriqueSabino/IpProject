@@ -9,6 +9,7 @@
 #include "../headers/list.h"
 #include "../headers/ground.h"
 #include "../headers/scenegeneration.h"
+#include "../headers/menu.h"
 
 volatile int close_game = FALSE;
 void close_program()
