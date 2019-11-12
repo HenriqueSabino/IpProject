@@ -1,6 +1,7 @@
 #include <allegro.h>
 #include <string.h>
 #include "../headers/enemy.h"
+#include "../headers/collisionbox.h"
 #include "../headers/vector.h"
 #include "../headers/list.h"
 
@@ -38,17 +39,6 @@ void onCollisionEnter_fox(RigidBody *self, RigidBody *other)
             self->acceleration = create_vector(0, 0);
         }
     }
-    /*if (strcmp(other->cb.tag, "player") == 0)
-    {
-        if (other->pos.x > self->pos.x)
-        {
-            self->velocity.x = -10;
-        }
-        else
-        {
-            self->velocity.x = 10;
-        }
-    }*/
 }
 
 void onCollisionStay_fox(RigidBody *self, RigidBody *other)
@@ -68,11 +58,12 @@ void init_fox(Enemy *fox, Vector pos)
     fox->animation_frame = 0;
     fox->facing_right = 1;
     fox->player_pos = create_vector(0, 0);
+    fox->attack = 0;
 
     fox->rb.acceleration = create_vector(0, 0);
     fox->rb.gravity_scale = 0.1f;
     fox->rb.pos = pos;
-    fox->rb.velocity = create_vector(0, 0);
+    fox->rb.velocity = create_vector(-5, 0);
 
     fox->rb.cb.width = 90;
     fox->rb.cb.height = 45;

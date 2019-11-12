@@ -8,10 +8,13 @@
 typedef struct player
 {
     RigidBody rb;
-    int animation_frame, facing_right, can_jump, life, taking_damage, attacking;
+    int animation_frame, facing_right, can_jump, life, taking_damage, attacking, invulnerability;
 } Player;
 
+void increment_invulnerability();
+void init_timer_invulnerability();
 void init_player(Player *player, Vector pos);
 void set_velocity_axis(Player *player, char *axis, float s);
+
 
 #endif // !"PLAYER_H"

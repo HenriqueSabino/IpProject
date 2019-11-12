@@ -1,10 +1,31 @@
 #include <allegro.h>
 #include <string.h>
-#include <stdio.h>
 #include "../headers/player.h"
 #include "../headers/vector.h"
 
 Player *player_ref;
+
+volatile int timer_invulnerability = 0;
+
+void increment_invulnerability()
+{
+    timer_invulnerability++;
+    player_ref->invulnerability = 1;
+
+    if(timer_invulnerability > 3)
+    {
+        player_ref->invulnerability = 0;
+    }
+}
+
+void init_timer_invulnerability()
+{
+    timer_invulnerability = 3;
+    install_int_ex(increment_invulnerability , SECS_TO_TIMER(1));
+}
+END_OF_FUNCTION(increment_invulnerability);
+
+LOCK_FUNCTION(increment_invulnerability);
 
 void set_velocity_axis(Player *player, char *axis, float s)
 {
@@ -36,7 +57,7 @@ void onCollisionEnter(RigidBody *self, RigidBody *other)
             self->acceleration = create_vector(0, 0);
         }
     }
-    if (strcmp(other->cb.tag, "bat") == 0 || strcmp(other->cb.tag, "fox") == 0 && player_ref->taking_damage == 0)
+    if ((strcmp(other->cb.tag, "bat") == 0 || strcmp(other->cb.tag, "fox") == 0) && player_ref->invulnerability == 0)
     {
         player_ref->life--;
         player_ref->taking_damage = 1;
@@ -50,6 +71,12 @@ void onCollisionEnter(RigidBody *self, RigidBody *other)
         {
             player_ref->rb.velocity.x = 10;
             player_ref->rb.velocity.y = -5;
+        }
+
+        if(player_ref->taking_damage == 1)
+        {
+            timer_invulnerability = 0;
+            increment_invulnerability();
         }
     }
 }
@@ -83,6 +110,7 @@ void init_player(Player *player, Vector pos)
     player->taking_damage = 0;
     player->attacking = 0;
     player->life = 100;
+    player->invulnerability = 0;
 
     player->rb.acceleration = create_vector(0, 0);
     player->rb.gravity_scale = 0.1f;

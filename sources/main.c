@@ -109,6 +109,7 @@ int main()
         if (map[i] == 'P')
         {
             init_player(&player, create_vector(col * 128, row * 128));
+            init_timer_invulnerability();
             camera = sum(player.rb.pos, create_vector(-100, -200));
             col++;
         }
@@ -158,7 +159,7 @@ int main()
     while (!close_game)
     {
 
-        if (player.life <= 0)
+        if (player.life <= 0 || player.rb.pos.y >= 1000)
         {
             close_program();
             break;
@@ -226,7 +227,7 @@ int main()
                     }
                 }
             }
-
+            
             if (player.animation_frame >= 0 && player.animation_frame <= 7)
             {
                 if (game_timer % 4 == 0)
@@ -339,13 +340,20 @@ void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player, Vector camera)
     //draw the a part of the sprite sheet to the screen and scales it
     masked_stretch_blit(sprite, player_sprite, r_img_pos, c_img_pos, 50, 50, 0, 0, 128, 128);
 
-    set_trans_blender(255, 255, 255, 128);
+    set_trans_blender(255, 255, 255, 64);
 
     if (player->facing_right)
     {
-        if (player->taking_damage == 1)
+        if (player->invulnerability == 1)
         {
-            draw_sprite_ex(bmp, player_sprite, player->rb.pos.x - camera.x, player->rb.pos.y - camera.y, DRAW_SPRITE_TRANS, DRAW_SPRITE_NO_FLIP);
+            if(game_timer % 2 == 0)
+            {
+                draw_sprite_ex(bmp, player_sprite, player->rb.pos.x - camera.x, player->rb.pos.y - camera.y, DRAW_SPRITE_TRANS, DRAW_SPRITE_NO_FLIP);
+            }
+            else
+            {
+                draw_sprite_ex(bmp, player_sprite, player->rb.pos.x - camera.x, player->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+            }
         }
         else
         {
@@ -354,9 +362,16 @@ void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player, Vector camera)
     }
     else
     {
-        if (player->taking_damage == 1)
+        if (player->invulnerability == 1)
         {
-            draw_sprite_ex(bmp, player_sprite, player->rb.pos.x - camera.x, player->rb.pos.y - camera.y, DRAW_SPRITE_TRANS, DRAW_SPRITE_H_FLIP);
+            if(game_timer % 4 == 0)
+            {
+                draw_sprite_ex(bmp, player_sprite, player->rb.pos.x - camera.x, player->rb.pos.y - camera.y, DRAW_SPRITE_TRANS, DRAW_SPRITE_H_FLIP);
+            }
+            else
+            {
+                draw_sprite_ex(bmp, player_sprite, player->rb.pos.x - camera.x, player->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
+            }
         }
         else
         {
