@@ -245,14 +245,14 @@ int main()
         {
             close_program();
         }
-        if ((key_down(KEY_W) || key_down(KEY_SPACE)))
+        if (key_down(KEY_W) || key_down(KEY_SPACE))
         {
             if (player.can_jump)
             {
                 set_velocity_axis(&player, "vertical", -20);
             }
         }
-        if (key_holding(KEY_A) || key_holding(KEY_D))
+        if ((key_holding(KEY_A) || key_holding(KEY_D)) && player.attacking == 0)
         {
             if (key_holding(KEY_A))
             {
