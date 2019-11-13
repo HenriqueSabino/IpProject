@@ -298,14 +298,21 @@ int main()
                 if (strcmp(enemies[i].rb.cb.tag, "bat") == 0 || strcmp(enemies[i].rb.cb.tag, "fox") == 0)
                 {
                     atk(&enemies[i], player.rb);
-
-                    if (enemies[i].animation_frame >= 0 && enemies[i].animation_frame <= 3)
+                    
+                    if(!enemies[i].taking_damage)
                     {
-                        if (game_timer % 4 == 0)
+                        if (enemies[i].animation_frame >= 0 && enemies[i].animation_frame <= 3)
                         {
-                            enemies[i].animation_frame++;
-                            enemies[i].animation_frame %= 4;
+                            if (game_timer % 4 == 0)
+                            {
+                                enemies[i].animation_frame++;
+                                enemies[i].animation_frame %= 4;
+                            }
                         }
+                    }
+                    else
+                    {
+                        enemies[i].animation_frame = 0;
                     }
                 }
             }

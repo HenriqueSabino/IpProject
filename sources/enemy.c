@@ -43,7 +43,8 @@ void onCollisionEnter_fox(RigidBody *self, RigidBody *other)
             self->velocity.y = 0;
             self->acceleration = create_vector(0, 0);
 
-            for (int i = 0; i < enemies_ref_count; i++){
+            for (int i = 0; i < enemies_ref_count; i++)
+            {
                 if (&enemies_ref[i].rb == self)
                 {
                     enemies_ref[i].taking_damage = 0;    
@@ -53,12 +54,13 @@ void onCollisionEnter_fox(RigidBody *self, RigidBody *other)
     }
     if (strcmp(other->cb.tag, "sword") == 0)
     {
-        for (int i = 0; i < enemies_ref_count; i++){
+        for (int i = 0; i < enemies_ref_count; i++)
+        {
                 if (&enemies_ref[i].rb == self)
                 {
                     enemies_ref[i].taking_damage = 1;    
                 }
-            }
+        }
 
         if (other->pos.x > self->pos.x)
         {
@@ -82,7 +84,8 @@ void onCollisionStay_fox(RigidBody *self, RigidBody *other)
             self->velocity.y = 0;
             self->acceleration = create_vector(0, 0);
 
-            for (int i = 0; i < enemies_ref_count; i++){
+            for (int i = 0; i < enemies_ref_count; i++)
+            {
                 if (&enemies_ref[i].rb == self)
                 {
                     enemies_ref[i].taking_damage = 0;    
@@ -149,7 +152,7 @@ void atk(Enemy *enemy, RigidBody player)
             enemy->rb.velocity = mult(normalized(diff(sum(player_pos, enemy->player_pos), enemy_pos)), 5);
         }
     }
-    else if (strcmp(enemy->rb.cb.tag, "fox") == 0 && enemy->taking_damage == 0)
+    else if (strcmp(enemy->rb.cb.tag, "fox") == 0 && enemy->taking_damage == 0 && enemy->rb.velocity.y == 0)
     {
         if (dist(create_vector(enemy_pos.x, 0), create_vector(player_pos.x, 0)) <= 100)
         {
@@ -157,13 +160,17 @@ void atk(Enemy *enemy, RigidBody player)
         }
         else if (dist(enemy->rb.pos, player_pos) <= 400)
         {
-            if (dist(enemy_pos, sum(player_pos, enemy->player_pos)) <= 10)
+            if (player_pos.x > enemy_pos.x)
             {
-                enemy->player_pos.x *= -1;
-                enemy->rb.acceleration = mult(normalized(diff(player_pos, enemy_pos)), 20);
+                enemy->rb.velocity.x = 5;
                 enemy->rb.acceleration.y = 0;
             }
-            enemy->rb.velocity = mult(normalized(diff(sum(player_pos, enemy->player_pos), enemy_pos)), 5);
+            else
+            {
+                enemy->rb.velocity.x = -5;
+                enemy->rb.acceleration.y = 0;
+            }
+            enemy->rb.acceleration.y = 0;
             enemy->rb.velocity.y = 0;
         }
     }
