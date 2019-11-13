@@ -38,9 +38,9 @@ void update_all(RigidBody *rbs[], int amount)
             DataNode other_cb;
             other_cb.value = &rbs[j]->cb;
 
-            if (collided(rbs[i]->cb, rbs[j]->cb))
+            if (collided(rbs[i]->cb, rbs[j]->cb)  && rbs[i]->cb.enabled && rbs[j]->cb.enabled)
             {
-                if (rbs[i]->cb.solid && rbs[j]->cb.solid && rbs[i]->cb.enabled && rbs[j]->cb.enabled && strcmp(rbs[j]->cb.tag, "fox") != 0)
+                if (rbs[i]->cb.solid && rbs[j]->cb.solid && strcmp(rbs[j]->cb.tag, "fox") != 0)
                 {
                     if (rbs_before_update[i].min.y >= rbs[j]->cb.max.y)
                     {
@@ -88,7 +88,7 @@ void update_all(RigidBody *rbs[], int amount)
             DataNode other_cb;
             other_cb.value = &rbs[j]->cb;
 
-            if (collided(rbs_after_update[i], rbs_after_update[j]))
+            if (collided(rbs_after_update[i], rbs_after_update[j])  && rbs[i]->cb.enabled && rbs[j]->cb.enabled)
             {
                 if (indexof(rbs[i]->collidingWith, other_cb) != -1)
                 {

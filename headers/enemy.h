@@ -11,11 +11,12 @@ typedef struct enemy
 {
     RigidBody rb;
     Vector player_pos;
-    int animation_frame, facing_right, live, attack;
+    int animation_frame, facing_right, live, attack, taking_damage;
 } Enemy;
 
 void init_bat(Enemy *enemy, Vector pos);
 void init_fox(Enemy *enemy, Vector pos);
 void atk(Enemy *enemy, RigidBody pos);
+void set_enemies_ref(Enemy *enemies, int count);
 
 #endif // !"ENEMY_H"

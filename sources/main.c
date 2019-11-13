@@ -104,6 +104,7 @@ int main()
     ground_count = 0;
 
     Enemy enemies[enemy_count];
+
     enemy_count = 0;
 
     for (int i = 0; i < map_size; i++)
@@ -218,7 +219,9 @@ int main()
         }
     }
 
-    RigidBody *rbs[map_size - not_objs];
+
+    int rbs_size = map_size - not_objs + 1;
+    RigidBody *rbs[rbs_size];
     rbs[0] = &player.rb;
     for (int i = 0; i < ground_count; i++)
     {
@@ -229,6 +232,10 @@ int main()
     {
         rbs[i + ground_count + 1] = &enemies[i].rb;
     }
+
+    set_enemies_ref(enemies, enemy_count);
+
+    rbs[rbs_size - 1] = &player.sword_rb;
 
     while (!close_game)
     {
@@ -272,14 +279,15 @@ int main()
 
         if (key_down(KEY_F))
         {
-            player.attacking = 1;
+            if(!player.taking_damage)
+                player.attacking = 1;
         }
 
         //UPDATE
 
         while (counter > 0)
         {
-            update_all(rbs, map_size - not_objs);
+            update_all(rbs, rbs_size);
 
             //linear interpolation between camera and player's position
             Vector offset_camera = create_vector(-100, -200);
@@ -324,6 +332,7 @@ int main()
                     {
                         player.animation_frame = 8;
                         player.attacking = 0;
+                        player.sword_rb.cb.enabled = 0;
                     }
                 }
             }
@@ -363,7 +372,7 @@ int main()
     destroy_bitmap(fox_sprite);
     destroy_bitmap(ground_sprite);
 
-    for (int i = 0; i < map_size - not_objs; i++)
+    for (int i = 0; i < rbs_size; i++)
     {
         destroy_list(rbs[i]->collidingWith);
     }
@@ -374,6 +383,8 @@ END_OF_MAIN();
 
 void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player, Vector camera)
 {
+    if(player->sword_rb.cb.enabled == 1)
+        rect(bmp, player->sword_rb.cb.min.x - camera.x, player->sword_rb.cb.min.y - camera.y, player->sword_rb.cb.max.x - camera.x, player->sword_rb.cb.max.y - camera.y, makecol(255,0,0));
 
     BITMAP *player_sprite = create_bitmap(128, 128);
     clear_to_color(player_sprite, makecol(255, 0, 255));
@@ -396,6 +407,8 @@ void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player, Vector camera)
         if (player->animation_frame < 17)
         {
             player->attacking = 1;
+            if (player->animation_frame >= 16)
+                player->sword_rb.cb.enabled = 1;
         }
     }
 
@@ -413,6 +426,8 @@ void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player, Vector camera)
         if (player->animation_frame < 17)
         {
             player->attacking = 1;
+            if (player->animation_frame >= 16)
+                player->sword_rb.cb.enabled = 1;
         }
     }
 

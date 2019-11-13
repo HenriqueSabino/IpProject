@@ -34,10 +34,20 @@ void set_velocity_axis(Player *player, char *axis, float s)
         if (strcmp(axis, "horizontal") == 0)
         {
             player->rb.velocity.x = s;
+
+            if(player_ref->facing_right == 1)
+                player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(60, 28));
+            else
+                player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(-9, 28));
         }
         else if (strcmp(axis, "vertical") == 0)
         {
             player->rb.velocity.y = s;
+
+            if(player_ref->facing_right == 1)
+                player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(60, 28));
+            else
+                player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(-9, 28));
         }
     }
 }
@@ -52,25 +62,46 @@ void onCollisionEnter(RigidBody *self, RigidBody *other)
             {
                 player_ref->can_jump = 1;
             }
-            self->velocity.y = 0;
+            player_ref->rb.velocity.y = 0;
+            player_ref->rb.acceleration = create_vector(0, 0);
+
+            if(player_ref->facing_right == 1)
+                player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(60, 28));
+            else
+                player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(-9, 28));
+
             player_ref->taking_damage = 0;
-            self->acceleration = create_vector(0, 0);
         }
     }
     if ((strcmp(other->cb.tag, "bat") == 0 || strcmp(other->cb.tag, "fox") == 0) && player_ref->invulnerability == 0)
     {
         player_ref->life--;
         player_ref->taking_damage = 1;
+        
+        if(player_ref->facing_right == 1)
+            player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(60, 28));
+        else
+            player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(-9, 28));
 
         if (other->pos.x > self->pos.x)
         {
             player_ref->rb.velocity.x = -10;
             player_ref->rb.velocity.y = -5;
+
+            if(player_ref->facing_right == 1)
+                player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(60, 28));
+            else
+                player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(-9, 28));
         }
         else
         {
             player_ref->rb.velocity.x = 10;
             player_ref->rb.velocity.y = -5;
+
+            if(player_ref->facing_right == 1)
+                player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(60, 28));
+            else
+                player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(-9, 28));
         }
 
         if (player_ref->taking_damage == 1)
@@ -87,10 +118,53 @@ void onCollisionStay(RigidBody *self, RigidBody *other)
     {
         if (self->cb.max.y < other->cb.min.y || self->cb.min.y > other->cb.max.y)
         {
-            self->velocity.y = 0;
-            self->acceleration = create_vector(0, 0);
+            player_ref->rb.velocity.y = 0;
+            player_ref->rb.acceleration = create_vector(0, 0);
+            
+            if(player_ref->facing_right == 1)
+                player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(60, 28));
+            else
+                player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(-9, 28));
+
             player_ref->can_jump = 1;
             player_ref->taking_damage = 0;
+        }
+    }
+    if ((strcmp(other->cb.tag, "bat") == 0 || strcmp(other->cb.tag, "fox") == 0) && player_ref->invulnerability == 0)
+    {
+        player_ref->life--;
+        player_ref->taking_damage = 1;
+        
+        if(player_ref->facing_right == 1)
+            player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(60, 28));
+        else
+            player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(-9, 28));
+
+        if (other->pos.x > self->pos.x)
+        {
+            player_ref->rb.velocity.x = -10;
+            player_ref->rb.velocity.y = -5;
+
+            if(player_ref->facing_right == 1)
+                player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(60, 28));
+            else
+                player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(-9, 28));
+        }
+        else
+        {
+            player_ref->rb.velocity.x = 10;
+            player_ref->rb.velocity.y = -5;
+
+            if(player_ref->facing_right == 1)
+                player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(60, 28));
+            else
+                player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(-9, 28));
+        }
+
+        if (player_ref->taking_damage == 1)
+        {
+            timer_invulnerability = 0;
+            increment_invulnerability();
         }
     }
 }
@@ -107,11 +181,12 @@ void init_player(Player *player, Vector pos)
 {
     player->animation_frame = 8;
     player->facing_right = 1;
-    player->taking_damage = 0;
     player->attacking = 0;
     player->life = 100;
     player->invulnerability = 0;
+    player->can_jump = 0;
 
+    player->taking_damage = 0;
     player->rb.acceleration = create_vector(0, 0);
     player->rb.gravity_scale = 0.1f;
     player->rb.pos = pos;
@@ -130,7 +205,27 @@ void init_player(Player *player, Vector pos)
     player->rb.onCollisionExit = onCollisionExit;
     player->rb.onCollisionStay = onCollisionStay;
     player->rb.collidingWith = createList();
-    player->can_jump = 0;
+
+    //Sword rigidbody
+
+    player->sword_rb.acceleration = player->rb.acceleration;
+    player->sword_rb.gravity_scale = 0;
+    player->sword_rb.pos = sum(pos, create_vector(60, 28));
+    player->sword_rb.velocity = player->rb.velocity;
+
+    player->sword_rb.cb.width = 68;
+    player->sword_rb.cb.height = 45;
+    player->sword_rb.cb.offset = create_vector(0, 0);
+    player->sword_rb.cb.min = create_vector(player->sword_rb.pos.x + player->sword_rb.cb.offset.x, player->sword_rb.pos.y + player->sword_rb.cb.offset.y);
+    player->sword_rb.cb.max = create_vector(player->sword_rb.cb.min.x + player->sword_rb.cb.width, player->sword_rb.cb.min.y + player->sword_rb.cb.height);
+    player->sword_rb.cb.solid = 0;
+    player->sword_rb.cb.enabled = 0;
+    strcpy(player->sword_rb.cb.tag, "sword");
+
+    player->sword_rb.onCollisionEnter = NULL;
+    player->sword_rb.onCollisionExit = NULL;
+    player->sword_rb.onCollisionStay = NULL;
+    player->sword_rb.collidingWith = createList();
 
     player_ref = player;
 }

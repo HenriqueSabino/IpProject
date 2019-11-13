@@ -1,9 +1,13 @@
 #include <allegro.h>
 #include <string.h>
+#include <stdio.h>
 #include "../headers/enemy.h"
 #include "../headers/collisionbox.h"
 #include "../headers/vector.h"
 #include "../headers/list.h"
+
+Enemy *enemies_ref;
+int enemies_ref_count;
 
 void init_bat(Enemy *bat, Vector pos)
 {
@@ -38,6 +42,33 @@ void onCollisionEnter_fox(RigidBody *self, RigidBody *other)
         {
             self->velocity.y = 0;
             self->acceleration = create_vector(0, 0);
+
+            for (int i = 0; i < enemies_ref_count; i++){
+                if (&enemies_ref[i].rb == self)
+                {
+                    enemies_ref[i].taking_damage = 0;    
+                }
+            }
+        }
+    }
+    if (strcmp(other->cb.tag, "sword") == 0)
+    {
+        for (int i = 0; i < enemies_ref_count; i++){
+                if (&enemies_ref[i].rb == self)
+                {
+                    enemies_ref[i].taking_damage = 1;    
+                }
+            }
+
+        if (other->pos.x > self->pos.x)
+        {
+            self->velocity.x = -10;
+            self->velocity.y = -5;
+        }
+        else
+        {
+            self->velocity.x = 10;
+            self->velocity.y = -5;
         }
     }
 }
@@ -50,6 +81,13 @@ void onCollisionStay_fox(RigidBody *self, RigidBody *other)
         {
             self->velocity.y = 0;
             self->acceleration = create_vector(0, 0);
+
+            for (int i = 0; i < enemies_ref_count; i++){
+                if (&enemies_ref[i].rb == self)
+                {
+                    enemies_ref[i].taking_damage = 0;    
+                }
+            }
         }
     }
 }
@@ -65,6 +103,7 @@ void init_fox(Enemy *fox, Vector pos)
     fox->rb.gravity_scale = 0.1f;
     fox->rb.pos = pos;
     fox->rb.velocity = create_vector(-5, 0);
+    fox->taking_damage = 0;
 
     fox->rb.cb.width = 90;
     fox->rb.cb.height = 45;
@@ -110,7 +149,7 @@ void atk(Enemy *enemy, RigidBody player)
             enemy->rb.velocity = mult(normalized(diff(sum(player_pos, enemy->player_pos), enemy_pos)), 5);
         }
     }
-    else if (strcmp(enemy->rb.cb.tag, "fox") == 0)
+    else if (strcmp(enemy->rb.cb.tag, "fox") == 0 && enemy->taking_damage == 0)
     {
         if (dist(create_vector(enemy_pos.x, 0), create_vector(player_pos.x, 0)) <= 100)
         {
@@ -128,4 +167,10 @@ void atk(Enemy *enemy, RigidBody player)
             enemy->rb.velocity.y = 0;
         }
     }
+}
+
+void set_enemies_ref(Enemy *enemies, int count)
+{
+    enemies_ref = enemies;
+    enemies_ref_count = count;
 }
