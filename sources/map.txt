@@ -1,5 +1,29 @@
-3
-12
-*****G*****
-P***GGG**FG
-GGGGGGGGGGG
+4
+13
+
+
+************
+P***102**F12
+1000A59000A3
+455555555553
+
+
+Captions:
+
+* => nothing
+P => player
+B => bat
+F => fox
+0 => ground sprite 0
+1 => ground sprite 1
+2 => ground sprite 2
+3 => ground sprite 3
+4 => ground sprite 4
+5 => ground sprite 5
+6 => ground sprite 6
+7 => ground sprite 7
+8 => ground sprite 8
+9 => ground sprite 9
+A => ground sprite 10
+B => ground sprite 11
+C => ground sprite 12

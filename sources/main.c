@@ -88,7 +88,9 @@ int main()
 
     for (int i = 0; i < map_size; i++)
     {
-        if (map[i] == 'G')
+        if (map[i] == '0' || map[i] == '1' || map[i] == '2' || map[i] == '3' || map[i] == '4' ||
+            map[i] == '5' || map[i] == '6' || map[i] == '7' || map[i] == '8' || map[i] == '9' ||
+            map[i] == 'A' || map[i] == 'B' || map[i] == 'C')
         {
             ground_count++;
         }
@@ -125,9 +127,81 @@ int main()
             enemy_count++;
             col++;
         }
-        else if (map[i] == 'G')
+        else if (map[i] == '0')
         {
             init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 0);
+            ground_count++;
+            col++;
+        }
+        else if (map[i] == '1')
+        {
+            init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 1);
+            ground_count++;
+            col++;
+        }
+        else if (map[i] == '2')
+        {
+            init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 2);
+            ground_count++;
+            col++;
+        }
+        else if (map[i] == '3')
+        {
+            init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 3);
+            ground_count++;
+            col++;
+        }
+        else if (map[i] == '4')
+        {
+            init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 4);
+            ground_count++;
+            col++;
+        }
+        else if (map[i] == '5')
+        {
+            init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 5);
+            ground_count++;
+            col++;
+        }
+        else if (map[i] == '6')
+        {
+            init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 6);
+            ground_count++;
+            col++;
+        }
+        else if (map[i] == '7')
+        {
+            init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 7);
+            ground_count++;
+            col++;
+        }
+        else if (map[i] == '8')
+        {
+            init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 8);
+            ground_count++;
+            col++;
+        }
+        else if (map[i] == '9')
+        {
+            init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 9);
+            ground_count++;
+            col++;
+        }
+        else if (map[i] == 'A')
+        {
+            init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 10);
+            ground_count++;
+            col++;
+        }
+        else if (map[i] == 'B')
+        {
+            init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 11);
+            ground_count++;
+            col++;
+        }
+        else if (map[i] == 'C')
+        {
+            init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 12);
             ground_count++;
             col++;
         }
@@ -227,7 +301,7 @@ int main()
                     }
                 }
             }
-            
+
             if (player.animation_frame >= 0 && player.animation_frame <= 7)
             {
                 if (game_timer % 4 == 0)
@@ -250,8 +324,8 @@ int main()
                     {
                         player.animation_frame = 8;
                         player.attacking = 0;
-                    }                    
-                }            
+                    }
+                }
             }
 
             counter--;
@@ -346,7 +420,7 @@ void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player, Vector camera)
     {
         if (player->invulnerability == 1)
         {
-            if(game_timer % 2 == 0)
+            if (game_timer % 2 == 0)
             {
                 draw_sprite_ex(bmp, player_sprite, player->rb.pos.x - camera.x, player->rb.pos.y - camera.y, DRAW_SPRITE_TRANS, DRAW_SPRITE_NO_FLIP);
             }
@@ -364,7 +438,7 @@ void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player, Vector camera)
     {
         if (player->invulnerability == 1)
         {
-            if(game_timer % 4 == 0)
+            if (game_timer % 4 == 0)
             {
                 draw_sprite_ex(bmp, player_sprite, player->rb.pos.x - camera.x, player->rb.pos.y - camera.y, DRAW_SPRITE_TRANS, DRAW_SPRITE_H_FLIP);
             }
