@@ -299,7 +299,7 @@ int main()
                 {
                     atk(&enemies[i], player.rb);
                     
-                    if(!enemies[i].taking_damage)
+                    if(!enemies[i].taking_damage && enemies[i].alive)
                     {
                         if (enemies[i].animation_frame >= 0 && enemies[i].animation_frame <= 3)
                         {
@@ -312,20 +312,23 @@ int main()
                     }
                     else
                     {
-                        enemies[i].animation_frame = 0;
+                        if(strcmp(enemies[i].rb.cb.tag, "bat") == 0)
+                            enemies[i].animation_frame = 3;
+                        else if(strcmp(enemies[i].rb.cb.tag, "fox") == 0)
+                            enemies[i].animation_frame = 0;
                     }
                 }
             }
 
-            // faz urro
+            // Kill enemy
             for (int i = 0; i < enemy_count; i++)
             {
-                if (enemies[i].life == 0)
+                if (enemies[i].life <= 0)
                 {
                     enemies[i].alive = 0;
-                    enemies[i].rb.onCollisionEnter = NULL;
-                    enemies[i].rb.onCollisionStay = NULL;
-                    enemies[i].rb.onCollisionExit = NULL;                  
+                    enemies[i].attack = 0;
+                    enemies[i].rb.gravity_scale = 0.2f;
+                    enemies[i].rb.cb.enabled = 0;                  
                 }
             }
 
@@ -370,13 +373,17 @@ int main()
 
         for (int i = 0; i < enemy_count; i++)
         {
-            if (strcmp(enemies[i].rb.cb.tag, "bat") == 0 && enemies[i].alive == 1)
+            if (strcmp(enemies[i].rb.cb.tag, "bat") == 0 && enemies[i].rb.pos.y <= 1000)
             {
                 draw_bat(buffer, bat_sprite, &enemies[i], camera);
+                if(enemies[i].alive == 0 && enemies[i].rb.pos.y >= 1000)
+                    enemies[i].rb.pos.y = 1001;
             }
-            else if (strcmp(enemies[i].rb.cb.tag, "fox") == 0 && enemies[i].alive == 1)
+            else if (strcmp(enemies[i].rb.cb.tag, "fox") == 0 && enemies[i].rb.pos.y <= 1000)
             {
                 draw_fox(buffer, fox_sprite, &enemies[i], camera);
+                if(enemies[i].alive == 0 && enemies[i].rb.pos.y >= 1000)
+                    enemies[i].rb.pos.y = 1001;
             }
         }
 
@@ -402,9 +409,6 @@ END_OF_MAIN();
 
 void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player, Vector camera)
 {
-    if(player->sword_rb.cb.enabled == 1)
-        rect(bmp, player->sword_rb.cb.min.x - camera.x, player->sword_rb.cb.min.y - camera.y, player->sword_rb.cb.max.x - camera.x, player->sword_rb.cb.max.y - camera.y, makecol(255,0,0));
-
     BITMAP *player_sprite = create_bitmap(128, 128);
     clear_to_color(player_sprite, makecol(255, 0, 255));
 
@@ -515,14 +519,45 @@ void draw_bat(BITMAP *bmp, BITMAP *sprite, Enemy *bat, Vector camera)
     //draw the a part of the sprite sheet to the screen and scales it
     masked_stretch_blit(sprite, bat_sprite, r_img_pos, c_img_pos, 32, 32, 0, 0, 64, 64);
 
+    set_trans_blender(255, 255, 255, 64);
+
     if (bat->facing_right)
     {
-        draw_sprite_ex(bmp, bat_sprite, bat->rb.pos.x - camera.x, bat->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+        if(bat->taking_damage == 0 || bat->alive == 0)
+        {
+            draw_sprite_ex(bmp, bat_sprite, bat->rb.pos.x - camera.x, bat->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+        }
+        else
+        {
+            if (game_timer % 2 == 0)
+            {
+                draw_sprite_ex(bmp, bat_sprite, bat->rb.pos.x - camera.x, bat->rb.pos.y - camera.y, DRAW_SPRITE_TRANS, DRAW_SPRITE_NO_FLIP);
+            }
+            else
+            {
+                draw_sprite_ex(bmp, bat_sprite, bat->rb.pos.x - camera.x, bat->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+            }
+        }
     }
     else
     {
-        draw_sprite_ex(bmp, bat_sprite, bat->rb.pos.x - camera.x, bat->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
+        if(bat->taking_damage == 0 || bat->alive == 0)
+        {
+            draw_sprite_ex(bmp, bat_sprite, bat->rb.pos.x - camera.x, bat->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
+        }
+        else
+        {
+            if (game_timer % 2 == 0)
+            {
+                draw_sprite_ex(bmp, bat_sprite, bat->rb.pos.x - camera.x, bat->rb.pos.y - camera.y, DRAW_SPRITE_TRANS, DRAW_SPRITE_H_FLIP);
+            }
+            else
+            {
+                draw_sprite_ex(bmp, bat_sprite, bat->rb.pos.x - camera.x, bat->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
+            }
+        }
     }
+
     destroy_bitmap(bat_sprite);
 }
 
@@ -542,14 +577,45 @@ void draw_fox(BITMAP *bmp, BITMAP *sprite, Enemy *fox, Vector camera)
     //draw the a part of the sprite sheet to the screen and scales it
     masked_stretch_blit(sprite, fox_sprite, r_img_pos, c_img_pos, 32, 32, 0, 0, 96, 96);
 
+    set_trans_blender(255, 255, 255, 64);
+
     if (fox->facing_right)
     {
-        draw_sprite_ex(bmp, fox_sprite, fox->rb.pos.x - camera.x, fox->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+        if(fox->taking_damage == 0 || fox->alive == 0)
+        {
+            draw_sprite_ex(bmp, fox_sprite, fox->rb.pos.x - camera.x, fox->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+        }
+        else
+        {
+            if (game_timer % 2 == 0)
+            {
+                draw_sprite_ex(bmp, fox_sprite, fox->rb.pos.x - camera.x, fox->rb.pos.y - camera.y, DRAW_SPRITE_TRANS, DRAW_SPRITE_NO_FLIP);
+            }
+            else
+            {
+                draw_sprite_ex(bmp, fox_sprite, fox->rb.pos.x - camera.x, fox->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+            }
+        }
     }
     else
     {
-        draw_sprite_ex(bmp, fox_sprite, fox->rb.pos.x - camera.x, fox->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
+        if(fox->taking_damage == 0 || fox->alive == 0)
+        {
+            draw_sprite_ex(bmp, fox_sprite, fox->rb.pos.x - camera.x, fox->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
+        }
+        else
+        {
+            if (game_timer % 2 == 0)
+            {
+                draw_sprite_ex(bmp, fox_sprite, fox->rb.pos.x - camera.x, fox->rb.pos.y - camera.y, DRAW_SPRITE_TRANS, DRAW_SPRITE_H_FLIP);
+            }
+            else
+            {
+                draw_sprite_ex(bmp, fox_sprite, fox->rb.pos.x - camera.x, fox->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
+            }
+        }
     }
+
     destroy_bitmap(fox_sprite);
 }
 

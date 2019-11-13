@@ -9,44 +9,8 @@
 Enemy *enemies_ref;
 int enemies_ref_count;
 
-void onCollisionStay_bat(RigidBody *self, RigidBody *other)
-{
-    if (strcmp(other->cb.tag, "ground") == 0)
-    {
-        if (self->cb.max.y < other->cb.min.y || self->cb.min.y > other->cb.max.y)
-        {
-            self->velocity.y = 0;
-            self->acceleration = create_vector(0, 0);
-
-            for (int i = 0; i < enemies_ref_count; i++)
-            {
-                if (&enemies_ref[i].rb == self)
-                {
-                    enemies_ref[i].taking_damage = 0;    
-                }
-            }
-        }
-    }
-}
-
 void onCollisionEnter_bat(RigidBody *self, RigidBody *other)
 {
-    if (strcmp(other->cb.tag, "ground") == 0)
-    {
-        if (self->cb.max.y < other->cb.min.y || self->cb.min.y > other->cb.max.y)
-        {
-            self->velocity.y = 0;
-            self->acceleration = create_vector(0, 0);
-
-            for (int i = 0; i < enemies_ref_count; i++)
-            {
-                if (&enemies_ref[i].rb == self)
-                {
-                    enemies_ref[i].taking_damage = 0;    
-                }
-            }
-        }
-    }
     if (strcmp(other->cb.tag, "sword") == 0)
     {
         for (int i = 0; i < enemies_ref_count; i++)
@@ -56,16 +20,16 @@ void onCollisionEnter_bat(RigidBody *self, RigidBody *other)
                     enemies_ref[i].taking_damage = 1;    
                 }
         }
-
+        
         if (other->pos.x > self->pos.x)
         {
             self->velocity.x = -10;
-            self->velocity.y = -5;
+            self->velocity.y = 0;
         }
         else
         {
             self->velocity.x = 10;
-            self->velocity.y = -5;
+            self->velocity.y = 0;
         }
         
     }
@@ -77,11 +41,12 @@ void onCollisionEnter_bat(RigidBody *self, RigidBody *other)
         {
             if (&enemies_ref[i].rb == self)
             {
-                if (enemies_ref[i].life - 1 >= 0)
-                {
-                    enemies_ref[i].life = enemies_ref[i].life - 1;  
-                    printf("\n%d\n", enemies_ref[i].life); 
-                }                     
+                    enemies_ref[i].life--;
+                    if(enemies_ref[i].life <= 0)
+                    {
+                        enemies_ref[i].alive = 0;
+                    }
+                    printf("\n%d\n", enemies_ref[i].life);                      
             }
         }
     }
@@ -93,7 +58,9 @@ void init_bat(Enemy *bat, Vector pos)
     bat->facing_right = 0;
     bat->player_pos = create_vector(200, -32);
     bat->life = 3;
+    bat->attack = 1;
     bat->alive = 1;
+    bat->taking_damage = 0;
 
     bat->rb.acceleration = create_vector(0, 0);
     bat->rb.gravity_scale = 0;
@@ -110,7 +77,7 @@ void init_bat(Enemy *bat, Vector pos)
     bat->rb.collidingWith = createList();
     bat->rb.onCollisionEnter = onCollisionEnter_bat;
     bat->rb.onCollisionExit = NULL;
-    bat->rb.onCollisionStay = onCollisionStay_bat;
+    bat->rb.onCollisionStay = NULL;
     strcpy(bat->rb.cb.tag, "bat");
 }
 
@@ -141,16 +108,24 @@ void onCollisionEnter_fox(RigidBody *self, RigidBody *other)
                     enemies_ref[i].taking_damage = 1;    
                 }
         }
-
-        if (other->pos.x > self->pos.x)
+        for(int i = 0; i < enemies_ref_count; i++)
         {
-            self->velocity.x = -10;
-            self->velocity.y = -5;
-        }
-        else
-        {
-            self->velocity.x = 10;
-            self->velocity.y = -5;
+            if(&enemies_ref[i].rb == self)
+            {
+                if(enemies_ref[i].life > 0)
+                {
+                    if (other->pos.x > self->pos.x)
+                    {
+                        self->velocity.x = -10;
+                        self->velocity.y = -5;
+                    }
+                    else
+                    {
+                        self->velocity.x = 10;
+                        self->velocity.y = -5;
+                    }
+                }
+            }
         }
         
     }
@@ -162,11 +137,8 @@ void onCollisionEnter_fox(RigidBody *self, RigidBody *other)
         {
             if (&enemies_ref[i].rb == self)
             {
-                if (enemies_ref[i].life - 1 >= 0)
-                {
-                    enemies_ref[i].life = enemies_ref[i].life - 1;  
-                    printf("\n%d\n", enemies_ref[i].life); 
-                }                     
+                    enemies_ref[i].life--;  
+                    printf("\n%d\n", enemies_ref[i].life);                     
             }
         }
     }
@@ -197,8 +169,8 @@ void init_fox(Enemy *fox, Vector pos)
     fox->animation_frame = 0;
     fox->facing_right = 1;
     fox->player_pos = create_vector(0, 0);
-    fox->attack = 0;
-    fox->life = 3;
+    fox->attack = 1;
+    fox->life = 5;
     fox->alive = 1;
 
     fox->rb.acceleration = create_vector(0, 0);
@@ -235,23 +207,28 @@ void atk(Enemy *enemy, RigidBody player)
         enemy->facing_right = 1;
     }
 
-    if (strcmp(enemy->rb.cb.tag, "bat") == 0)
+    if (strcmp(enemy->rb.cb.tag, "bat") == 0 && enemy->attack)
     {
+        if(dist(create_vector(enemy_pos.x, 0), create_vector(player_pos.x, 0)) >= 200)
+        {
+            enemy->taking_damage = 0;
+        }
+
         if (dist(create_vector(enemy_pos.x, 0), create_vector(player_pos.x, 0)) <= 100)
         {
             enemy->rb.acceleration = create_vector(0, 0);
         }
-        else if (dist(enemy->rb.pos, player_pos) <= 400)
+        else if (dist(enemy->rb.pos, player_pos) <= 400 && !enemy->taking_damage)
         {
             if (dist(enemy_pos, sum(player_pos, enemy->player_pos)) <= 10)
             {
                 enemy->player_pos.x *= -1;
-                enemy->rb.acceleration = mult(normalized(diff(player_pos, enemy_pos)), 15);
+                enemy->rb.acceleration = mult(normalized(diff(player_pos, enemy_pos)), 8);
             }
             enemy->rb.velocity = mult(normalized(diff(sum(player_pos, enemy->player_pos), enemy_pos)), 5);
         }
     }
-    else if (strcmp(enemy->rb.cb.tag, "fox") == 0 && enemy->taking_damage == 0 && enemy->rb.velocity.y == 0)
+    else if (strcmp(enemy->rb.cb.tag, "fox") == 0 && enemy->taking_damage == 0 && enemy->rb.velocity.y == 0 && enemy->attack)
     {
         if (dist(create_vector(enemy_pos.x, 0), create_vector(player_pos.x, 0)) <= 100)
         {

@@ -2,8 +2,8 @@
 13
 
 
-************
-P**F102**F12
+******B*****
+P***102F**12
 1000a59000a3
 455555555553
 
@@ -14,6 +14,8 @@ Captions:
 P => player
 B => bat
 F => fox
+H => harpy
+G => ghost
 0 => ground sprite 0
 1 => ground sprite 1
 2 => ground sprite 2

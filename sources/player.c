@@ -76,7 +76,7 @@ void onCollisionEnter(RigidBody *self, RigidBody *other)
     }
     if ((strcmp(other->cb.tag, "bat") == 0 || strcmp(other->cb.tag, "fox") == 0) && player_ref->invulnerability == 0)
     {
-        player_ref->life = player_ref->life - 10;
+        player_ref->life--;
         player_ref->taking_damage = 1;
         
         if(player_ref->facing_right == 1)
