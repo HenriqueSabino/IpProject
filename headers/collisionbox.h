@@ -7,7 +7,7 @@ typedef struct collision_box
 {
     Vector min, max, offset;
     char tag[50];
-    int solid, width, height;
+    int solid, width, height, enabled;
 } CollisionBox;
 
 int collided(CollisionBox a, CollisionBox b);

@@ -40,7 +40,7 @@ void update_all(RigidBody *rbs[], int amount)
 
             if (collided(rbs[i]->cb, rbs[j]->cb))
             {
-                if (rbs[i]->cb.solid && rbs[j]->cb.solid && strcmp(rbs[j]->cb.tag, "fox") != 0)
+                if (rbs[i]->cb.solid && rbs[j]->cb.solid && rbs[i]->cb.enabled && rbs[j]->cb.enabled && strcmp(rbs[j]->cb.tag, "fox") != 0)
                 {
                     if (rbs_before_update[i].min.y >= rbs[j]->cb.max.y)
                     {

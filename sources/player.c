@@ -123,6 +123,7 @@ void init_player(Player *player, Vector pos)
     player->rb.cb.min = create_vector(player->rb.pos.x + player->rb.cb.offset.x, player->rb.pos.y + player->rb.cb.offset.y);
     player->rb.cb.max = create_vector(player->rb.cb.min.x + player->rb.cb.width, player->rb.cb.min.y + player->rb.cb.height);
     player->rb.cb.solid = 1;
+    player->rb.cb.enabled = 1;
     strcpy(player->rb.cb.tag, "player");
 
     player->rb.onCollisionEnter = onCollisionEnter;

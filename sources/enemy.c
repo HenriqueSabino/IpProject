@@ -22,6 +22,7 @@ void init_bat(Enemy *bat, Vector pos)
     bat->rb.cb.min = create_vector(bat->rb.pos.x + bat->rb.cb.offset.x, bat->rb.pos.y + bat->rb.cb.offset.y);
     bat->rb.cb.max = create_vector(bat->rb.cb.min.x + bat->rb.cb.width, bat->rb.cb.min.y + bat->rb.cb.height);
     bat->rb.cb.solid = 0;
+    bat->rb.cb.enabled = 1;
     bat->rb.collidingWith = createList();
     bat->rb.onCollisionEnter = NULL;
     bat->rb.onCollisionExit = NULL;
@@ -71,6 +72,7 @@ void init_fox(Enemy *fox, Vector pos)
     fox->rb.cb.min = create_vector(fox->rb.pos.x + fox->rb.cb.offset.x, fox->rb.pos.y + fox->rb.cb.offset.y);
     fox->rb.cb.max = create_vector(fox->rb.cb.min.x + fox->rb.cb.width, fox->rb.cb.min.y + fox->rb.cb.height);
     fox->rb.cb.solid = 1;
+    fox->rb.cb.enabled = 1;
     fox->rb.collidingWith = createList();
     fox->rb.onCollisionEnter = onCollisionEnter_fox;
     fox->rb.onCollisionExit = NULL;
@@ -92,7 +94,7 @@ void atk(Enemy *enemy, RigidBody player)
         enemy->facing_right = 1;
     }
 
-    if(strcmp(enemy->rb.cb.tag, "bat") == 0)
+    if (strcmp(enemy->rb.cb.tag, "bat") == 0)
     {
         if (dist(create_vector(enemy_pos.x, 0), create_vector(player_pos.x, 0)) <= 100)
         {
@@ -108,7 +110,7 @@ void atk(Enemy *enemy, RigidBody player)
             enemy->rb.velocity = mult(normalized(diff(sum(player_pos, enemy->player_pos), enemy_pos)), 5);
         }
     }
-    else if(strcmp(enemy->rb.cb.tag, "fox") == 0)
+    else if (strcmp(enemy->rb.cb.tag, "fox") == 0)
     {
         if (dist(create_vector(enemy_pos.x, 0), create_vector(player_pos.x, 0)) <= 100)
         {

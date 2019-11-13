@@ -41,6 +41,7 @@ void init_ground(Ground *ground, Vector pos, int animation_frame)
     ground->rb.cb.max = create_vector(ground->rb.cb.min.x + ground->rb.cb.width, ground->rb.cb.min.y + ground->rb.cb.height);
     strcpy(ground->rb.cb.tag, "ground");
     ground->rb.cb.solid = 1;
+    ground->rb.cb.enabled = 1;
     ground->rb.collidingWith = createList();
     ground->rb.onCollisionEnter = NULL;
     ground->rb.onCollisionExit = NULL;
