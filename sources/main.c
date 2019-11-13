@@ -327,7 +327,6 @@ int main()
                     }
                 }
             }
-
             counter--;
         }
 
@@ -400,9 +399,21 @@ void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player, Vector camera)
         }
     }
 
-    if (!player->can_jump || player->rb.velocity.y != 0)
+    if ((!player->can_jump || player->rb.velocity.y != 0) && player->attacking == 0)
     {
         player->animation_frame = 10;
+    }
+    else if ((!player->can_jump || player->rb.velocity.y != 0) && player->attacking != 0)
+    {
+        if (player->animation_frame < 12)
+        {
+            player->animation_frame = 12;
+        }
+
+        if (player->animation_frame < 17)
+        {
+            player->attacking = 1;
+        }
     }
 
     int r_img_pos = player->animation_frame % PLAYER_SPRITE_COLS;
