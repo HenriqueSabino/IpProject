@@ -12,7 +12,7 @@ void increment_invulnerability()
     timer_invulnerability++;
     player_ref->invulnerability = 1;
 
-    if(timer_invulnerability > 3)
+    if (timer_invulnerability > 3)
     {
         player_ref->invulnerability = 0;
     }
@@ -21,7 +21,7 @@ void increment_invulnerability()
 void init_timer_invulnerability()
 {
     timer_invulnerability = 3;
-    install_int_ex(increment_invulnerability , SECS_TO_TIMER(1));
+    install_int_ex(increment_invulnerability, SECS_TO_TIMER(1));
 }
 END_OF_FUNCTION(increment_invulnerability);
 
@@ -73,7 +73,7 @@ void onCollisionEnter(RigidBody *self, RigidBody *other)
             player_ref->rb.velocity.y = -5;
         }
 
-        if(player_ref->taking_damage == 1)
+        if (player_ref->taking_damage == 1)
         {
             timer_invulnerability = 0;
             increment_invulnerability();
@@ -117,9 +117,9 @@ void init_player(Player *player, Vector pos)
     player->rb.pos = pos;
     player->rb.velocity = create_vector(0, 0);
 
-    player->rb.cb.width = 54;
-    player->rb.cb.height = 65;
-    player->rb.cb.offset = create_vector(37, 39);
+    player->rb.cb.width = 23;
+    player->rb.cb.height = 67;
+    player->rb.cb.offset = create_vector(53, 37);
     player->rb.cb.min = create_vector(player->rb.pos.x + player->rb.cb.offset.x, player->rb.pos.y + player->rb.cb.offset.y);
     player->rb.cb.max = create_vector(player->rb.cb.min.x + player->rb.cb.width, player->rb.cb.min.y + player->rb.cb.height);
     player->rb.cb.solid = 1;
