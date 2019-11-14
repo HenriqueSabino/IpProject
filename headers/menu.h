@@ -7,10 +7,9 @@
 
 #define INTRO_SOUND "../sounds/intro.wav"
 #define SELECT_SOUND "../sounds/select.wav"
-#define ENTER_SOUND "../sounds/buble.wav"
+#define ENTER_SOUND "../sounds/enter.wav"
 #define DEATH_SOUND "../sounds/Deathscreen.wav"
 
-int menu(int timer);
 void deathscreen();
 
 #endif // !"MENU_H"

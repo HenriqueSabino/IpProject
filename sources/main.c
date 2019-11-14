@@ -18,6 +18,7 @@ void close_program()
 }
 END_OF_FUNCTION(close_program)
 
+volatile int menu_on = TRUE;
 volatile int counter = 0;
 volatile long game_timer = 0;
 void increment()
@@ -44,8 +45,10 @@ int main()
 
     allegro_init();
     install_keyboard();
+    install_sound(DIGI_AUTODETECT, MIDI_AUTODETECT, NULL);
     install_timer();
     set_color_depth(desktop_color_depth());
+    
     set_gfx_mode(GFX_AUTODETECT_WINDOWED, 64 * 16, 64 * 9, 0, 0);
 
     LOCK_VARIABLE(close_game);
@@ -54,6 +57,7 @@ int main()
 
     LOCK_VARIABLE(game_timer);
     LOCK_VARIABLE(counter);
+    LOCK_VARIABLE(menu_on);
     LOCK_FUNCTION(increment);
 
     install_int_ex(increment, MSEC_TO_TIMER(1.0 / FPS * 1000));
@@ -236,6 +240,97 @@ int main()
     set_enemies_ref(enemies, enemy_count);
 
     rbs[rbs_size - 1] = &player.sword_rb;
+
+
+    while (menu_on)
+    {
+       
+    //VARIABLES
+	int  chx  =  315, chy = 347 , som = 0;
+	int  px = 315, py[2]= {347, 400};
+
+	//BITMAPS
+	BITMAP *menu  = load_bitmap(LOGO_PATH , NULL);
+	BITMAP *chave = load_bitmap(ARROW_PATH , NULL);
+	BITMAP *buff  = create_bitmap(  64 * 16, 64 * 9 );
+
+	//SAMPLES
+	SAMPLE *select = load_sample(SELECT_SOUND);
+	SAMPLE *intro  = load_sample(INTRO_SOUND);
+	SAMPLE *enter  = load_sample(ENTER_SOUND);
+
+	//INTRODUCTION SAMPLE
+	play_sample(intro, 255, 128, 1000, 1);
+
+	while(!key[KEY_ESC] && menu_on)
+	{
+		//INPUT
+		if(key[KEY_RIGHT])
+		{
+            som = 1;
+        }
+
+		if(key[KEY_DOWN ])
+		{
+        	if(chy == py[0])
+			{
+                chy = py[1];
+                som = 1;
+            }
+        }
+
+		if(key[KEY_LEFT ])
+		{
+            som = 1;
+        }
+
+		if(key[KEY_UP   ])
+		{
+        	if(chy == py[1])
+			{
+                chy = py[0];
+                som = 1;
+            }
+        }
+
+		if(key[KEY_ENTER])
+		{
+            if(chy == py[0])
+			{
+                stop_sample(intro);
+                play_sample(enter, 255, 128, 1000, 0);
+                menu_on = FALSE;
+			}
+			else
+			{
+                // OUTPUT FUNCTION
+                return 0;
+            }
+		}
+
+		if(game_timer % 4 != 0)
+        {
+			draw_sprite(buff, chave, chx, chy);
+		}
+
+		if(som == 1 )
+		{
+            play_sample(select, 255, 128, 1000, 0);
+            som = 0;
+        }
+
+		draw_sprite(screen, buff, 0, 0);
+		clear(buff);
+		draw_sprite(buff,  menu, 0, 0);
+	}
+	destroy_bitmap(buff  );
+	destroy_bitmap(menu  );
+	destroy_bitmap(chave );
+	destroy_sample(select);
+	destroy_sample(intro );
+
+    }
+    
 
     while (!close_game)
     {
