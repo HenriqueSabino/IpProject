@@ -317,6 +317,18 @@ int main()
                 }
             }
 
+            // faz urro
+            for (int i = 0; i < enemy_count; i++)
+            {
+                if (enemies[i].life == 0)
+                {
+                    enemies[i].alive = 0;
+                    enemies[i].rb.onCollisionEnter = NULL;
+                    enemies[i].rb.onCollisionStay = NULL;
+                    enemies[i].rb.onCollisionExit = NULL;                  
+                }
+            }
+
             if (player.animation_frame >= 0 && player.animation_frame <= 7)
             {
                 if (game_timer % 4 == 0)
@@ -358,11 +370,11 @@ int main()
 
         for (int i = 0; i < enemy_count; i++)
         {
-            if (strcmp(enemies[i].rb.cb.tag, "bat") == 0)
+            if (strcmp(enemies[i].rb.cb.tag, "bat") == 0 && enemies[i].alive == 1)
             {
                 draw_bat(buffer, bat_sprite, &enemies[i], camera);
             }
-            else if (strcmp(enemies[i].rb.cb.tag, "fox") == 0)
+            else if (strcmp(enemies[i].rb.cb.tag, "fox") == 0 && enemies[i].alive == 1)
             {
                 draw_fox(buffer, fox_sprite, &enemies[i], camera);
             }

@@ -9,11 +9,91 @@
 Enemy *enemies_ref;
 int enemies_ref_count;
 
+void onCollisionStay_bat(RigidBody *self, RigidBody *other)
+{
+    if (strcmp(other->cb.tag, "ground") == 0)
+    {
+        if (self->cb.max.y < other->cb.min.y || self->cb.min.y > other->cb.max.y)
+        {
+            self->velocity.y = 0;
+            self->acceleration = create_vector(0, 0);
+
+            for (int i = 0; i < enemies_ref_count; i++)
+            {
+                if (&enemies_ref[i].rb == self)
+                {
+                    enemies_ref[i].taking_damage = 0;    
+                }
+            }
+        }
+    }
+}
+
+void onCollisionEnter_bat(RigidBody *self, RigidBody *other)
+{
+    if (strcmp(other->cb.tag, "ground") == 0)
+    {
+        if (self->cb.max.y < other->cb.min.y || self->cb.min.y > other->cb.max.y)
+        {
+            self->velocity.y = 0;
+            self->acceleration = create_vector(0, 0);
+
+            for (int i = 0; i < enemies_ref_count; i++)
+            {
+                if (&enemies_ref[i].rb == self)
+                {
+                    enemies_ref[i].taking_damage = 0;    
+                }
+            }
+        }
+    }
+    if (strcmp(other->cb.tag, "sword") == 0)
+    {
+        for (int i = 0; i < enemies_ref_count; i++)
+        {
+                if (&enemies_ref[i].rb == self)
+                {
+                    enemies_ref[i].taking_damage = 1;    
+                }
+        }
+
+        if (other->pos.x > self->pos.x)
+        {
+            self->velocity.x = -10;
+            self->velocity.y = -5;
+        }
+        else
+        {
+            self->velocity.x = 10;
+            self->velocity.y = -5;
+        }
+        
+    }
+
+    // faz urro
+    if (strcmp(other->cb.tag, "sword") == 0)
+    {
+        for (int i = 0; i < enemies_ref_count; i++)
+        {
+            if (&enemies_ref[i].rb == self)
+            {
+                if (enemies_ref[i].life - 1 >= 0)
+                {
+                    enemies_ref[i].life = enemies_ref[i].life - 1;  
+                    printf("\n%d\n", enemies_ref[i].life); 
+                }                     
+            }
+        }
+    }
+}
+
 void init_bat(Enemy *bat, Vector pos)
 {
     bat->animation_frame = 0;
     bat->facing_right = 0;
     bat->player_pos = create_vector(200, -32);
+    bat->life = 3;
+    bat->alive = 1;
 
     bat->rb.acceleration = create_vector(0, 0);
     bat->rb.gravity_scale = 0;
@@ -28,9 +108,9 @@ void init_bat(Enemy *bat, Vector pos)
     bat->rb.cb.solid = 0;
     bat->rb.cb.enabled = 1;
     bat->rb.collidingWith = createList();
-    bat->rb.onCollisionEnter = NULL;
+    bat->rb.onCollisionEnter = onCollisionEnter_bat;
     bat->rb.onCollisionExit = NULL;
-    bat->rb.onCollisionStay = NULL;
+    bat->rb.onCollisionStay = onCollisionStay_bat;
     strcpy(bat->rb.cb.tag, "bat");
 }
 
@@ -72,6 +152,23 @@ void onCollisionEnter_fox(RigidBody *self, RigidBody *other)
             self->velocity.x = 10;
             self->velocity.y = -5;
         }
+        
+    }
+
+    // faz urro
+    if (strcmp(other->cb.tag, "sword") == 0)
+    {
+        for (int i = 0; i < enemies_ref_count; i++)
+        {
+            if (&enemies_ref[i].rb == self)
+            {
+                if (enemies_ref[i].life - 1 >= 0)
+                {
+                    enemies_ref[i].life = enemies_ref[i].life - 1;  
+                    printf("\n%d\n", enemies_ref[i].life); 
+                }                     
+            }
+        }
     }
 }
 
@@ -101,6 +198,8 @@ void init_fox(Enemy *fox, Vector pos)
     fox->facing_right = 1;
     fox->player_pos = create_vector(0, 0);
     fox->attack = 0;
+    fox->life = 3;
+    fox->alive = 1;
 
     fox->rb.acceleration = create_vector(0, 0);
     fox->rb.gravity_scale = 0.1f;
