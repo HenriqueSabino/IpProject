@@ -38,6 +38,8 @@ void draw_ground(BITMAP *bmp, BITMAP *sprite, Ground *ground, Vector camera);
 
 void draw_lifebar(BITMAP *bmp, BITMAP *sprite, Player player);
 
+void draw_arrow(BITMAP *bmp, BITMAP *sprite);
+
 int main()
 {
     char *map;
@@ -86,6 +88,10 @@ int main()
 
     BITMAP *lifebar_sprite = load_bitmap("../assets/Canvas/LifeBar.bmp", NULL);
     if (lifebar_sprite == NULL)
+        allegro_message("error");
+
+    BITMAP *arrow_sprite = load_bitmap(ARROW_PATH, NULL);
+    if (arrow_sprite == NULL)
         allegro_message("error");
 
     int row = 0, col = 0, not_objs = 0, ground_count = 0, enemy_count = 0;
@@ -240,76 +246,89 @@ int main()
 
     rbs[rbs_size - 1] = &player.sword_rb;
 
+#pragma region menu
+    //VARIABLES
+    int chx = 315, chy = 347, som = 0;
+    int py[2] = {347, 400};
+
+    //BITMAPS
+    BITMAP *menu = load_bitmap(LOGO_PATH, NULL);
+    BITMAP *arrow = load_bitmap(ARROW_PATH, NULL);
+    BITMAP *buff = create_bitmap(64 * 16, 64 * 9);
+
+    //SAMPLES
+    SAMPLE *select = load_sample(SELECT_SOUND);
+    SAMPLE *intro = load_sample(INTRO_SOUND);
+    SAMPLE *enter = load_sample(ENTER_SOUND);
+
+    //INTRODUCTION SAMPLE
+    play_sample(intro, 255, 128, 1000, 1);
+
+    int animation_frame = 0;
+
     while (menu_on)
     {
+        keyboard_input();
 
-        //VARIABLES
-        int chx = 315, chy = 347, som = 0;
-        int px = 315, py[2] = {347, 400};
-
-        //BITMAPS
-        BITMAP *menu = load_bitmap(LOGO_PATH, NULL);
-        BITMAP *chave = load_bitmap(ARROW_PATH, NULL);
-        BITMAP *buff = create_bitmap(64 * 16, 64 * 9);
-
-        //SAMPLES
-        SAMPLE *select = load_sample(SELECT_SOUND);
-        SAMPLE *intro = load_sample(INTRO_SOUND);
-        SAMPLE *enter = load_sample(ENTER_SOUND);
-
-        //INTRODUCTION SAMPLE
-        play_sample(intro, 255, 128, 1000, 1);
-
-        while (!key[KEY_ESC] && menu_on)
+        //INPUT
+        if (key_down(KEY_RIGHT) || key_down(KEY_LEFT))
         {
-            //INPUT
-            if (key[KEY_RIGHT])
-            {
-                som = 1;
-            }
+            som = 1;
+        }
 
-            if (key[KEY_DOWN])
+        if (key_down(KEY_DOWN))
+        {
+            chy = (chy == py[0]) ? py[1] : py[0];
+            som = 1;
+        }
+
+        if (key_down(KEY_UP))
+        {
+
+            chy = (chy == py[0]) ? py[1] : py[0];
+            som = 1;
+        }
+
+        if (key_down(KEY_ENTER))
+        {
+            if (chy == py[0])
             {
-                if (chy == py[0])
+                stop_sample(intro);
+                play_sample(enter, 255, 128, 1000, 0);
+                menu_on = FALSE;
+            }
+            else
+            {
+                // OUTPUT FUNCTION
+                return 0;
+            }
+        }
+
+        if (key_down(KEY_ESC))
+        {
+            // OUTPUT FUNCTION
+            return 0;
+        }
+
+        while (counter > 0)
+        {
+            if (animation_frame >= 0 && animation_frame <= 15)
+            {
+                if (game_timer % 2 == 0)
                 {
-                    chy = py[1];
-                    som = 1;
+                    animation_frame++;
+                    animation_frame %= 16;
                 }
             }
 
-            if (key[KEY_LEFT])
-            {
-                som = 1;
-            }
+            int r_img_pos = animation_frame % ARROW_SPRITE_COLS;
+            int c_img_pos = animation_frame / ARROW_SPRITE_COLS;
 
-            if (key[KEY_UP])
-            {
-                if (chy == py[1])
-                {
-                    chy = py[0];
-                    som = 1;
-                }
-            }
+            r_img_pos *= ARROW_TILE_SIZE;
+            c_img_pos *= ARROW_TILE_SIZE;
 
-            if (key[KEY_ENTER])
-            {
-                if (chy == py[0])
-                {
-                    stop_sample(intro);
-                    play_sample(enter, 255, 128, 1000, 0);
-                    menu_on = FALSE;
-                }
-                else
-                {
-                    // OUTPUT FUNCTION
-                    return 0;
-                }
-            }
-
-            if (game_timer % 4 != 0)
-            {
-                draw_sprite(buff, chave, chx, chy);
-            }
+            //draw the a part of the sprite sheet to the screen and scales it
+            masked_blit(arrow_sprite, buff, r_img_pos, c_img_pos, chx, chy, 32, 32);
 
             if (som == 1)
             {
@@ -320,13 +339,18 @@ int main()
             draw_sprite(screen, buff, 0, 0);
             clear(buff);
             draw_sprite(buff, menu, 0, 0);
+
+            counter--;
         }
-        destroy_bitmap(buff);
-        destroy_bitmap(menu);
-        destroy_bitmap(chave);
-        destroy_sample(select);
-        destroy_sample(intro);
     }
+
+    destroy_bitmap(buff);
+    destroy_bitmap(menu);
+    destroy_bitmap(arrow);
+    destroy_sample(select);
+    destroy_sample(intro);
+
+#pragma endregion
 
     clear_to_color(buffer, 0x40AEBF);
 
