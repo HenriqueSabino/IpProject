@@ -15,38 +15,28 @@ void onCollisionEnter_bat(RigidBody *self, RigidBody *other)
     {
         for (int i = 0; i < enemies_ref_count; i++)
         {
-                if (&enemies_ref[i].rb == self)
-                {
-                    enemies_ref[i].taking_damage = 1;    
-                }
-        }
-        
-        if (other->pos.x > self->pos.x)
-        {
-            self->velocity.x = -10;
-            self->velocity.y = 0;
-        }
-        else
-        {
-            self->velocity.x = 10;
-            self->velocity.y = 0;
-        }
-        
-    }
-
-    // faz urro
-    if (strcmp(other->cb.tag, "sword") == 0)
-    {
-        for (int i = 0; i < enemies_ref_count; i++)
-        {
             if (&enemies_ref[i].rb == self)
             {
-                    enemies_ref[i].life--;
-                    if(enemies_ref[i].life <= 0)
+                enemies_ref[i].taking_damage = 1;
+                enemies_ref[i].life--;
+
+                if (enemies_ref[i].life > 0)
+                {
+                    if (other->pos.x > self->pos.x)
                     {
-                        enemies_ref[i].alive = 0;
+                        self->velocity = create_vector(-10, 0);
                     }
-                    printf("\n%d\n", enemies_ref[i].life);                      
+                    else
+                    {
+                        self->velocity = create_vector(10, 0);
+                    }
+                }
+                else
+                {
+                    self->velocity = create_vector(0, -5);
+                    self->acceleration = create_vector(0, 0);
+                    enemies_ref[i].alive = 0;
+                }
             }
         }
     }
@@ -94,51 +84,36 @@ void onCollisionEnter_fox(RigidBody *self, RigidBody *other)
             {
                 if (&enemies_ref[i].rb == self)
                 {
-                    enemies_ref[i].taking_damage = 0;    
+                    enemies_ref[i].taking_damage = 0;
                 }
             }
         }
     }
-    if (strcmp(other->cb.tag, "sword") == 0)
-    {
-        for (int i = 0; i < enemies_ref_count; i++)
-        {
-                if (&enemies_ref[i].rb == self)
-                {
-                    enemies_ref[i].taking_damage = 1;    
-                }
-        }
-        for(int i = 0; i < enemies_ref_count; i++)
-        {
-            if(&enemies_ref[i].rb == self)
-            {
-                if(enemies_ref[i].life > 0)
-                {
-                    if (other->pos.x > self->pos.x)
-                    {
-                        self->velocity.x = -10;
-                        self->velocity.y = -5;
-                    }
-                    else
-                    {
-                        self->velocity.x = 10;
-                        self->velocity.y = -5;
-                    }
-                }
-            }
-        }
-        
-    }
-
-    // faz urro
     if (strcmp(other->cb.tag, "sword") == 0)
     {
         for (int i = 0; i < enemies_ref_count; i++)
         {
             if (&enemies_ref[i].rb == self)
             {
-                    enemies_ref[i].life--;  
-                    printf("\n%d\n", enemies_ref[i].life);                     
+                enemies_ref[i].taking_damage = 1;
+                enemies_ref[i].life--;
+
+                if (enemies_ref[i].life > 0)
+                {
+                    if (other->pos.x > self->pos.x)
+                    {
+                        self->velocity = create_vector(-10, -5);
+                    }
+                    else
+                    {
+                        self->velocity = create_vector(10, -5);
+                    }
+                }
+                else
+                {
+                    self->velocity = create_vector(0, -5);
+                    self->acceleration = create_vector(0, 0);
+                }
             }
         }
     }
@@ -157,7 +132,7 @@ void onCollisionStay_fox(RigidBody *self, RigidBody *other)
             {
                 if (&enemies_ref[i].rb == self)
                 {
-                    enemies_ref[i].taking_damage = 0;    
+                    enemies_ref[i].taking_damage = 0;
                 }
             }
         }
@@ -209,7 +184,7 @@ void atk(Enemy *enemy, RigidBody player)
 
     if (strcmp(enemy->rb.cb.tag, "bat") == 0 && enemy->attack)
     {
-        if(dist(create_vector(enemy_pos.x, 0), create_vector(player_pos.x, 0)) >= 200)
+        if (dist(create_vector(enemy_pos.x, 0), create_vector(player_pos.x, 0)) >= 200)
         {
             enemy->taking_damage = 0;
         }

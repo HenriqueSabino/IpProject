@@ -48,7 +48,7 @@ int main()
     install_sound(DIGI_AUTODETECT, MIDI_AUTODETECT, NULL);
     install_timer();
     set_color_depth(desktop_color_depth());
-    
+
     set_gfx_mode(GFX_AUTODETECT_WINDOWED, 64 * 16, 64 * 9, 0, 0);
 
     LOCK_VARIABLE(close_game);
@@ -223,7 +223,6 @@ int main()
         }
     }
 
-
     int rbs_size = map_size - not_objs + 1;
     RigidBody *rbs[rbs_size];
     rbs[0] = &player.rb;
@@ -241,96 +240,93 @@ int main()
 
     rbs[rbs_size - 1] = &player.sword_rb;
 
-
     while (menu_on)
     {
-       
-    //VARIABLES
-	int  chx  =  315, chy = 347 , som = 0;
-	int  px = 315, py[2]= {347, 400};
 
-	//BITMAPS
-	BITMAP *menu  = load_bitmap(LOGO_PATH , NULL);
-	BITMAP *chave = load_bitmap(ARROW_PATH , NULL);
-	BITMAP *buff  = create_bitmap(  64 * 16, 64 * 9 );
+        //VARIABLES
+        int chx = 315, chy = 347, som = 0;
+        int px = 315, py[2] = {347, 400};
 
-	//SAMPLES
-	SAMPLE *select = load_sample(SELECT_SOUND);
-	SAMPLE *intro  = load_sample(INTRO_SOUND);
-	SAMPLE *enter  = load_sample(ENTER_SOUND);
+        //BITMAPS
+        BITMAP *menu = load_bitmap(LOGO_PATH, NULL);
+        BITMAP *chave = load_bitmap(ARROW_PATH, NULL);
+        BITMAP *buff = create_bitmap(64 * 16, 64 * 9);
 
-	//INTRODUCTION SAMPLE
-	play_sample(intro, 255, 128, 1000, 1);
+        //SAMPLES
+        SAMPLE *select = load_sample(SELECT_SOUND);
+        SAMPLE *intro = load_sample(INTRO_SOUND);
+        SAMPLE *enter = load_sample(ENTER_SOUND);
 
-	while(!key[KEY_ESC] && menu_on)
-	{
-		//INPUT
-		if(key[KEY_RIGHT])
-		{
-            som = 1;
-        }
+        //INTRODUCTION SAMPLE
+        play_sample(intro, 255, 128, 1000, 1);
 
-		if(key[KEY_DOWN ])
-		{
-        	if(chy == py[0])
-			{
-                chy = py[1];
-                som = 1;
-            }
-        }
-
-		if(key[KEY_LEFT ])
-		{
-            som = 1;
-        }
-
-		if(key[KEY_UP   ])
-		{
-        	if(chy == py[1])
-			{
-                chy = py[0];
-                som = 1;
-            }
-        }
-
-		if(key[KEY_ENTER])
-		{
-            if(chy == py[0])
-			{
-                stop_sample(intro);
-                play_sample(enter, 255, 128, 1000, 0);
-                menu_on = FALSE;
-			}
-			else
-			{
-                // OUTPUT FUNCTION
-                return 0;
-            }
-		}
-
-		if(game_timer % 4 != 0)
+        while (!key[KEY_ESC] && menu_on)
         {
-			draw_sprite(buff, chave, chx, chy);
-		}
+            //INPUT
+            if (key[KEY_RIGHT])
+            {
+                som = 1;
+            }
 
-		if(som == 1 )
-		{
-            play_sample(select, 255, 128, 1000, 0);
-            som = 0;
+            if (key[KEY_DOWN])
+            {
+                if (chy == py[0])
+                {
+                    chy = py[1];
+                    som = 1;
+                }
+            }
+
+            if (key[KEY_LEFT])
+            {
+                som = 1;
+            }
+
+            if (key[KEY_UP])
+            {
+                if (chy == py[1])
+                {
+                    chy = py[0];
+                    som = 1;
+                }
+            }
+
+            if (key[KEY_ENTER])
+            {
+                if (chy == py[0])
+                {
+                    stop_sample(intro);
+                    play_sample(enter, 255, 128, 1000, 0);
+                    menu_on = FALSE;
+                }
+                else
+                {
+                    // OUTPUT FUNCTION
+                    return 0;
+                }
+            }
+
+            if (game_timer % 4 != 0)
+            {
+                draw_sprite(buff, chave, chx, chy);
+            }
+
+            if (som == 1)
+            {
+                play_sample(select, 255, 128, 1000, 0);
+                som = 0;
+            }
+
+            draw_sprite(screen, buff, 0, 0);
+            clear(buff);
+            draw_sprite(buff, menu, 0, 0);
         }
-
-		draw_sprite(screen, buff, 0, 0);
-		clear(buff);
-		draw_sprite(buff,  menu, 0, 0);
-	}
-	destroy_bitmap(buff  );
-	destroy_bitmap(menu  );
-	destroy_bitmap(chave );
-	destroy_sample(select);
-	destroy_sample(intro );
-
+        destroy_bitmap(buff);
+        destroy_bitmap(menu);
+        destroy_bitmap(chave);
+        destroy_sample(select);
+        destroy_sample(intro);
     }
-    
 
     while (!close_game)
     {
@@ -374,7 +370,7 @@ int main()
 
         if (key_down(KEY_F))
         {
-            if(!player.taking_damage)
+            if (!player.taking_damage)
                 player.attacking = 1;
         }
 
@@ -390,28 +386,28 @@ int main()
 
             for (int i = 0; i < enemy_count; i++)
             {
-                if (strcmp(enemies[i].rb.cb.tag, "bat") == 0 || strcmp(enemies[i].rb.cb.tag, "fox") == 0)
+                if (enemies[i].alive)
                 {
                     atk(&enemies[i], player.rb);
-                    
-                    if(!enemies[i].taking_damage && enemies[i].alive)
+                }
+
+                if (!enemies[i].taking_damage && enemies[i].alive)
+                {
+                    if (enemies[i].animation_frame >= 0 && enemies[i].animation_frame <= 3)
                     {
-                        if (enemies[i].animation_frame >= 0 && enemies[i].animation_frame <= 3)
+                        if (game_timer % 4 == 0)
                         {
-                            if (game_timer % 4 == 0)
-                            {
-                                enemies[i].animation_frame++;
-                                enemies[i].animation_frame %= 4;
-                            }
+                            enemies[i].animation_frame++;
+                            enemies[i].animation_frame %= 4;
                         }
                     }
-                    else
-                    {
-                        if(strcmp(enemies[i].rb.cb.tag, "bat") == 0)
-                            enemies[i].animation_frame = 3;
-                        else if(strcmp(enemies[i].rb.cb.tag, "fox") == 0)
-                            enemies[i].animation_frame = 0;
-                    }
+                }
+                else
+                {
+                    if (strcmp(enemies[i].rb.cb.tag, "bat") == 0)
+                        enemies[i].animation_frame = 3;
+                    else if (strcmp(enemies[i].rb.cb.tag, "fox") == 0)
+                        enemies[i].animation_frame = 0;
                 }
             }
 
@@ -423,7 +419,7 @@ int main()
                     enemies[i].alive = 0;
                     enemies[i].attack = 0;
                     enemies[i].rb.gravity_scale = 0.2f;
-                    enemies[i].rb.cb.enabled = 0;                  
+                    enemies[i].rb.cb.enabled = 0;
                 }
             }
 
@@ -471,13 +467,13 @@ int main()
             if (strcmp(enemies[i].rb.cb.tag, "bat") == 0 && enemies[i].rb.pos.y <= 1000)
             {
                 draw_bat(buffer, bat_sprite, &enemies[i], camera);
-                if(enemies[i].alive == 0 && enemies[i].rb.pos.y >= 1000)
+                if (enemies[i].alive == 0 && enemies[i].rb.pos.y >= 1000)
                     enemies[i].rb.pos.y = 1001;
             }
             else if (strcmp(enemies[i].rb.cb.tag, "fox") == 0 && enemies[i].rb.pos.y <= 1000)
             {
                 draw_fox(buffer, fox_sprite, &enemies[i], camera);
-                if(enemies[i].alive == 0 && enemies[i].rb.pos.y >= 1000)
+                if (enemies[i].alive == 0 && enemies[i].rb.pos.y >= 1000)
                     enemies[i].rb.pos.y = 1001;
             }
         }
@@ -618,7 +614,7 @@ void draw_bat(BITMAP *bmp, BITMAP *sprite, Enemy *bat, Vector camera)
 
     if (bat->facing_right)
     {
-        if(bat->taking_damage == 0 || bat->alive == 0)
+        if (bat->taking_damage == 0 || bat->alive == 0)
         {
             draw_sprite_ex(bmp, bat_sprite, bat->rb.pos.x - camera.x, bat->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
         }
@@ -636,7 +632,7 @@ void draw_bat(BITMAP *bmp, BITMAP *sprite, Enemy *bat, Vector camera)
     }
     else
     {
-        if(bat->taking_damage == 0 || bat->alive == 0)
+        if (bat->taking_damage == 0 || bat->alive == 0)
         {
             draw_sprite_ex(bmp, bat_sprite, bat->rb.pos.x - camera.x, bat->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
         }
@@ -676,7 +672,7 @@ void draw_fox(BITMAP *bmp, BITMAP *sprite, Enemy *fox, Vector camera)
 
     if (fox->facing_right)
     {
-        if(fox->taking_damage == 0 || fox->alive == 0)
+        if (fox->taking_damage == 0 || fox->alive == 0)
         {
             draw_sprite_ex(bmp, fox_sprite, fox->rb.pos.x - camera.x, fox->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
         }
@@ -694,7 +690,7 @@ void draw_fox(BITMAP *bmp, BITMAP *sprite, Enemy *fox, Vector camera)
     }
     else
     {
-        if(fox->taking_damage == 0 || fox->alive == 0)
+        if (fox->taking_damage == 0 || fox->alive == 0)
         {
             draw_sprite_ex(bmp, fox_sprite, fox->rb.pos.x - camera.x, fox->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
         }
