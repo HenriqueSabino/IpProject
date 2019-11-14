@@ -49,7 +49,7 @@ int main()
     install_timer();
     set_color_depth(desktop_color_depth());
 
-    set_gfx_mode(GFX_AUTODETECT_WINDOWED, 64 * 16, 64 * 9, 0, 0);
+    set_gfx_mode(GFX_AUTODETECT_WINDOWED, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
 
     LOCK_VARIABLE(close_game);
     LOCK_FUNCTION(close_program);
@@ -328,6 +328,8 @@ int main()
         destroy_sample(intro);
     }
 
+    clear_to_color(buffer, 0x40AEBF);
+
     while (!close_game)
     {
 
@@ -479,7 +481,7 @@ int main()
         }
 
         draw_sprite(screen, buffer, 0, 0);
-        clear(buffer);
+        clear_to_color(buffer, 0x40AEBF);
     }
 
     free(map);

@@ -1,5 +1,7 @@
 #define GRAVITY 10.0f
 #define FPS 30
+#define SCREEN_WIDTH 1024
+#define SCREEN_HEIGHT 576
 #define PLAYER_SPRITE_COLS 4
 #define PLAYER_TILE_SIZE 50
 #define BAT_SPRITE_COLS 2
@@ -8,4 +10,3 @@
 #define FOX_TILE_SIZE 32
 #define GROUND_SPRITE_COLS 4
 #define GROUND_TILE_SIZE 32
-

@@ -5,6 +5,7 @@
 #include "../headers/collisionbox.h"
 #include "../headers/vector.h"
 #include "../headers/list.h"
+#include "../headers/constants.h"
 
 Enemy *enemies_ref;
 int enemies_ref_count;
@@ -33,7 +34,7 @@ void onCollisionEnter_bat(RigidBody *self, RigidBody *other)
                 }
                 else
                 {
-                    self->velocity = create_vector(0, -5);
+                    self->velocity = create_vector(0, -15);
                     self->acceleration = create_vector(0, 0);
                     enemies_ref[i].alive = 0;
                 }
@@ -111,7 +112,7 @@ void onCollisionEnter_fox(RigidBody *self, RigidBody *other)
                 }
                 else
                 {
-                    self->velocity = create_vector(0, -5);
+                    self->velocity = create_vector(0, -15);
                     self->acceleration = create_vector(0, 0);
                 }
             }
@@ -193,7 +194,7 @@ void atk(Enemy *enemy, RigidBody player)
         {
             enemy->rb.acceleration = create_vector(0, 0);
         }
-        else if (dist(enemy->rb.pos, player_pos) <= 400 && !enemy->taking_damage)
+        else if (dist(enemy->rb.pos, player_pos) <= SCREEN_WIDTH && !enemy->taking_damage)
         {
             if (dist(enemy_pos, sum(player_pos, enemy->player_pos)) <= 10)
             {
@@ -205,11 +206,7 @@ void atk(Enemy *enemy, RigidBody player)
     }
     else if (strcmp(enemy->rb.cb.tag, "fox") == 0 && enemy->taking_damage == 0 && enemy->rb.velocity.y == 0 && enemy->attack)
     {
-        if (dist(create_vector(enemy_pos.x, 0), create_vector(player_pos.x, 0)) <= 100)
-        {
-            enemy->rb.acceleration = create_vector(0, 0);
-        }
-        else if (dist(enemy->rb.pos, player_pos) <= 400)
+        if (dist(enemy->rb.pos, player_pos) <= SCREEN_WIDTH)
         {
             if (player_pos.x > enemy_pos.x)
             {
@@ -223,6 +220,10 @@ void atk(Enemy *enemy, RigidBody player)
             }
             enemy->rb.acceleration.y = 0;
             enemy->rb.velocity.y = 0;
+        }
+        else
+        {
+            enemy->rb.velocity = create_vector(0, 0);
         }
     }
 }
