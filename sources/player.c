@@ -74,13 +74,13 @@ void onCollisionEnter(RigidBody *self, RigidBody *other)
             player_ref->taking_damage = 0;
         }
     }
-    if ((strcmp(other->cb.tag, "bat") == 0 || strcmp(other->cb.tag, "fox") == 0) && player_ref->invulnerability == 0)
+    if ((strcmp(other->cb.tag, "bat") == 0 || strcmp(other->cb.tag, "fox") == 0 || strcmp(other->cb.tag, "harpy") == 0 || strcmp(other->cb.tag, "ghost") == 0) && player_ref->invulnerability == 0)
     {
         if (strcmp(other->cb.tag, "bat") == 0)
         {
             player_ref->life -= 2;
         }
-        else if (strcmp(other->cb.tag, "fox") == 0)
+        else if (strcmp(other->cb.tag, "fox") == 0 || strcmp(other->cb.tag, "harpy") == 0 || strcmp(other->cb.tag, "ghost") == 0)
         {
             player_ref->life -= 5;
         }
@@ -92,25 +92,33 @@ void onCollisionEnter(RigidBody *self, RigidBody *other)
         else
             player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(-9, 28));
 
-        if (other->pos.x > self->pos.x)
+        if(player_ref->life > 0)
         {
-            player_ref->rb.velocity.x = -10;
-            player_ref->rb.velocity.y = -5;
+            if (other->pos.x > self->pos.x)
+            {
+                player_ref->rb.velocity.x = -10;
+                player_ref->rb.velocity.y = -5;
 
-            if (player_ref->facing_right == 1)
-                player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(60, 28));
+                if (player_ref->facing_right == 1)
+                    player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(60, 28));
+                else
+                    player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(-9, 28));
+            }
             else
-                player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(-9, 28));
+            {
+                player_ref->rb.velocity.x = 10;
+                player_ref->rb.velocity.y = -5;
+
+                if (player_ref->facing_right == 1)
+                    player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(60, 28));
+                else
+                    player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(-9, 28));
+            }
         }
         else
         {
-            player_ref->rb.velocity.x = 10;
-            player_ref->rb.velocity.y = -5;
-
-            if (player_ref->facing_right == 1)
-                player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(60, 28));
-            else
-                player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(-9, 28));
+            self->velocity = create_vector(0, -15);
+            self->acceleration = create_vector(0, 0);
         }
 
         if (player_ref->taking_damage == 1)

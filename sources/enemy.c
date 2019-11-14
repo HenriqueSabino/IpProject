@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "../headers/enemy.h"
+#include "../headers/player.h"
 #include "../headers/collisionbox.h"
 #include "../headers/vector.h"
 #include "../headers/list.h"
@@ -169,6 +170,65 @@ void init_fox(Enemy *fox, Vector pos)
     strcpy(fox->rb.cb.tag, "fox");
 }
 
+
+void init_harpy(Enemy *harpy, Vector pos)
+{
+    harpy->animation_frame = 0;
+    harpy->facing_right = 0;
+    harpy->player_pos = create_vector(200, -32);
+    harpy->life = 6;
+    harpy->attack = 1;
+    harpy->alive = 1;
+    harpy->taking_damage = 0;
+
+    harpy->rb.acceleration = create_vector(0, 0);
+    harpy->rb.gravity_scale = 0;
+    harpy->rb.pos = pos;
+    harpy->rb.velocity = create_vector(0, 0);
+
+    harpy->rb.cb.width = 50;
+    harpy->rb.cb.height = 30;
+    harpy->rb.cb.offset = create_vector(11, 22);
+    harpy->rb.cb.min = create_vector(harpy->rb.pos.x + harpy->rb.cb.offset.x, harpy->rb.pos.y + harpy->rb.cb.offset.y);
+    harpy->rb.cb.max = create_vector(harpy->rb.cb.min.x + harpy->rb.cb.width, harpy->rb.cb.min.y + harpy->rb.cb.height);
+    harpy->rb.cb.solid = 0;
+    harpy->rb.cb.enabled = 1;
+    harpy->rb.collidingWith = createList();
+    harpy->rb.onCollisionEnter = onCollisionEnter_bat;
+    harpy->rb.onCollisionExit = NULL;
+    harpy->rb.onCollisionStay = NULL;
+    strcpy(harpy->rb.cb.tag, "harpy");
+}
+
+void init_ghost(Enemy *ghost, Vector pos)
+{
+    ghost->animation_frame = 0;
+    ghost->facing_right = 0;
+    ghost->player_pos = create_vector(200, -32);
+    ghost->life = 6;
+    ghost->attack = 1;
+    ghost->alive = 1;
+    ghost->taking_damage = 0;
+
+    ghost->rb.acceleration = create_vector(0, 0);
+    ghost->rb.gravity_scale = 0;
+    ghost->rb.pos = pos;
+    ghost->rb.velocity = create_vector(0, 0);
+
+    ghost->rb.cb.width = 40;
+    ghost->rb.cb.height = 40;
+    ghost->rb.cb.offset = create_vector(7, 7);
+    ghost->rb.cb.min = create_vector(ghost->rb.pos.x + ghost->rb.cb.offset.x, ghost->rb.pos.y + ghost->rb.cb.offset.y);
+    ghost->rb.cb.max = create_vector(ghost->rb.cb.min.x + ghost->rb.cb.width, ghost->rb.cb.min.y + ghost->rb.cb.height);
+    ghost->rb.cb.solid = 0;
+    ghost->rb.cb.enabled = 1;
+    ghost->rb.collidingWith = createList();
+    ghost->rb.onCollisionEnter = NULL;
+    ghost->rb.onCollisionExit = NULL;
+    ghost->rb.onCollisionStay = NULL;
+    strcpy(ghost->rb.cb.tag, "ghost");
+}
+
 void atk(Enemy *enemy, RigidBody player)
 {
     Vector player_pos = mult(sum(player.cb.min, player.cb.max), 0.5f);
@@ -183,7 +243,7 @@ void atk(Enemy *enemy, RigidBody player)
         enemy->facing_right = 1;
     }
 
-    if (strcmp(enemy->rb.cb.tag, "bat") == 0 && enemy->attack)
+    if ((strcmp(enemy->rb.cb.tag, "bat") == 0 || strcmp(enemy->rb.cb.tag, "harpy") == 0) && enemy->attack)
     {
         if (dist(create_vector(enemy_pos.x, 0), create_vector(player_pos.x, 0)) >= 200)
         {
@@ -208,16 +268,20 @@ void atk(Enemy *enemy, RigidBody player)
     {
         if (dist(enemy->rb.pos, player_pos) <= SCREEN_WIDTH)
         {
-            if (player_pos.x > enemy_pos.x)
+            if (dist(create_vector(enemy_pos.x, 0), create_vector(player_pos.x, 0)) <= 100)
+        {
+            enemy->rb.acceleration = create_vector(0, 0);
+        }
+        else if (dist(enemy->rb.pos, player_pos) <= SCREEN_WIDTH && !enemy->taking_damage)
+        {
+            if (dist(enemy_pos, sum(player_pos, enemy->player_pos)) <= 10)
             {
-                enemy->rb.velocity.x = 5;
-                enemy->rb.acceleration.y = 0;
+                enemy->player_pos.x *= -1;
+                enemy->rb.acceleration = mult(normalized(diff(create_vector(player_pos.x, 0), create_vector(enemy_pos.x, 0))), 8);
             }
-            else
-            {
-                enemy->rb.velocity.x = -5;
-                enemy->rb.acceleration.y = 0;
-            }
+            enemy->rb.velocity = mult(normalized(diff(create_vector(player_pos.x, 0), create_vector(enemy_pos.x, 0))), 5);
+        }
+
             enemy->rb.acceleration.y = 0;
             enemy->rb.velocity.y = 0;
         }
@@ -228,8 +292,55 @@ void atk(Enemy *enemy, RigidBody player)
     }
 }
 
+void atk_ghost(Enemy *enemy, Player *player)
+{
+    Vector player_pos = mult(sum(player->rb.cb.min, player->rb.cb.max), 0.5f);
+    Vector enemy_pos = mult(sum(enemy->rb.cb.min, enemy->rb.cb.max), 0.5f);
+
+    if (player_pos.x >= enemy_pos.x)
+    {
+        enemy->facing_right = 0;
+    }
+    else
+    {
+        enemy->facing_right = 1;
+    }
+
+    if(enemy->facing_right == player->facing_right)
+    {
+        enemy->attack = 0;
+    }
+    else
+    {
+        enemy->attack = 1;
+    }
+
+    if (enemy->attack == 1)
+    {
+        if (dist(create_vector(enemy_pos.x, 0), create_vector(player_pos.x, 0)) <= 100)
+        {
+                enemy->rb.acceleration = create_vector(0, 0);
+        }
+        else if (dist(enemy->rb.pos, player_pos) <= SCREEN_WIDTH)
+        {
+            if (dist(enemy_pos, sum(player_pos, enemy->player_pos)) <= 10)
+            {
+                enemy->player_pos.x *= -1;
+                enemy->rb.acceleration = mult(normalized(diff(player_pos, enemy_pos)), 3);
+            }
+            enemy->rb.velocity = mult(normalized(diff(sum(player_pos, enemy->player_pos), enemy_pos)), 3);
+        }
+    }
+    else
+    {
+        enemy->rb.velocity = create_vector (0, 0);
+        enemy->rb.acceleration = create_vector (0, 0);
+    }
+}
+
 void set_enemies_ref(Enemy *enemies, int count)
 {
     enemies_ref = enemies;
     enemies_ref_count = count;
 }
+

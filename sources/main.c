@@ -34,6 +34,10 @@ void draw_bat(BITMAP *bmp, BITMAP *sprite, Enemy *bat, Vector camera);
 
 void draw_fox(BITMAP *bmp, BITMAP *sprite, Enemy *fox, Vector camera);
 
+void draw_harpy(BITMAP *bmp, BITMAP *sprite, Enemy *harpy, Vector camera);
+
+void draw_ghost(BITMAP *bmp, BITMAP *sprite, Enemy *harpy, Vector camera);
+
 void draw_ground(BITMAP *bmp, BITMAP *sprite, Ground *ground, Vector camera);
 
 void draw_lifebar(BITMAP *bmp, BITMAP *sprite, Player player);
@@ -82,6 +86,14 @@ int main()
     if (fox_sprite == NULL)
         allegro_message("error");
 
+    BITMAP *harpy_sprite = load_bitmap(HARPY, NULL);
+    if (harpy_sprite == NULL)
+        allegro_message("error");
+
+    BITMAP *ghost_sprite = load_bitmap(GHOST, NULL);
+    if (ghost_sprite == NULL)
+        allegro_message("error");
+
     BITMAP *ground_sprite = load_bitmap(OVER_WORLD_GROUND, NULL);
     if (ground_sprite == NULL)
         allegro_message("error");
@@ -104,7 +116,7 @@ int main()
         {
             ground_count++;
         }
-        else if (map[i] == 'B' || map[i] == 'F')
+        else if (map[i] == 'B' || map[i] == 'F'|| map[i] == 'H' || map[i] == 'G')
         {
             enemy_count++;
         }
@@ -135,6 +147,18 @@ int main()
         else if (map[i] == 'F')
         {
             init_fox(&enemies[enemy_count], create_vector(col * 128, row * 128));
+            enemy_count++;
+            col++;
+        }
+        else if (map[i] == 'H')
+        {
+            init_harpy(&enemies[enemy_count], create_vector(col * 128, row * 128));
+            enemy_count++;
+            col++;
+        }
+        else if (map[i] == 'G')
+        {
+            init_ghost(&enemies[enemy_count], create_vector(col * 128, row * 128));
             enemy_count++;
             col++;
         }
@@ -356,11 +380,20 @@ int main()
 
     while (!close_game)
     {
-
-        if (player.life <= 0 || player.rb.pos.y >= 1000)
+        if(player.rb.pos.y >= 700)
         {
-            close_program();
-            break;
+            player.life = 0;
+        }
+
+        if (player.life <= 0)
+        {
+            player.rb.cb.enabled = 0;
+            player.sword_rb.cb.enabled = 0;
+            if(player.rb.pos.y >= 1000)
+            {
+                close_program();
+                break;
+            }
         }
 
         keyboard_input();
@@ -408,23 +441,64 @@ int main()
 
             //linear interpolation between camera and player's position
             Vector offset_camera = create_vector(-100, -200);
-            camera = lerp(camera, sum(player.rb.pos, offset_camera), 0.9f);
+
+            if(player.rb.pos.y <= 400 && player.life > 0)
+                camera = lerp(camera, sum(player.rb.pos, offset_camera), 0.9f);
 
             for (int i = 0; i < enemy_count; i++)
             {
                 if (enemies[i].alive)
                 {
-                    atk(&enemies[i], player.rb);
+                    if(strcmp(enemies[i].rb.cb.tag, "ghost") != 0)
+                    {
+                        atk(&enemies[i], player.rb);
+                    }
+                    else
+                    {
+                        atk_ghost(&enemies[i], &player);
+                    }
                 }
 
                 if (!enemies[i].taking_damage && enemies[i].alive)
                 {
-                    if (enemies[i].animation_frame >= 0 && enemies[i].animation_frame <= 3)
+                    if(strcmp(enemies[i].rb.cb.tag, "fox") == 0 || strcmp(enemies[i].rb.cb.tag, "fox") == 0)
                     {
-                        if (game_timer % 4 == 0)
+                        if (enemies[i].animation_frame >= 0 && enemies[i].animation_frame <= 3)
                         {
-                            enemies[i].animation_frame++;
-                            enemies[i].animation_frame %= 4;
+                            if (game_timer % 4 == 0)
+                            {
+                                enemies[i].animation_frame++;
+                                enemies[i].animation_frame %= 4;
+                            }
+                        }
+                    }
+                    else if(strcmp(enemies[i].rb.cb.tag, "harpy") == 0)
+                    {
+                        if (enemies[i].animation_frame >= 0 && enemies[i].animation_frame <= 4)
+                        {
+                            if (game_timer % 4 == 0)
+                            {
+                                enemies[i].animation_frame++;
+                                enemies[i].animation_frame %= 5;
+                            }
+                        }
+                    }
+                    else if(strcmp(enemies[i].rb.cb.tag, "ghost") == 0)
+                    {
+                        if(enemies[i].attack == 1)
+                        {
+                            if (enemies[i].animation_frame >= 0 && enemies[i].animation_frame <= 3)
+                            {
+                                if (game_timer % 4 == 0)
+                                {
+                                    enemies[i].animation_frame++;
+                                    enemies[i].animation_frame %= 4;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            enemies[i].animation_frame = 0;
                         }
                     }
                 }
@@ -432,7 +506,7 @@ int main()
                 {
                     if (strcmp(enemies[i].rb.cb.tag, "bat") == 0)
                         enemies[i].animation_frame = 3;
-                    else if (strcmp(enemies[i].rb.cb.tag, "fox") == 0)
+                    else
                         enemies[i].animation_frame = 0;
                 }
             }
@@ -499,6 +573,18 @@ int main()
             else if (strcmp(enemies[i].rb.cb.tag, "fox") == 0 && enemies[i].rb.pos.y <= 1000)
             {
                 draw_fox(buffer, fox_sprite, &enemies[i], camera);
+                if (enemies[i].alive == 0 && enemies[i].rb.pos.y >= 1000)
+                    enemies[i].rb.pos.y = 1001;
+            }
+            else if (strcmp(enemies[i].rb.cb.tag, "harpy") == 0 && enemies[i].rb.pos.y <= 1000)
+            {
+                draw_harpy(buffer, harpy_sprite, &enemies[i], camera);
+                if (enemies[i].alive == 0 && enemies[i].rb.pos.y >= 1000)
+                    enemies[i].rb.pos.y = 1001;
+            }
+            else if (strcmp(enemies[i].rb.cb.tag, "ghost") == 0 && enemies[i].rb.pos.y <= 1000)
+            {
+                draw_ghost(buffer, ghost_sprite, &enemies[i], camera);
                 if (enemies[i].alive == 0 && enemies[i].rb.pos.y >= 1000)
                     enemies[i].rb.pos.y = 1001;
             }
@@ -584,7 +670,7 @@ void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player, Vector camera)
 
     if (player->facing_right)
     {
-        if (player->invulnerability == 1)
+        if (player->invulnerability == 1 && player->life > 0)
         {
             if (game_timer % 2 == 0)
             {
@@ -602,7 +688,7 @@ void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player, Vector camera)
     }
     else
     {
-        if (player->invulnerability == 1)
+        if (player->invulnerability == 1 && player->life > 0)
         {
             if (game_timer % 4 == 0)
             {
@@ -734,6 +820,104 @@ void draw_fox(BITMAP *bmp, BITMAP *sprite, Enemy *fox, Vector camera)
     }
 
     destroy_bitmap(fox_sprite);
+}
+
+void draw_harpy(BITMAP *bmp, BITMAP *sprite, Enemy *harpy, Vector camera)
+{
+    BITMAP *harpy_sprite = create_bitmap(64, 64);
+    clear_to_color(harpy_sprite, makecol(255, 0, 255));
+
+    int r_img_pos = harpy->animation_frame % BAT_SPRITE_COLS;
+    int c_img_pos = harpy->animation_frame / BAT_SPRITE_COLS;
+
+    r_img_pos *= BAT_TILE_SIZE;
+    c_img_pos *= BAT_TILE_SIZE;
+
+    //draw the a part of the sprite sheet to the screen and scales it
+    masked_stretch_blit(sprite, harpy_sprite, r_img_pos, c_img_pos, 32, 32, 0, 0, 64, 64);
+
+    set_trans_blender(255, 255, 255, 64);
+
+    if (harpy->facing_right)
+    {
+        if (harpy->taking_damage == 0 || harpy->alive == 0)
+        {
+            draw_sprite_ex(bmp, harpy_sprite, harpy->rb.pos.x - camera.x, harpy->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+        }
+        else
+        {
+            if (game_timer % 2 == 0)
+            {
+                draw_sprite_ex(bmp, harpy_sprite, harpy->rb.pos.x - camera.x, harpy->rb.pos.y - camera.y, DRAW_SPRITE_TRANS, DRAW_SPRITE_NO_FLIP);
+            }
+            else
+            {
+                draw_sprite_ex(bmp, harpy_sprite, harpy->rb.pos.x - camera.x, harpy->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+            }
+        }
+    }
+    else
+    {
+        if (harpy->taking_damage == 0 || harpy->alive == 0)
+        {
+            draw_sprite_ex(bmp, harpy_sprite, harpy->rb.pos.x - camera.x, harpy->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
+        }
+        else
+        {
+            if (game_timer % 2 == 0)
+            {
+                draw_sprite_ex(bmp, harpy_sprite, harpy->rb.pos.x - camera.x, harpy->rb.pos.y - camera.y, DRAW_SPRITE_TRANS, DRAW_SPRITE_H_FLIP);
+            }
+            else
+            {
+                draw_sprite_ex(bmp, harpy_sprite, harpy->rb.pos.x - camera.x, harpy->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
+            }
+        }
+    }
+
+    destroy_bitmap(harpy_sprite);
+}
+
+void draw_ghost(BITMAP *bmp, BITMAP *sprite, Enemy *ghost, Vector camera)
+{
+    BITMAP *ghost_sprite = create_bitmap(64, 64);
+    clear_to_color(ghost_sprite, makecol(255, 0, 255));
+
+    int r_img_pos = ghost->animation_frame % BAT_SPRITE_COLS;
+    int c_img_pos = ghost->animation_frame / BAT_SPRITE_COLS;
+
+    r_img_pos *= BAT_TILE_SIZE;
+    c_img_pos *= BAT_TILE_SIZE;
+
+    //draw the a part of the sprite sheet to the screen and scales it
+    masked_stretch_blit(sprite, ghost_sprite, r_img_pos, c_img_pos, 32, 32, 0, 0, 64, 64);
+
+    set_trans_blender(255, 255, 255, 64);
+
+    if (ghost->facing_right)
+    {
+        if (ghost->attack == 1)
+        {
+            draw_sprite_ex(bmp, ghost_sprite, ghost->rb.pos.x - camera.x, ghost->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+        }
+        else
+        {
+            draw_sprite_ex(bmp, ghost_sprite, ghost->rb.pos.x - camera.x, ghost->rb.pos.y - camera.y, DRAW_SPRITE_TRANS, DRAW_SPRITE_NO_FLIP);
+        }
+    }
+    else
+    {
+        if (ghost->attack == 1)
+        {
+            draw_sprite_ex(bmp, ghost_sprite, ghost->rb.pos.x - camera.x, ghost->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
+        }
+        else
+        {
+            draw_sprite_ex(bmp, ghost_sprite, ghost->rb.pos.x - camera.x, ghost->rb.pos.y - camera.y, DRAW_SPRITE_TRANS, DRAW_SPRITE_H_FLIP);
+        }
+    }
+
+    destroy_bitmap(ghost_sprite);
 }
 
 void draw_ground(BITMAP *bmp, BITMAP *sprite, Ground *ground, Vector camera)
