@@ -148,13 +148,13 @@ void onCollisionStay(RigidBody *self, RigidBody *other)
         }
     }
 
-    if ((strcmp(other->cb.tag, "bat") == 0 || strcmp(other->cb.tag, "fox") == 0) && player_ref->invulnerability == 0)
+    if ((strcmp(other->cb.tag, "bat") == 0 || strcmp(other->cb.tag, "fox") == 0 || strcmp(other->cb.tag, "harpy") == 0 || strcmp(other->cb.tag, "ghost") == 0) && player_ref->invulnerability == 0)
     {
         if (strcmp(other->cb.tag, "bat") == 0)
         {
             player_ref->life -= 2;
         }
-        else if (strcmp(other->cb.tag, "fox") == 0)
+        else if (strcmp(other->cb.tag, "fox") == 0 || strcmp(other->cb.tag, "harpy") == 0 || strcmp(other->cb.tag, "ghost") == 0)
         {
             player_ref->life -= 5;
         }

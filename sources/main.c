@@ -380,7 +380,7 @@ int main()
 
     while (!close_game)
     {
-        if(player.rb.pos.y >= 700)
+        if(player.rb.pos.y >= 600)
         {
             player.life = 0;
         }
@@ -389,7 +389,7 @@ int main()
         {
             player.rb.cb.enabled = 0;
             player.sword_rb.cb.enabled = 0;
-            if(player.rb.pos.y >= 1000)
+            if(player.rb.pos.y >= 1200)
             {
                 close_program();
                 break;
@@ -569,7 +569,6 @@ int main()
         }
 
         //DRAWING
-        draw_lifebar(buffer, lifebar_sprite, player);
 
         for (int i = 0; i < ground_count; i++)
         {
@@ -606,13 +605,18 @@ int main()
             }
         }
 
+        draw_lifebar(buffer, lifebar_sprite, player);
+
         draw_sprite(screen, buffer, 0, 0);
         clear_to_color(buffer, 0x40AEBF);
     }
 
     free(map);
     destroy_bitmap(buffer);
+    destroy_bitmap(lifebar_sprite);
     destroy_bitmap(player_sprite);
+    destroy_bitmap(harpy_sprite);
+    destroy_bitmap(ghost_sprite);
     destroy_bitmap(bat_sprite);
     destroy_bitmap(fox_sprite);
     destroy_bitmap(ground_sprite);
