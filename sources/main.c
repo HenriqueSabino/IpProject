@@ -442,7 +442,7 @@ int main()
             //linear interpolation between camera and player's position
             Vector offset_camera = create_vector(-100, -200);
 
-            if(player.rb.pos.y <= n_rows * grounds[0].rb.cb.width && 
+            if(player.rb.pos.y <= n_rows * grounds[0].rb.cb.height && 
                 player.rb.pos.x >= grounds[0].rb.cb.width && 
                 player.rb.pos.x <= grounds[ground_count - 1].rb.pos.x - SCREEN_WIDTH && 
                 player.life > 0)
