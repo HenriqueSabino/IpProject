@@ -5,6 +5,8 @@
 
 #define OVER_WORLD_GROUND "..\\assets\\Platforms\\OverworldGround.bmp"
 #define OVER_WORLD_PLATFORM "..\\assets\\Platforms\\OverworldGround3.bmp"
+#define LAVA "..\\assets\\Platforms\\LavaGround.bmp"
+
 
 typedef struct ground
 {
@@ -14,5 +16,6 @@ typedef struct ground
 
 void init_ground(Ground *ground, Vector pos, int animation_frame);
 void init_platform(Ground *ground, Vector pos, int animation_frame);
+void init_lava(Ground *lava, Vector pos, int animation_frame);
 
 #endif // "GROUND_H"

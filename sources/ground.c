@@ -98,3 +98,37 @@ void init_platform(Ground *platform, Vector pos, int animation_frame)
     platform->rb.onCollisionExit = NULL;
     platform->rb.onCollisionStay = NULL;
 }
+
+void init_lava(Ground *lava, Vector pos, int animation_frame)
+{
+    lava->animation_frame = animation_frame;
+
+    lava->rb.gravity_scale = 0;
+    lava->rb.velocity = create_vector(0, 0);
+    lava->rb.acceleration = create_vector(0, 0);
+    lava->rb.pos = pos;
+
+    if (animation_frame == 4)
+    {
+        lava->rb.cb.width = 128;
+        lava->rb.cb.height = 128;
+        lava->rb.cb.offset = create_vector(0, 0);
+    }
+    else
+    {
+        lava->rb.cb.width = 128;
+        lava->rb.cb.height = 120;
+        lava->rb.cb.offset = create_vector(0, 8);
+    }
+    
+
+    lava->rb.cb.min = create_vector(lava->rb.pos.x, lava->rb.pos.y);
+    lava->rb.cb.max = create_vector(lava->rb.cb.min.x + lava->rb.cb.width, lava->rb.cb.min.y + lava->rb.cb.height);
+    strcpy(lava->rb.cb.tag, "lava");
+    lava->rb.cb.solid = 1;
+    lava->rb.cb.enabled = 1;
+    lava->rb.collidingWith = createList();
+    lava->rb.onCollisionEnter = NULL;
+    lava->rb.onCollisionExit = NULL;
+    lava->rb.onCollisionStay = NULL;
+}

@@ -598,9 +598,13 @@ int main()
         for (int i = 0; i < ground_count; i++)
         {
             if (strcmp(grounds[i].rb.cb.tag, "ground") == 0)
+            {
                 draw_ground(buffer, ground_sprite, &grounds[i], camera);
+            }
             else if (strcmp(grounds[i].rb.cb.tag, "platform") == 0)
+            {
                 draw_platform(buffer, platform_sprite, &grounds[i], camera);
+            }
         }
 
         draw_player(buffer, player_sprite, &player, camera);
