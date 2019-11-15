@@ -441,13 +441,21 @@ int main()
 
             //linear interpolation between camera and player's position
             Vector offset_camera = create_vector(-100, -200);
+            camera = lerp(camera, sum(player.rb.pos, offset_camera), 0.9f);
 
-            if(player.rb.pos.y <= n_rows * grounds[0].rb.cb.height && 
-                player.rb.pos.x >= grounds[0].rb.cb.width && 
-                player.rb.pos.x <= grounds[ground_count - 1].rb.pos.x - SCREEN_WIDTH && 
-                player.life > 0)
-                camera = lerp(camera, sum(player.rb.pos, offset_camera), 0.9f);
-        
+            if (camera.x <= 0)
+            {
+                camera.x = 0;
+            }
+            else if (camera.x + SCREEN_W >= grounds[ground_count - 1].rb.cb.max.x)
+            {
+                camera.x = grounds[ground_count - 1].rb.cb.max.x - SCREEN_W;
+            }
+
+            if (camera.y + SCREEN_H >= grounds[ground_count - 1].rb.cb.max.y)
+            {
+                camera.y = grounds[ground_count - 1].rb.cb.max.y - SCREEN_H;
+            }
 
             for (int i = 0; i < enemy_count; i++)
             {
