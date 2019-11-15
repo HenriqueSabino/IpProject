@@ -17,6 +17,11 @@ int readMap(char **map, char *path)
         fscanf(mapPointer, "%i\n", &rows);
         fscanf(mapPointer, "%i", &cols);
 
+        /* creating two variables to hold the number of rows and columns so that one can 
+        have access to them into the main function.*/
+        n_rows = rows;
+        n_cols = cols;
+
         char c = fgetc(mapPointer);
         while (c == '\n')
         {
