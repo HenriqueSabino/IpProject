@@ -444,6 +444,20 @@ int main()
 
             if(player.rb.pos.y <= 400 && player.life > 0)
                 camera = lerp(camera, sum(player.rb.pos, offset_camera), 0.9f);
+            
+            if (player.rb.pos.x <= 2 * grounds[0].rb.cb.width)
+            {
+                Vector v = create_vector(50, player.rb.pos.y + offset_camera.y);
+                camera = lerp(v, sum(player.rb.pos, offset_camera), 0.9f);
+                //camera.x = 50;
+                //camera.y = player.rb.pos.y + offset_camera.y;
+            }
+            printf("\n%d\n", grounds[0].rb.cb.max.x);
+            if (player.rb.cb.max.x >= grounds[ground_count - 1].rb.pos.x - SCREEN_WIDTH)
+            {
+                Vector v = create_vector(grounds[ground_count - 1].rb.pos.x - SCREEN_WIDTH, player.rb.pos.y + offset_camera.y);
+                camera = lerp(v, sum(player.rb.pos, offset_camera), 0.9f);
+            }
 
             for (int i = 0; i < enemy_count; i++)
             {
