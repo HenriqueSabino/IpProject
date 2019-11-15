@@ -272,8 +272,8 @@ int main()
 
 #pragma region menu
     //VARIABLES
-    int chx = 315, chy = 347, som = 0;
-    int py[2] = {347, 400};
+    int chx = 355, chy = 420, som = 0;
+    int py[2] = {420, 485};
 
     //BITMAPS
     BITMAP *menu = load_bitmap(LOGO_PATH, NULL);
