@@ -30,7 +30,7 @@ void update_all(RigidBody *rbs[], int amount)
     {
         for (int j = 0; j < amount; j++)
         {
-            if (i == j || strcmp(rbs[i]->cb.tag, "ground") == 0)
+            if (i == j || strcmp(rbs[i]->cb.tag, "ground") == 0 || strcmp(rbs[i]->cb.tag, "platform") == 0)
             {
                 continue;
             }
@@ -42,7 +42,7 @@ void update_all(RigidBody *rbs[], int amount)
             {
                 if (rbs[i]->cb.solid && rbs[j]->cb.solid && strcmp(rbs[j]->cb.tag, "fox") != 0)
                 {
-                    if (rbs_before_update[i].min.y >= rbs[j]->cb.max.y)
+                    if (rbs_before_update[i].min.y >= rbs[j]->cb.max.y && strcmp(rbs[j]->cb.tag, "platform") != 0)
                     {
                         rbs[i]->pos.y = rbs_before_update[i].min.y - (rbs_before_update[i].min.y - rbs[j]->cb.max.y) - rbs_before_update[i].offset.y + 1;
                     }
@@ -50,11 +50,11 @@ void update_all(RigidBody *rbs[], int amount)
                     {
                         rbs[i]->pos.y = rbs_before_update[i].min.y + rbs[j]->cb.min.y - rbs_before_update[i].max.y - rbs_before_update[i].offset.y - 1;
                     }
-                    else if (rbs_before_update[i].min.x >= rbs[j]->cb.max.x)
+                    else if (rbs_before_update[i].min.x >= rbs[j]->cb.max.x && strcmp(rbs[j]->cb.tag, "platform") != 0)
                     {
                         rbs[i]->pos.x = (rbs_before_update[i].min.x) - (rbs_before_update[i].min.x - rbs[j]->cb.max.x) - rbs_before_update[i].offset.x + 1;
                     }
-                    else if (rbs_before_update[i].max.x <= rbs[j]->cb.min.x)
+                    else if (rbs_before_update[i].max.x <= rbs[j]->cb.min.x && strcmp(rbs[j]->cb.tag, "platform") != 0)
                     {
                         rbs[i]->pos.x = rbs_before_update[i].min.x + rbs[j]->cb.min.x - rbs_before_update[i].max.x - rbs_before_update[i].offset.x - 1;
                     }

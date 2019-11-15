@@ -40,6 +40,8 @@ void draw_ghost(BITMAP *bmp, BITMAP *sprite, Enemy *harpy, Vector camera);
 
 void draw_ground(BITMAP *bmp, BITMAP *sprite, Ground *ground, Vector camera);
 
+void draw_platform(BITMAP *bmp, BITMAP *sprite, Ground *platform, Vector camera);
+
 void draw_lifebar(BITMAP *bmp, BITMAP *sprite, Player player);
 
 void draw_arrow(BITMAP *bmp, BITMAP *sprite);
@@ -98,6 +100,10 @@ int main()
     if (ground_sprite == NULL)
         allegro_message("error");
 
+    BITMAP *platform_sprite = load_bitmap(OVER_WORLD_PLATFORM, NULL);
+    if (platform_sprite == NULL)
+        allegro_message("error");
+
     BITMAP *lifebar_sprite = load_bitmap("../assets/Canvas/LifeBar.bmp", NULL);
     if (lifebar_sprite == NULL)
         allegro_message("error");
@@ -112,7 +118,8 @@ int main()
     {
         if (map[i] == '0' || map[i] == '1' || map[i] == '2' || map[i] == '3' || map[i] == '4' ||
             map[i] == '5' || map[i] == '6' || map[i] == '7' || map[i] == '8' || map[i] == '9' ||
-            map[i] == 'a' || map[i] == 'b' || map[i] == 'c')
+            map[i] == 'a' || map[i] == 'b' || map[i] == 'c' || map[i] == 'd' || map[i] == 'e' || 
+            map[i] == 'f')
         {
             ground_count++;
         }
@@ -237,6 +244,24 @@ int main()
         else if (map[i] == 'c')
         {
             init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 12);
+            ground_count++;
+            col++;
+        }
+        else if (map[i] == 'd')
+        {
+            init_platform(&grounds[ground_count], create_vector(col * 128, row * 128), 0);
+            ground_count++;
+            col++;
+        }
+        else if (map[i] == 'e')
+        {
+            init_platform(&grounds[ground_count], create_vector(col * 128, row * 128), 1);
+            ground_count++;
+            col++;
+        }
+        else if (map[i] == 'f')
+        {
+            init_platform(&grounds[ground_count], create_vector(col * 128, row * 128), 2);
             ground_count++;
             col++;
         }
@@ -477,7 +502,7 @@ int main()
 
                 if (!enemies[i].taking_damage && enemies[i].alive)
                 {
-                    if(strcmp(enemies[i].rb.cb.tag, "fox") == 0 || strcmp(enemies[i].rb.cb.tag, "fox") == 0)
+                    if(strcmp(enemies[i].rb.cb.tag, "bat") == 0 || strcmp(enemies[i].rb.cb.tag, "fox") == 0)
                     {
                         if (enemies[i].animation_frame >= 0 && enemies[i].animation_frame <= 3)
                         {
@@ -572,7 +597,10 @@ int main()
 
         for (int i = 0; i < ground_count; i++)
         {
-            draw_ground(buffer, ground_sprite, &grounds[i], camera);
+            if (strcmp(grounds[i].rb.cb.tag, "ground") == 0)
+                draw_ground(buffer, ground_sprite, &grounds[i], camera);
+            else if (strcmp(grounds[i].rb.cb.tag, "platform") == 0)
+                draw_platform(buffer, platform_sprite, &grounds[i], camera);
         }
 
         draw_player(buffer, player_sprite, &player, camera);
@@ -620,6 +648,7 @@ int main()
     destroy_bitmap(bat_sprite);
     destroy_bitmap(fox_sprite);
     destroy_bitmap(ground_sprite);
+    destroy_bitmap(platform_sprite);
 
     for (int i = 0; i < rbs_size; i++)
     {
@@ -957,6 +986,25 @@ void draw_ground(BITMAP *bmp, BITMAP *sprite, Ground *ground, Vector camera)
     draw_sprite_ex(bmp, ground_sprite, ground->rb.pos.x - camera.x, ground->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
 
     destroy_bitmap(ground_sprite);
+}
+
+void draw_platform(BITMAP *bmp, BITMAP *sprite, Ground *platform, Vector camera)
+{
+    BITMAP *platform_sprite = create_bitmap(128, 128);
+    clear_to_color(platform_sprite, makecol(255, 0, 255));
+
+    int r_img_pos = platform->animation_frame % BAT_SPRITE_COLS;
+    int c_img_pos = platform->animation_frame / BAT_SPRITE_COLS;
+
+    r_img_pos *= BAT_TILE_SIZE;
+    c_img_pos *= BAT_TILE_SIZE;
+
+    //draw the a part of the sprite sheet to the screen and scales it
+    masked_stretch_blit(sprite, platform_sprite, r_img_pos, c_img_pos, 32, 32, 0, 0, 128, 128);
+
+    draw_sprite_ex(bmp, platform_sprite, platform->rb.pos.x - camera.x, platform->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+
+    destroy_bitmap(platform_sprite);
 }
 
 void draw_lifebar(BITMAP *bmp, BITMAP *sprite, Player player)

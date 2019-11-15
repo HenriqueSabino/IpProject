@@ -74,6 +74,27 @@ void onCollisionEnter(RigidBody *self, RigidBody *other)
             player_ref->taking_damage = 0;
         }
     }
+
+    if (strcmp(other->cb.tag, "platform") == 0)
+    {
+        if (self->cb.max.y < other->cb.min.y)
+        {
+            if (self->cb.max.y < other->cb.min.y)
+            {
+                player_ref->can_jump = 1;
+            }
+            player_ref->rb.velocity.y = 0;
+            player_ref->rb.acceleration = create_vector(0, 0);
+
+            if (player_ref->facing_right == 1)
+                player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(60, 28));
+            else
+                player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(-9, 28));
+
+            player_ref->taking_damage = 0;
+        }
+    }
+
     if ((strcmp(other->cb.tag, "bat") == 0 || strcmp(other->cb.tag, "fox") == 0 || strcmp(other->cb.tag, "harpy") == 0 || strcmp(other->cb.tag, "ghost") == 0) && player_ref->invulnerability == 0)
     {
         if (strcmp(other->cb.tag, "bat") == 0)
@@ -148,6 +169,23 @@ void onCollisionStay(RigidBody *self, RigidBody *other)
         }
     }
 
+    if (strcmp(other->cb.tag, "platform") == 0)
+    {
+        if (self->cb.max.y < other->cb.min.y)
+        {
+            player_ref->rb.velocity.y = 0;
+            player_ref->rb.acceleration = create_vector(0, 0);
+
+            if (player_ref->facing_right == 1)
+                player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(60, 28));
+            else
+                player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(-9, 28));
+
+            player_ref->can_jump = 1;
+            player_ref->taking_damage = 0;
+        }
+    }
+
     if ((strcmp(other->cb.tag, "bat") == 0 || strcmp(other->cb.tag, "fox") == 0 || strcmp(other->cb.tag, "harpy") == 0 || strcmp(other->cb.tag, "ghost") == 0) && player_ref->invulnerability == 0)
     {
         if (strcmp(other->cb.tag, "bat") == 0)
@@ -196,7 +234,7 @@ void onCollisionStay(RigidBody *self, RigidBody *other)
 
 void onCollisionExit(RigidBody *self, RigidBody *other)
 {
-    if (strcmp(other->cb.tag, "ground") == 0)
+    if (strcmp(other->cb.tag, "ground") == 0 || strcmp(other->cb.tag, "platform") == 0)
     {
         player_ref->can_jump = 0;
     }

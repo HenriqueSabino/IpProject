@@ -2,8 +2,8 @@
 25
 
 
-************************
-P******G****************
+*********FB*************
+P******edfF*************
 100000000000000000000002
 455555555555555555555553
 455555555555555555555553
@@ -30,3 +30,7 @@ G => ghost
 a => ground sprite 10
 b => ground sprite 11
 c => ground sprite 12
+d => platform sprite 0
+e => platform sprite 1
+f => platform sprite 2
+

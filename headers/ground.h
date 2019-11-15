@@ -4,6 +4,7 @@
 #include "rigidbody.h"
 
 #define OVER_WORLD_GROUND "..\\assets\\Platforms\\OverworldGround.bmp"
+#define OVER_WORLD_PLATFORM "..\\assets\\Platforms\\OverworldGround3.bmp"
 
 typedef struct ground
 {
@@ -12,5 +13,6 @@ typedef struct ground
 } Ground;
 
 void init_ground(Ground *ground, Vector pos, int animation_frame);
-//void set_velocity_axis(Player *player, char *axis, float s);
+void init_platform(Ground *ground, Vector pos, int animation_frame);
+
 #endif // "GROUND_H"

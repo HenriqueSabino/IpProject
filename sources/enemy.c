@@ -91,6 +91,24 @@ void onCollisionEnter_fox(RigidBody *self, RigidBody *other)
             }
         }
     }
+
+    if (strcmp(other->cb.tag, "platform") == 0)
+    {
+        if (self->cb.max.y < other->cb.min.y )
+        {
+            self->velocity.y = 0;
+            self->acceleration = create_vector(0, 0);
+
+            for (int i = 0; i < enemies_ref_count; i++)
+            {
+                if (&enemies_ref[i].rb == self)
+                {
+                    enemies_ref[i].taking_damage = 0;
+                }
+            }
+        }
+    }
+
     if (strcmp(other->cb.tag, "sword") == 0)
     {
         for (int i = 0; i < enemies_ref_count; i++)
@@ -126,6 +144,23 @@ void onCollisionStay_fox(RigidBody *self, RigidBody *other)
     if (strcmp(other->cb.tag, "ground") == 0)
     {
         if (self->cb.max.y < other->cb.min.y || self->cb.min.y > other->cb.max.y)
+        {
+            self->velocity.y = 0;
+            self->acceleration = create_vector(0, 0);
+
+            for (int i = 0; i < enemies_ref_count; i++)
+            {
+                if (&enemies_ref[i].rb == self)
+                {
+                    enemies_ref[i].taking_damage = 0;
+                }
+            }
+        }
+    }
+
+    if (strcmp(other->cb.tag, "platform") == 0)
+    {
+        if (self->cb.max.y < other->cb.min.y)
         {
             self->velocity.y = 0;
             self->acceleration = create_vector(0, 0);

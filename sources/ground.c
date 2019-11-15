@@ -59,3 +59,42 @@ void init_ground(Ground *ground, Vector pos, int animation_frame)
     ground->rb.onCollisionExit = NULL;
     ground->rb.onCollisionStay = NULL;
 }
+
+void init_platform(Ground *platform, Vector pos, int animation_frame)
+{
+    platform->animation_frame = animation_frame;
+
+    platform->rb.gravity_scale = 0;
+    platform->rb.velocity = create_vector(0, 0);
+    platform->rb.acceleration = create_vector(0, 0);
+    platform->rb.pos = pos;
+
+    if (animation_frame == 0)
+    {
+        platform->rb.cb.width = 128;
+        platform->rb.cb.height = 1;
+        platform->rb.cb.offset = create_vector(0, 28);
+    }
+    else if (animation_frame == 1)
+    {
+        platform->rb.cb.width = 116;
+        platform->rb.cb.height = 1;
+        platform->rb.cb.offset = create_vector(12, 28);
+    }
+    else if (animation_frame == 2)
+    {
+        platform->rb.cb.width = 116;
+        platform->rb.cb.height = 1;
+        platform->rb.cb.offset = create_vector(0, 28);
+    }
+
+    platform->rb.cb.min = create_vector(platform->rb.pos.x, platform->rb.pos.y);
+    platform->rb.cb.max = create_vector(platform->rb.cb.min.x + platform->rb.cb.width, platform->rb.cb.min.y + platform->rb.cb.height);
+    strcpy(platform->rb.cb.tag, "platform");
+    platform->rb.cb.solid = 1;
+    platform->rb.cb.enabled = 1;
+    platform->rb.collidingWith = createList();
+    platform->rb.onCollisionEnter = NULL;
+    platform->rb.onCollisionExit = NULL;
+    platform->rb.onCollisionStay = NULL;
+}
