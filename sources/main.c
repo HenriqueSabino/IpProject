@@ -19,6 +19,7 @@ void close_program()
 END_OF_FUNCTION(close_program)
 
 volatile int menu_on = TRUE;
+volatile int death_on = TRUE;
 volatile int counter = 0;
 volatile long game_timer = 0;
 void increment()
@@ -66,6 +67,7 @@ int main()
     LOCK_VARIABLE(game_timer);
     LOCK_VARIABLE(counter);
     LOCK_VARIABLE(menu_on);
+    LOCK_VARIABLE(death_on);
     LOCK_FUNCTION(increment);
 
     install_int_ex(increment, MSEC_TO_TIMER(1.0 / FPS * 1000));
@@ -416,9 +418,88 @@ int main()
             player.sword_rb.cb.enabled = 0;
             if(player.rb.pos.y >= 1200)
             {
-                close_program();
-                break;
-            }
+                 //VARIABLES
+                int shx = 235, shy = 390, snd = 0;
+
+                //BITMAPS
+                BITMAP *death = load_bitmap(DEATHSCREEN_PATH, NULL);
+                BITMAP *arrow = load_bitmap(ARROW_PATH, NULL);
+                BITMAP *buff = create_bitmap(64 * 16, 64 * 9);
+
+                //SAMPLES
+                SAMPLE *select = load_sample(SELECT_SOUND);
+                SAMPLE *sound_death = load_sample(DEATH_SOUND);
+                SAMPLE *enter = load_sample(ENTER_SOUND);
+
+                //DEATH SAMPLE
+                play_sample(sound_death, 255, 128, 1000, 1);
+
+                int animation_frame = 0;
+
+                while (death_on)
+                {
+                    keyboard_input();
+
+                    //INPUT
+                    if (key_down(KEY_RIGHT) || key_down(KEY_LEFT)||key_down(KEY_DOWN)||key_down(KEY_UP))
+                    {
+                        snd = 1;
+                    }
+
+                    if (key_down(KEY_ENTER))
+                    {
+                        
+                        return 0;
+                    
+                    }
+
+                    if (key_down(KEY_ESC))
+                    {
+                        // OUTPUT FUNCTION
+                        return 0;
+                    }
+
+                    while (counter > 0)
+                    {
+                        if (animation_frame >= 0 && animation_frame <= 15)
+                        {
+                            if (game_timer % 2 == 0)
+                            {
+                                animation_frame++;
+                                animation_frame %= 16;
+                            }
+                        }
+
+                        int r_img_pos = animation_frame % ARROW_SPRITE_COLS;
+                        int c_img_pos = animation_frame / ARROW_SPRITE_COLS;
+
+                        r_img_pos *= ARROW_TILE_SIZE;
+                        c_img_pos *= ARROW_TILE_SIZE;
+
+                        //draw the a part of the sprite sheet to the screen and scales it
+                        masked_blit(arrow_sprite, buff, r_img_pos, c_img_pos, shx, shy, 32, 32);
+
+                        if (snd == 1)
+                        {
+                            play_sample(select, 255, 128, 1000, 0);
+                            snd = 0;
+                        }
+
+                        draw_sprite(screen, buff, 0, 0);
+                        clear(buff);
+                        draw_sprite(buff, death, 0, 0);
+
+                        counter--;
+                    }
+                }
+
+                destroy_bitmap(buff);
+                destroy_bitmap(death);
+                destroy_bitmap(arrow);
+                destroy_sample(select);
+                destroy_sample(sound_death);
+
+                }
         }
 
         keyboard_input();

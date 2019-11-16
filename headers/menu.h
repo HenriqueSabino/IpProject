@@ -13,6 +13,5 @@
 #define ARROW_SPRITE_COLS 4
 #define ARROW_TILE_SIZE 32
 
-void deathscreen();
 
 #endif // !"MENU_H"
