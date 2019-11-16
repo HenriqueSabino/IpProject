@@ -148,6 +148,14 @@ void onCollisionEnter(RigidBody *self, RigidBody *other)
             increment_invulnerability();
         }
     }
+
+    if (strcmp(other->cb.tag, "lava") == 0)
+    {
+        player_ref->taking_damage = 1;
+        player_ref->life = 0;
+        self->velocity = create_vector(0, -15);
+        self->acceleration = create_vector(0, 0);
+    }
 }
 
 void onCollisionStay(RigidBody *self, RigidBody *other)
@@ -203,25 +211,33 @@ void onCollisionStay(RigidBody *self, RigidBody *other)
         else
             player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(-9, 28));
 
-        if (other->pos.x > self->pos.x)
+        if(player_ref->life > 0)
         {
-            player_ref->rb.velocity.x = -10;
-            player_ref->rb.velocity.y = -5;
+            if (other->pos.x > self->pos.x)
+            {
+                player_ref->rb.velocity.x = -10;
+                player_ref->rb.velocity.y = -5;
 
-            if (player_ref->facing_right == 1)
-                player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(60, 28));
+                if (player_ref->facing_right == 1)
+                    player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(60, 28));
+                else
+                    player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(-9, 28));
+            }
             else
-                player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(-9, 28));
+            {
+                player_ref->rb.velocity.x = 10;
+                player_ref->rb.velocity.y = -5;
+
+                if (player_ref->facing_right == 1)
+                    player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(60, 28));
+                else
+                    player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(-9, 28));
+            }
         }
         else
         {
-            player_ref->rb.velocity.x = 10;
-            player_ref->rb.velocity.y = -5;
-
-            if (player_ref->facing_right == 1)
-                player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(60, 28));
-            else
-                player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(-9, 28));
+            self->velocity = create_vector(0, -15);
+            self->acceleration = create_vector(0, 0);
         }
 
         if (player_ref->taking_damage == 1)
@@ -229,6 +245,14 @@ void onCollisionStay(RigidBody *self, RigidBody *other)
             timer_invulnerability = 0;
             increment_invulnerability();
         }
+    }
+
+    if (strcmp(other->cb.tag, "lava") == 0)
+    {
+        player_ref->taking_damage = 1;
+        player_ref->life = 0;
+        self->velocity = create_vector(0, -15);
+        self->acceleration = create_vector(0, 0);
     }
 }
 

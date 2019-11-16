@@ -114,11 +114,11 @@ void init_lava(Ground *lava, Vector pos, int animation_frame)
         lava->rb.cb.height = 128;
         lava->rb.cb.offset = create_vector(0, 0);
     }
-    else
+    else if (animation_frame == 0 || animation_frame == 1 || animation_frame == 2 || animation_frame == 3)
     {
         lava->rb.cb.width = 128;
-        lava->rb.cb.height = 120;
-        lava->rb.cb.offset = create_vector(0, 8);
+        lava->rb.cb.height = 80;
+        lava->rb.cb.offset = create_vector(0, 48);
     }
     
 

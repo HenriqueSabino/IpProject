@@ -43,6 +43,8 @@ void draw_ground(BITMAP *bmp, BITMAP *sprite, Ground *ground, Vector camera);
 
 void draw_platform(BITMAP *bmp, BITMAP *sprite, Ground *platform, Vector camera);
 
+void draw_lava(BITMAP *bmp, BITMAP *sprite, Ground *lava, Vector camera);
+
 void draw_lifebar(BITMAP *bmp, BITMAP *sprite, Player player);
 
 void draw_arrow(BITMAP *bmp, BITMAP *sprite);
@@ -106,6 +108,10 @@ int main()
     if (platform_sprite == NULL)
         allegro_message("error");
 
+    BITMAP *lava_sprite = load_bitmap(LAVA, NULL);
+    if (lava_sprite == NULL)
+        allegro_message("error");
+
     BITMAP *lifebar_sprite = load_bitmap("../assets/Canvas/LifeBar.bmp", NULL);
     if (lifebar_sprite == NULL)
         allegro_message("error");
@@ -121,7 +127,7 @@ int main()
         if (map[i] == '0' || map[i] == '1' || map[i] == '2' || map[i] == '3' || map[i] == '4' ||
             map[i] == '5' || map[i] == '6' || map[i] == '7' || map[i] == '8' || map[i] == '9' ||
             map[i] == 'a' || map[i] == 'b' || map[i] == 'c' || map[i] == 'd' || map[i] == 'e' || 
-            map[i] == 'f')
+            map[i] == 'f' || map[i] == 'L' || map[i] == 'S')
         {
             ground_count++;
         }
@@ -264,6 +270,18 @@ int main()
         else if (map[i] == 'f')
         {
             init_platform(&grounds[ground_count], create_vector(col * 128, row * 128), 2);
+            ground_count++;
+            col++;
+        }
+        else if (map[i] == 'L')
+        {
+            init_lava(&grounds[ground_count], create_vector(col * 128, row * 128), 0);
+            ground_count++;
+            col++;
+        }
+        else if (map[i] == 'S')
+        {
+            init_lava(&grounds[ground_count], create_vector(col * 128, row * 128), 4);
             ground_count++;
             col++;
         }
@@ -671,6 +689,22 @@ int main()
                     }
                 }
             }
+
+            for(int i2 = 0; i2 < ground_count; i2++)
+            {
+                if(strcmp(grounds[i2].rb.cb.tag, "lava") == 0)
+                {
+                    if (grounds[i2].animation_frame >= 0 && grounds[i2].animation_frame <= 3)
+                    {
+                        if (game_timer % 4 == 0)
+                        {
+                            grounds[i2].animation_frame++;
+                            grounds[i2].animation_frame %= 4;
+                        }
+                    }
+                }
+            }
+
             counter--;
         }
 
@@ -685,6 +719,10 @@ int main()
             else if (strcmp(grounds[i].rb.cb.tag, "platform") == 0)
             {
                 draw_platform(buffer, platform_sprite, &grounds[i], camera);
+            }
+            else if (strcmp(grounds[i].rb.cb.tag, "lava") == 0)
+            {
+                draw_lava(buffer, lava_sprite, &grounds[i], camera);
             }
         }
 
@@ -727,6 +765,7 @@ int main()
     free(map);
     destroy_bitmap(buffer);
     destroy_bitmap(lifebar_sprite);
+    destroy_bitmap(lava_sprite);
     destroy_bitmap(player_sprite);
     destroy_bitmap(harpy_sprite);
     destroy_bitmap(ghost_sprite);
@@ -1092,12 +1131,31 @@ void draw_platform(BITMAP *bmp, BITMAP *sprite, Ground *platform, Vector camera)
     destroy_bitmap(platform_sprite);
 }
 
+void draw_lava(BITMAP *bmp, BITMAP *sprite, Ground *lava, Vector camera)
+{
+    BITMAP *lava_sprite = create_bitmap(128, 128);
+    clear_to_color(lava_sprite, makecol(255, 0, 255));
+
+    int r_img_pos = lava->animation_frame % LAVA_SPRITE_COLS;
+    int c_img_pos = lava->animation_frame / LAVA_SPRITE_COLS;
+
+    r_img_pos *= LAVA_TILE_SIZE;
+    c_img_pos *= LAVA_TILE_SIZE;
+
+    //draw the a part of the sprite sheet to the screen and scales it
+    masked_stretch_blit(sprite, lava_sprite, r_img_pos, c_img_pos, 32, 32, 0, 0, 128, 128);
+
+    draw_sprite_ex(bmp, lava_sprite, lava->rb.pos.x - camera.x, lava->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+
+    destroy_bitmap(lava_sprite);
+}
+
 void draw_lifebar(BITMAP *bmp, BITMAP *sprite, Player player)
 {
     char player_life[4];
     itoa(player.life, player_life, 10);
     strcat(player_life, "%");
-    rectfill(bmp, 74, 34, 74 + floor(57 * player.life / 100.0f), 49, makecol(255, 0, 0));
+    rectfill(bmp, 73, 34, 73 + floor(122 * player.life / 100.0f), 49, makecol(255, 0, 0));
     draw_sprite(bmp, sprite, 10, 10);
-    textout_ex(bmp, font, player_life, 64 + 25, 38, makecol(255, 255, 0), -1);
+    textout_ex(bmp, font, player_life, 64 + 55, 38, makecol(255, 255, 0), -1);
 }
