@@ -30,7 +30,7 @@ void update_all(RigidBody *rbs[], int amount)
     {
         for (int j = 0; j < amount; j++)
         {
-            if (i == j || strcmp(rbs[i]->cb.tag, "ground") == 0 || strcmp(rbs[i]->cb.tag, "platform") == 0 || strcmp(rbs[i]->cb.tag, "lava") == 0)
+            if (i == j || strcmp(rbs[i]->cb.tag, "ground") == 0 || strcmp(rbs[i]->cb.tag, "platform") == 0 || strcmp(rbs[i]->cb.tag, "lava") == 0 || strcmp(rbs[i]->cb.tag, "bridge") == 0)
             {
                 continue;
             }

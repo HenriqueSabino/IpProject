@@ -55,7 +55,7 @@ void set_velocity_axis(Player *player, char *axis, float s)
 
 void onCollisionEnter(RigidBody *self, RigidBody *other)
 {
-    if (strcmp(other->cb.tag, "ground") == 0)
+    if (strcmp(other->cb.tag, "ground") == 0 || strcmp(other->cb.tag, "bridge") == 0)
     {
         if (self->cb.max.y < other->cb.min.y || self->cb.min.y > other->cb.max.y)
         {
@@ -107,7 +107,7 @@ void onCollisionEnter(RigidBody *self, RigidBody *other)
         }
         else if(strcmp(other->cb.tag, "spike") == 0)
         {
-            player_ref->life -= 20;
+            player_ref->life -= 10;
         }
 
         player_ref->taking_damage = 1;
@@ -164,7 +164,7 @@ void onCollisionEnter(RigidBody *self, RigidBody *other)
 
 void onCollisionStay(RigidBody *self, RigidBody *other)
 {
-    if (strcmp(other->cb.tag, "ground") == 0)
+    if (strcmp(other->cb.tag, "ground") == 0 || strcmp(other->cb.tag, "bridge") == 0)
     {
         if (self->cb.max.y < other->cb.min.y || self->cb.min.y > other->cb.max.y)
         {
@@ -210,7 +210,7 @@ void onCollisionStay(RigidBody *self, RigidBody *other)
         }
         else if(strcmp(other->cb.tag, "spike") == 0)
         {
-            player_ref->life -= 20;
+            player_ref->life -= 10;
         }
 
         player_ref->taking_damage = 1;
@@ -267,7 +267,7 @@ void onCollisionStay(RigidBody *self, RigidBody *other)
 
 void onCollisionExit(RigidBody *self, RigidBody *other)
 {
-    if (strcmp(other->cb.tag, "ground") == 0 || strcmp(other->cb.tag, "platform") == 0)
+    if (strcmp(other->cb.tag, "ground") == 0 || strcmp(other->cb.tag, "platform") == 0 || strcmp(other->cb.tag, "bridge") == 0)
     {
         player_ref->can_jump = 0;
     }

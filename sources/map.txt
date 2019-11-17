@@ -3,10 +3,10 @@
 
 
 ************************
-P*******edf*************
-102III10LLL0000000000002
-459000a5SSS5555555555553
-45555555SSS5555555555553
+P***g*******************
+102III10hij0000000000002
+459000a5mkl5555555555553
+45555555mkl5555555555553
 
 
 Captions:
@@ -36,4 +36,11 @@ c => ground sprite 12
 d => platform sprite 0
 e => platform sprite 1
 f => platform sprite 2
+g => platform sprite 3
+h => bridge sprite 0
+i => bridge sprite 1
+j => bridge sprite 2
+k => bridge sprite 3
+l => bridge sprite 4
+m => bridge sprite 5
 

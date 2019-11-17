@@ -48,6 +48,8 @@ void draw_platform(BITMAP *bmp, BITMAP *sprite, Ground *platform, Vector camera)
 
 void draw_lava(BITMAP *bmp, BITMAP *sprite, Ground *lava, Vector camera);
 
+void draw_bridge(BITMAP *bmp, BITMAP *sprite, Ground *bridge, Vector camera);
+
 void draw_lifebar(BITMAP *bmp, BITMAP *sprite, Player player);
 
 void draw_arrow(BITMAP *bmp, BITMAP *sprite);
@@ -119,6 +121,10 @@ int main()
     if (lava_sprite == NULL)
         allegro_message("error");
 
+    BITMAP *bridge_sprite = load_bitmap(BRIDGE, NULL);
+    if (bridge_sprite == NULL)
+        allegro_message("error");
+
     BITMAP *lifebar_sprite = load_bitmap("../assets/Canvas/LifeBar.bmp", NULL);
     if (lifebar_sprite == NULL)
         allegro_message("error");
@@ -134,7 +140,8 @@ int main()
         if (map[i] == '0' || map[i] == '1' || map[i] == '2' || map[i] == '3' || map[i] == '4' ||
             map[i] == '5' || map[i] == '6' || map[i] == '7' || map[i] == '8' || map[i] == '9' ||
             map[i] == 'a' || map[i] == 'b' || map[i] == 'c' || map[i] == 'd' || map[i] == 'e' || 
-            map[i] == 'f' || map[i] == 'L' || map[i] == 'S')
+            map[i] == 'f' || map[i] == 'g' || map[i] == 'h' || map[i] == 'i' || map[i] == 'j' || 
+            map[i] == 'k' || map[i] == 'l' || map[i] == 'm' || map[i] == 'L' || map[i] == 'S' )
         {
             ground_count++;
         }
@@ -283,6 +290,48 @@ int main()
         else if (map[i] == 'f')
         {
             init_platform(&grounds[ground_count], create_vector(col * 128, row * 128), 2);
+            ground_count++;
+            col++;
+        }
+        else if (map[i] == 'g')
+        {
+            init_platform(&grounds[ground_count], create_vector(col * 128, row * 128), 3);
+            ground_count++;
+            col++;
+        }
+        else if (map[i] == 'h')
+        {
+            init_bridge(&grounds[ground_count], create_vector(col * 128, row * 128), 0);
+            ground_count++;
+            col++;
+        }
+        else if (map[i] == 'i')
+        {
+            init_bridge(&grounds[ground_count], create_vector(col * 128, row * 128), 1);
+            ground_count++;
+            col++;
+        }
+        else if (map[i] == 'j')
+        {
+            init_bridge(&grounds[ground_count], create_vector(col * 128, row * 128), 2);
+            ground_count++;
+            col++;
+        }
+        else if (map[i] == 'k')
+        {
+            init_bridge(&grounds[ground_count], create_vector(col * 128, row * 128), 3);
+            ground_count++;
+            col++;
+        }
+        else if (map[i] == 'l')
+        {
+            init_bridge(&grounds[ground_count], create_vector(col * 128, row * 128), 4);
+            ground_count++;
+            col++;
+        }
+        else if (map[i] == 'm')
+        {
+            init_bridge(&grounds[ground_count], create_vector(col * 128, row * 128), 5);
             ground_count++;
             col++;
         }
@@ -656,17 +705,21 @@ int main()
                     }
                     else if(strcmp(enemies[i].rb.cb.tag, "spike") == 0)
                     {
-                        if(game_timer % 40 == 0)
-                        {
-                            if(enemies[i].animation_frame == 0)
-                            {
-                                enemies[i].animation_frame = 4;
-                            }
-                            else
+                        
+                            if(game_timer % 160 < 71 && game_timer % 160 != 0)
                             {
                                 enemies[i].animation_frame = 0;
                             }
-                        }
+                            else if(game_timer % 160 > 80 && game_timer % 160 < 151)
+                            {
+                                enemies[i].animation_frame = 4;
+                            }
+                            else if (game_timer % 4 == 0)
+                            {
+                                enemies[i].animation_frame++;
+                                enemies[i].animation_frame %= 9;
+                            }
+                        
                     }
                 }
                 else
@@ -787,6 +840,14 @@ int main()
             }
         }
 
+        for (int i = 0; i < ground_count; i++)
+        {
+            if (strcmp(grounds[i].rb.cb.tag, "bridge") == 0)
+            {
+                draw_bridge(buffer, bridge_sprite, &grounds[i], camera);
+            }
+        }
+
         draw_lifebar(buffer, lifebar_sprite, player);
 
 
@@ -805,6 +866,7 @@ int main()
     destroy_bitmap(fox_sprite);
     destroy_bitmap(ground_sprite);
     destroy_bitmap(platform_sprite);
+    destroy_bitmap(bridge_sprite);
     destroy_bitmap(spike_sprite);
 
     for (int i = 0; i < rbs_size; i++)
@@ -1183,6 +1245,25 @@ void draw_lava(BITMAP *bmp, BITMAP *sprite, Ground *lava, Vector camera)
     destroy_bitmap(lava_sprite);
 }
 
+void draw_bridge(BITMAP *bmp, BITMAP *sprite, Ground *bridge, Vector camera)
+{
+    BITMAP *bridge_sprite = create_bitmap(128, 128);
+    clear_to_color(bridge_sprite, makecol(255, 0, 255));
+
+    int r_img_pos = bridge->animation_frame % LAVA_SPRITE_COLS;
+    int c_img_pos = bridge->animation_frame / LAVA_SPRITE_COLS;
+
+    r_img_pos *= LAVA_TILE_SIZE;
+    c_img_pos *= LAVA_TILE_SIZE;
+
+    //draw the a part of the sprite sheet to the screen and scales it
+    masked_stretch_blit(sprite, bridge_sprite, r_img_pos, c_img_pos, 32, 32, 0, 0, 128, 128);
+
+    draw_sprite_ex(bmp, bridge_sprite, bridge->rb.pos.x - camera.x, bridge->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+
+    destroy_bitmap(bridge_sprite);
+}
+
 void draw_spike(BITMAP *bmp, BITMAP *sprite, Enemy *spike, Vector camera)
 {
     BITMAP *spike_sprite = create_bitmap(128, 128);
@@ -1201,6 +1282,7 @@ void draw_spike(BITMAP *bmp, BITMAP *sprite, Enemy *spike, Vector camera)
 
     destroy_bitmap(spike_sprite);
 }
+
 
 void draw_lifebar(BITMAP *bmp, BITMAP *sprite, Player player)
 {

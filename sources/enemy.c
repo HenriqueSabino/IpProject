@@ -75,7 +75,7 @@ void init_bat(Enemy *bat, Vector pos)
 
 void onCollisionEnter_fox(RigidBody *self, RigidBody *other)
 {
-    if (strcmp(other->cb.tag, "ground") == 0)
+    if (strcmp(other->cb.tag, "ground") == 0 || strcmp(other->cb.tag, "bridge") == 0)
     {
         if (self->cb.max.y < other->cb.min.y || self->cb.min.y > other->cb.max.y)
         {
@@ -141,7 +141,7 @@ void onCollisionEnter_fox(RigidBody *self, RigidBody *other)
 
 void onCollisionStay_fox(RigidBody *self, RigidBody *other)
 {
-    if (strcmp(other->cb.tag, "ground") == 0)
+    if (strcmp(other->cb.tag, "ground") == 0 || strcmp(other->cb.tag, "bridge") == 0)
     {
         if (self->cb.max.y < other->cb.min.y || self->cb.min.y > other->cb.max.y)
         {
@@ -266,7 +266,7 @@ void init_ghost(Enemy *ghost, Vector pos)
 
 void onCollision_spike(RigidBody *self, RigidBody *other)
 {
-    if (strcmp(other->cb.tag, "ground") == 0 || strcmp(other->cb.tag, "platform") == 0)
+    if (strcmp(other->cb.tag, "ground") == 0 || strcmp(other->cb.tag, "platform") == 0 || strcmp(other->cb.tag, "bridge") == 0)
     {
         if (self->cb.max.y < other->cb.min.y || self->cb.min.y > other->cb.max.y)
         {
@@ -369,7 +369,7 @@ void atk(Enemy *enemy, RigidBody player)
             enemy->rb.velocity = create_vector(0, 0);
         }
     }
-    else if(strcmp(enemy->rb.cb.tag, "spike") == 0)
+    else if(strcmp(enemy->rb.cb.tag, "spike") == 0 && enemy->rb.cb.solid == 0)
     {
         if(enemy->animation_frame == 0)
         {
@@ -378,21 +378,21 @@ void atk(Enemy *enemy, RigidBody player)
             enemy->rb.cb.offset = create_vector(4, 48);
             enemy->rb.cb.enabled = 1;
         }
-        else if(enemy->animation_frame == 1)
+        else if(enemy->animation_frame == 1 || enemy->animation_frame == 7)
         {
             enemy->rb.cb.width = 120;
             enemy->rb.cb.height = 56;
             enemy->rb.cb.offset = create_vector(4, 68);
             enemy->rb.cb.enabled = 1;
         }
-        else if(enemy->animation_frame == 2)
+        else if(enemy->animation_frame == 2 || enemy->animation_frame == 6)
         {
             enemy->rb.cb.width = 120;
             enemy->rb.cb.height = 44;
             enemy->rb.cb.offset = create_vector(4, 80);
             enemy->rb.cb.enabled = 1;
         }
-        else if(enemy->animation_frame == 3)
+        else if(enemy->animation_frame == 3 || enemy->animation_frame == 5)
         {
             enemy->rb.cb.width = 120;
             enemy->rb.cb.height = 28;
