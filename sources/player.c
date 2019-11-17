@@ -95,7 +95,7 @@ void onCollisionEnter(RigidBody *self, RigidBody *other)
         }
     }
 
-    if ((strcmp(other->cb.tag, "bat") == 0 || strcmp(other->cb.tag, "fox") == 0 || strcmp(other->cb.tag, "harpy") == 0 || strcmp(other->cb.tag, "ghost") == 0) && player_ref->invulnerability == 0)
+    if ((strcmp(other->cb.tag, "bat") == 0 || strcmp(other->cb.tag, "fox") == 0 || strcmp(other->cb.tag, "harpy") == 0 || strcmp(other->cb.tag, "ghost") == 0 || strcmp(other->cb.tag, "spike") == 0) && player_ref->invulnerability == 0)
     {
         if (strcmp(other->cb.tag, "bat") == 0)
         {
@@ -104,6 +104,10 @@ void onCollisionEnter(RigidBody *self, RigidBody *other)
         else if (strcmp(other->cb.tag, "fox") == 0 || strcmp(other->cb.tag, "harpy") == 0 || strcmp(other->cb.tag, "ghost") == 0)
         {
             player_ref->life -= 5;
+        }
+        else if(strcmp(other->cb.tag, "spike") == 0)
+        {
+            player_ref->life -= 20;
         }
 
         player_ref->taking_damage = 1;
@@ -194,7 +198,7 @@ void onCollisionStay(RigidBody *self, RigidBody *other)
         }
     }
 
-    if ((strcmp(other->cb.tag, "bat") == 0 || strcmp(other->cb.tag, "fox") == 0 || strcmp(other->cb.tag, "harpy") == 0 || strcmp(other->cb.tag, "ghost") == 0) && player_ref->invulnerability == 0)
+    if ((strcmp(other->cb.tag, "bat") == 0 || strcmp(other->cb.tag, "fox") == 0 || strcmp(other->cb.tag, "harpy") == 0 || strcmp(other->cb.tag, "ghost") == 0 || strcmp(other->cb.tag, "spike") == 0) && player_ref->invulnerability == 0)
     {
         if (strcmp(other->cb.tag, "bat") == 0)
         {
@@ -204,6 +208,11 @@ void onCollisionStay(RigidBody *self, RigidBody *other)
         {
             player_ref->life -= 5;
         }
+        else if(strcmp(other->cb.tag, "spike") == 0)
+        {
+            player_ref->life -= 20;
+        }
+
         player_ref->taking_damage = 1;
 
         if (player_ref->facing_right == 1)

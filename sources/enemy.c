@@ -264,6 +264,50 @@ void init_ghost(Enemy *ghost, Vector pos)
     strcpy(ghost->rb.cb.tag, "ghost");
 }
 
+void onCollision_spike(RigidBody *self, RigidBody *other)
+{
+    if (strcmp(other->cb.tag, "ground") == 0 || strcmp(other->cb.tag, "platform") == 0)
+    {
+        if (self->cb.max.y < other->cb.min.y || self->cb.min.y > other->cb.max.y)
+        {
+            self->velocity.y = 0;
+            self->acceleration = create_vector(0, 0);
+            self->gravity_scale = 0;
+            self->cb.enabled = 0;
+            self->cb.solid = 0;
+        }
+    }
+}
+
+void init_spike(Enemy *spike, Vector pos)
+{
+    spike->animation_frame = 4;
+    spike->facing_right = 0;
+    spike->player_pos = create_vector(0, 0);
+    spike->life = 1;
+    spike->attack = 1;
+    spike->alive = 1;
+    spike->taking_damage = 0;
+
+    spike->rb.acceleration = create_vector(0, 0);
+    spike->rb.gravity_scale = 4.0f;
+    spike->rb.pos = pos;
+    spike->rb.velocity = create_vector(0, 0);
+
+    spike->rb.cb.width = 120;
+    spike->rb.cb.height = 8;
+    spike->rb.cb.offset = create_vector(4, 118);
+    spike->rb.cb.min = create_vector(spike->rb.pos.x + spike->rb.cb.offset.x, spike->rb.pos.y + spike->rb.cb.offset.y);
+    spike->rb.cb.max = create_vector(spike->rb.cb.min.x + spike->rb.cb.width, spike->rb.cb.min.y + spike->rb.cb.height);
+    spike->rb.cb.solid = 1;
+    spike->rb.cb.enabled = 1;
+    spike->rb.collidingWith = createList();
+    spike->rb.onCollisionEnter = onCollision_spike;
+    spike->rb.onCollisionExit = NULL;
+    spike->rb.onCollisionStay = onCollision_spike;
+    strcpy(spike->rb.cb.tag, "spike");
+}
+
 void atk(Enemy *enemy, RigidBody player)
 {
     Vector player_pos = mult(sum(player.cb.min, player.cb.max), 0.5f);
@@ -323,6 +367,44 @@ void atk(Enemy *enemy, RigidBody player)
         else
         {
             enemy->rb.velocity = create_vector(0, 0);
+        }
+    }
+    else if(strcmp(enemy->rb.cb.tag, "spike") == 0)
+    {
+        if(enemy->animation_frame == 0)
+        {
+            enemy->rb.cb.width = 120;
+            enemy->rb.cb.height = 76;
+            enemy->rb.cb.offset = create_vector(4, 48);
+            enemy->rb.cb.enabled = 1;
+        }
+        else if(enemy->animation_frame == 1)
+        {
+            enemy->rb.cb.width = 120;
+            enemy->rb.cb.height = 56;
+            enemy->rb.cb.offset = create_vector(4, 68);
+            enemy->rb.cb.enabled = 1;
+        }
+        else if(enemy->animation_frame == 2)
+        {
+            enemy->rb.cb.width = 120;
+            enemy->rb.cb.height = 44;
+            enemy->rb.cb.offset = create_vector(4, 80);
+            enemy->rb.cb.enabled = 1;
+        }
+        else if(enemy->animation_frame == 3)
+        {
+            enemy->rb.cb.width = 120;
+            enemy->rb.cb.height = 28;
+            enemy->rb.cb.offset = create_vector(4, 96);
+            enemy->rb.cb.enabled = 1;
+        }
+        else
+        {
+            enemy->rb.cb.width = 120;
+            enemy->rb.cb.height = 8;
+            enemy->rb.cb.offset = create_vector(4, 118);
+            enemy->rb.cb.enabled = 0;
         }
     }
 }

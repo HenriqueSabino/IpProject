@@ -22,6 +22,7 @@ volatile int menu_on = TRUE;
 volatile int death_on = TRUE;
 volatile int counter = 0;
 volatile long game_timer = 0;
+
 void increment()
 {
     counter++;
@@ -37,7 +38,9 @@ void draw_fox(BITMAP *bmp, BITMAP *sprite, Enemy *fox, Vector camera);
 
 void draw_harpy(BITMAP *bmp, BITMAP *sprite, Enemy *harpy, Vector camera);
 
-void draw_ghost(BITMAP *bmp, BITMAP *sprite, Enemy *harpy, Vector camera);
+void draw_ghost(BITMAP *bmp, BITMAP *sprite, Enemy *ghost, Vector camera);
+
+void draw_spike(BITMAP *bmp, BITMAP *sprite, Enemy *spike, Vector camera);
 
 void draw_ground(BITMAP *bmp, BITMAP *sprite, Ground *ground, Vector camera);
 
@@ -99,6 +102,10 @@ int main()
     BITMAP *ghost_sprite = load_bitmap(GHOST, NULL);
     if (ghost_sprite == NULL)
         allegro_message("error");
+    
+    BITMAP *spike_sprite = load_bitmap(SPIKE, NULL);
+    if (spike_sprite == NULL)
+        allegro_message("error");
 
     BITMAP *ground_sprite = load_bitmap(OVER_WORLD_GROUND, NULL);
     if (ground_sprite == NULL)
@@ -120,7 +127,7 @@ int main()
     if (arrow_sprite == NULL)
         allegro_message("error");
 
-    int row = 0, col = 0, not_objs = 0, ground_count = 0, enemy_count = 0;
+    int row = 0, col = 0, not_objs = 0, ground_count = 0, enemy_count = 0, actived = 0, spike_an = 0;
 
     for (int i = 0; i < map_size; i++)
     {
@@ -131,7 +138,7 @@ int main()
         {
             ground_count++;
         }
-        else if (map[i] == 'B' || map[i] == 'F'|| map[i] == 'H' || map[i] == 'G')
+        else if (map[i] == 'B' || map[i] == 'F'|| map[i] == 'H' || map[i] == 'G' || map[i] == 'I')
         {
             enemy_count++;
         }
@@ -174,6 +181,12 @@ int main()
         else if (map[i] == 'G')
         {
             init_ghost(&enemies[enemy_count], create_vector(col * 128, row * 128));
+            enemy_count++;
+            col++;
+        }
+        else if (map[i] == 'I')
+        {
+            init_spike(&enemies[enemy_count], create_vector(col * 128, row * 128));
             enemy_count++;
             col++;
         }
@@ -641,12 +654,26 @@ int main()
                             enemies[i].animation_frame = 0;
                         }
                     }
+                    else if(strcmp(enemies[i].rb.cb.tag, "spike") == 0)
+                    {
+                        if(game_timer % 40 == 0)
+                        {
+                            if(enemies[i].animation_frame == 0)
+                            {
+                                enemies[i].animation_frame = 4;
+                            }
+                            else
+                            {
+                                enemies[i].animation_frame = 0;
+                            }
+                        }
+                    }
                 }
                 else
                 {
                     if (strcmp(enemies[i].rb.cb.tag, "bat") == 0)
                         enemies[i].animation_frame = 3;
-                    else
+                    else if (strcmp(enemies[i].rb.cb.tag, "spike") != 0)
                         enemies[i].animation_frame = 0;
                 }
             }
@@ -754,9 +781,14 @@ int main()
                 if (enemies[i].alive == 0 && enemies[i].rb.pos.y >= 1000)
                     enemies[i].rb.pos.y = 1001;
             }
+            else if(strcmp(enemies[i].rb.cb.tag, "spike") == 0)
+            {
+                draw_spike(buffer, spike_sprite, &enemies[i], camera);
+            }
         }
 
         draw_lifebar(buffer, lifebar_sprite, player);
+
 
         draw_sprite(screen, buffer, 0, 0);
         clear_to_color(buffer, 0x40AEBF);
@@ -773,6 +805,7 @@ int main()
     destroy_bitmap(fox_sprite);
     destroy_bitmap(ground_sprite);
     destroy_bitmap(platform_sprite);
+    destroy_bitmap(spike_sprite);
 
     for (int i = 0; i < rbs_size; i++)
     {
@@ -1148,6 +1181,25 @@ void draw_lava(BITMAP *bmp, BITMAP *sprite, Ground *lava, Vector camera)
     draw_sprite_ex(bmp, lava_sprite, lava->rb.pos.x - camera.x, lava->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
 
     destroy_bitmap(lava_sprite);
+}
+
+void draw_spike(BITMAP *bmp, BITMAP *sprite, Enemy *spike, Vector camera)
+{
+    BITMAP *spike_sprite = create_bitmap(128, 128);
+    clear_to_color(spike_sprite, makecol(255, 0, 255));
+
+    int r_img_pos = spike->animation_frame % SPIKE_SPRITE_COLS;
+    int c_img_pos = spike->animation_frame / SPIKE_SPRITE_COLS;
+
+    r_img_pos *= SPIKE_TILE_SIZE;
+    c_img_pos *= SPIKE_TILE_SIZE;
+
+    //draw the a part of the sprite sheet to the screen and scales it
+    masked_stretch_blit(sprite, spike_sprite, r_img_pos, c_img_pos, 32, 32, 0, 0, 128, 128);
+
+    draw_sprite_ex(bmp, spike_sprite, spike->rb.pos.x - camera.x, spike->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+
+    destroy_bitmap(spike_sprite);
 }
 
 void draw_lifebar(BITMAP *bmp, BITMAP *sprite, Player player)

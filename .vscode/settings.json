@@ -3,6 +3,7 @@
         "vector.h": "c",
         "list.h": "c",
         "string.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "random": "c"
     }
 }
