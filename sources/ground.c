@@ -163,8 +163,8 @@ void init_bridge(Ground *bridge, Vector pos, int animation_frame)
     else if (animation_frame == 0 || animation_frame == 1 || animation_frame == 2)
     {
         bridge->rb.cb.width = 128;
-        bridge->rb.cb.height = 92;
-        bridge->rb.cb.offset = create_vector(0, 36);
+        bridge->rb.cb.height = 116;
+        bridge->rb.cb.offset = create_vector(0, 28);
     }
     
 

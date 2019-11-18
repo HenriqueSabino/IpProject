@@ -610,7 +610,7 @@ int main()
             set_velocity_axis(&player, "horizontal", 0);
         }
 
-        if (key_down(KEY_F))
+        if (key_down(KEY_Q))
         {
             if (!player.taking_damage)
                 player.attacking = 1;
