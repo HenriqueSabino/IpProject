@@ -16,14 +16,17 @@ void update(RigidBody *rb)
     rb->cb.max.y = rb->cb.min.y + rb->cb.height;
 }
 
-void update_all(RigidBody *rbs[], int amount)
+void update_all(RigidBody *rbs[], int amount, Vector camera)
 {
     CollisionBox rbs_before_update[amount];
     CollisionBox rbs_after_update[amount];
     for (int i = 0; i < amount; i++)
     {
         rbs_before_update[i] = rbs[i]->cb;
-        update(rbs[i]);
+        if (rbs[i]->pos.x >= camera.x - 384 && rbs[i]->pos.x < camera.x + SCREEN_WIDTH + 384)
+        {
+            update(rbs[i]);
+        }
         rbs_after_update[i] = rbs[i]->cb;
     }
     for (int i = 0; i < amount; i++)
@@ -34,11 +37,15 @@ void update_all(RigidBody *rbs[], int amount)
             {
                 continue;
             }
+            if (dist(rbs[i]->pos, rbs[j]->pos) > rbs[i]->cb.max.x + rbs[j]->cb.max.x)
+            {
+                continue;
+            }
 
             DataNode other_cb;
             other_cb.value = &rbs[j]->cb;
 
-            if (collided(rbs[i]->cb, rbs[j]->cb)  && rbs[i]->cb.enabled && rbs[j]->cb.enabled)
+            if (collided(rbs[i]->cb, rbs[j]->cb) && rbs[i]->cb.enabled && rbs[j]->cb.enabled)
             {
                 if (rbs[i]->cb.solid && rbs[j]->cb.solid && strcmp(rbs[j]->cb.tag, "fox") != 0)
                 {
@@ -88,7 +95,7 @@ void update_all(RigidBody *rbs[], int amount)
             DataNode other_cb;
             other_cb.value = &rbs[j]->cb;
 
-            if (collided(rbs_after_update[i], rbs_after_update[j])  && rbs[i]->cb.enabled && rbs[j]->cb.enabled)
+            if (collided(rbs_after_update[i], rbs_after_update[j]) && rbs[i]->cb.enabled && rbs[j]->cb.enabled)
             {
                 if (indexof(rbs[i]->collidingWith, other_cb) != -1)
                 {

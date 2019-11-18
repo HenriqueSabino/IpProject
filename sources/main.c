@@ -104,7 +104,7 @@ int main()
     BITMAP *ghost_sprite = load_bitmap(GHOST, NULL);
     if (ghost_sprite == NULL)
         allegro_message("error");
-    
+
     BITMAP *spike_sprite = load_bitmap(SPIKE, NULL);
     if (spike_sprite == NULL)
         allegro_message("error");
@@ -139,13 +139,13 @@ int main()
     {
         if (map[i] == '0' || map[i] == '1' || map[i] == '2' || map[i] == '3' || map[i] == '4' ||
             map[i] == '5' || map[i] == '6' || map[i] == '7' || map[i] == '8' || map[i] == '9' ||
-            map[i] == 'a' || map[i] == 'b' || map[i] == 'c' || map[i] == 'd' || map[i] == 'e' || 
-            map[i] == 'f' || map[i] == 'g' || map[i] == 'h' || map[i] == 'i' || map[i] == 'j' || 
-            map[i] == 'k' || map[i] == 'l' || map[i] == 'm' || map[i] == 'L' || map[i] == 'S' )
+            map[i] == 'a' || map[i] == 'b' || map[i] == 'c' || map[i] == 'd' || map[i] == 'e' ||
+            map[i] == 'f' || map[i] == 'g' || map[i] == 'h' || map[i] == 'i' || map[i] == 'j' ||
+            map[i] == 'k' || map[i] == 'l' || map[i] == 'm' || map[i] == 'L' || map[i] == 'S')
         {
             ground_count++;
         }
-        else if (map[i] == 'B' || map[i] == 'F'|| map[i] == 'H' || map[i] == 'G' || map[i] == 'I')
+        else if (map[i] == 'B' || map[i] == 'F' || map[i] == 'H' || map[i] == 'G' || map[i] == 'I')
         {
             enemy_count++;
         }
@@ -486,7 +486,7 @@ int main()
 
     while (!close_game)
     {
-        if(player.rb.pos.y >= 600)
+        if (player.rb.pos.y >= grounds[ground_count - 1].rb.cb.max.y)
         {
             player.life = 0;
         }
@@ -495,9 +495,9 @@ int main()
         {
             player.rb.cb.enabled = 0;
             player.sword_rb.cb.enabled = 0;
-            if(player.rb.pos.y >= 1200)
+            if (player.rb.pos.y >= grounds[ground_count - 1].rb.cb.max.y + 512)
             {
-                 //VARIABLES
+                //VARIABLES
                 int shx = 235, shy = 390, snd = 0;
 
                 //BITMAPS
@@ -520,16 +520,15 @@ int main()
                     keyboard_input();
 
                     //INPUT
-                    if (key_down(KEY_RIGHT) || key_down(KEY_LEFT)||key_down(KEY_DOWN)||key_down(KEY_UP))
+                    if (key_down(KEY_RIGHT) || key_down(KEY_LEFT) || key_down(KEY_DOWN) || key_down(KEY_UP))
                     {
                         snd = 1;
                     }
 
                     if (key_down(KEY_ENTER))
                     {
-                        
+
                         return 0;
-                    
                     }
 
                     if (key_down(KEY_ESC))
@@ -577,8 +576,7 @@ int main()
                 destroy_bitmap(arrow);
                 destroy_sample(select);
                 destroy_sample(sound_death);
-
-                }
+            }
         }
 
         keyboard_input();
@@ -622,12 +620,12 @@ int main()
 
         while (counter > 0)
         {
-            update_all(rbs, rbs_size);
+            update_all(rbs, rbs_size, camera);
 
             //linear interpolation between camera and player's position
             Vector offset_camera = create_vector(-100, -200);
 
-            if(player.life > 0)
+            if (player.life > 0)
             {
                 camera = lerp(camera, sum(player.rb.pos, offset_camera), 0.9f);
 
@@ -650,7 +648,7 @@ int main()
             {
                 if (enemies[i].alive)
                 {
-                    if(strcmp(enemies[i].rb.cb.tag, "ghost") != 0)
+                    if (strcmp(enemies[i].rb.cb.tag, "ghost") != 0)
                     {
                         atk(&enemies[i], player.rb);
                     }
@@ -662,7 +660,7 @@ int main()
 
                 if (!enemies[i].taking_damage && enemies[i].alive)
                 {
-                    if(strcmp(enemies[i].rb.cb.tag, "bat") == 0 || strcmp(enemies[i].rb.cb.tag, "fox") == 0)
+                    if (strcmp(enemies[i].rb.cb.tag, "bat") == 0 || strcmp(enemies[i].rb.cb.tag, "fox") == 0)
                     {
                         if (enemies[i].animation_frame >= 0 && enemies[i].animation_frame <= 3)
                         {
@@ -673,7 +671,7 @@ int main()
                             }
                         }
                     }
-                    else if(strcmp(enemies[i].rb.cb.tag, "harpy") == 0)
+                    else if (strcmp(enemies[i].rb.cb.tag, "harpy") == 0)
                     {
                         if (enemies[i].animation_frame >= 0 && enemies[i].animation_frame <= 4)
                         {
@@ -684,9 +682,9 @@ int main()
                             }
                         }
                     }
-                    else if(strcmp(enemies[i].rb.cb.tag, "ghost") == 0)
+                    else if (strcmp(enemies[i].rb.cb.tag, "ghost") == 0)
                     {
-                        if(enemies[i].attack == 1)
+                        if (enemies[i].attack == 1)
                         {
                             if (enemies[i].animation_frame >= 0 && enemies[i].animation_frame <= 3)
                             {
@@ -702,23 +700,22 @@ int main()
                             enemies[i].animation_frame = 0;
                         }
                     }
-                    else if(strcmp(enemies[i].rb.cb.tag, "spike") == 0)
+                    else if (strcmp(enemies[i].rb.cb.tag, "spike") == 0)
                     {
-                        
-                            if(game_timer % 70 < 32 && game_timer % 70 != 0)
-                            {
-                                enemies[i].animation_frame = 0;
-                            }
-                            else if(game_timer % 70 > 36 && game_timer % 70 < 66)
-                            {
-                                enemies[i].animation_frame = 4;
-                            }
-                            else if (game_timer % 4 == 0)
-                            {
-                                enemies[i].animation_frame++;
-                                enemies[i].animation_frame %= 8;
-                            }
-                        
+
+                        if (game_timer % 70 < 32 && game_timer % 70 != 0)
+                        {
+                            enemies[i].animation_frame = 0;
+                        }
+                        else if (game_timer % 70 > 36 && game_timer % 70 < 66)
+                        {
+                            enemies[i].animation_frame = 4;
+                        }
+                        else if (game_timer % 4 == 0)
+                        {
+                            enemies[i].animation_frame++;
+                            enemies[i].animation_frame %= 8;
+                        }
                     }
                 }
                 else
@@ -769,9 +766,9 @@ int main()
                 }
             }
 
-            for(int i2 = 0; i2 < ground_count; i2++)
+            for (int i2 = 0; i2 < ground_count; i2++)
             {
-                if(strcmp(grounds[i2].rb.cb.tag, "lava") == 0)
+                if (strcmp(grounds[i2].rb.cb.tag, "lava") == 0)
                 {
                     if (grounds[i2].animation_frame >= 0 && grounds[i2].animation_frame <= 3)
                     {
@@ -833,7 +830,7 @@ int main()
                 if (enemies[i].alive == 0 && enemies[i].rb.pos.y >= 1000)
                     enemies[i].rb.pos.y = 1001;
             }
-            else if(strcmp(enemies[i].rb.cb.tag, "spike") == 0)
+            else if (strcmp(enemies[i].rb.cb.tag, "spike") == 0)
             {
                 draw_spike(buffer, spike_sprite, &enemies[i], camera);
             }
@@ -848,7 +845,6 @@ int main()
         }
 
         draw_lifebar(buffer, lifebar_sprite, player);
-
 
         draw_sprite(screen, buffer, 0, 0);
         clear_to_color(buffer, 0x40AEBF);
@@ -1281,7 +1277,6 @@ void draw_spike(BITMAP *bmp, BITMAP *sprite, Enemy *spike, Vector camera)
 
     destroy_bitmap(spike_sprite);
 }
-
 
 void draw_lifebar(BITMAP *bmp, BITMAP *sprite, Player player)
 {

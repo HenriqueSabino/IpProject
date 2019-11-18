@@ -17,7 +17,7 @@ typedef struct rigidbody
 } RigidBody;
 
 void update(RigidBody *rb);
-void update_all(RigidBody *rbs[], int amount);
+void update_all(RigidBody *rbs[], int amount, Vector camera);
 void update_limit_pos(RigidBody *rb, Vector min, Vector max);
 void apply_force(RigidBody *rb, float x, float y);
 
