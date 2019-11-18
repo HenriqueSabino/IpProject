@@ -425,7 +425,6 @@ int main()
             if (chy == py[0])
             {
                 stop_sample(intro);
-                play_sample(enter, 255, 128, 1000, 0);
                 menu_on = FALSE;
             }
             else
@@ -717,7 +716,7 @@ int main()
                             else if (game_timer % 4 == 0)
                             {
                                 enemies[i].animation_frame++;
-                                enemies[i].animation_frame %= 9;
+                                enemies[i].animation_frame %= 8;
                             }
                         
                     }
