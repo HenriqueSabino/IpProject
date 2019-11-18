@@ -705,11 +705,11 @@ int main()
                     else if(strcmp(enemies[i].rb.cb.tag, "spike") == 0)
                     {
                         
-                            if(game_timer % 160 < 71 && game_timer % 160 != 0)
+                            if(game_timer % 70 < 32 && game_timer % 70 != 0)
                             {
                                 enemies[i].animation_frame = 0;
                             }
-                            else if(game_timer % 160 > 80 && game_timer % 160 < 151)
+                            else if(game_timer % 70 > 36 && game_timer % 70 < 66)
                             {
                                 enemies[i].animation_frame = 4;
                             }
