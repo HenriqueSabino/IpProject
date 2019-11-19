@@ -21,12 +21,15 @@ END_OF_FUNCTION(close_program)
 volatile int menu_on = TRUE;
 volatile int death_on = TRUE;
 volatile int counter = 0;
+volatile int player_animation_counter = 0;
 volatile long game_timer = 0;
 
 void increment()
 {
     counter++;
     game_timer++;
+    player_animation_counter++;
+    
 }
 END_OF_FUNCTION(increment)
 
@@ -495,7 +498,7 @@ int main()
         {
             player.rb.cb.enabled = 0;
             player.sword_rb.cb.enabled = 0;
-            if (player.rb.pos.y >= grounds[ground_count - 1].rb.cb.max.y + 512)
+            if (player.rb.pos.y >= grounds[ground_count - 1].rb.cb.max.y + 256)
             {
                 //VARIABLES
                 int shx = 290;
@@ -594,7 +597,7 @@ int main()
                 set_velocity_axis(&player, "vertical", -20);
             }
         }
-        if ((key_holding(KEY_A) || key_holding(KEY_D)) && player.attacking == 0)
+        if ((key_holding(KEY_A) || key_holding(KEY_D)) && !player.attacking && !player.Bow_attack)
         {
             if (key_holding(KEY_A))
             {
@@ -615,12 +618,18 @@ int main()
         if (key_down(KEY_Q))
         {
             if (!player.taking_damage)
+            {
                 player.attacking = 1;
+                player_animation_counter = 0;
+            }
         }
         if (key_down(KEY_E))
         {
             if (!player.taking_damage)
+            {
                 player.Bow_attack = 1;
+                player_animation_counter = 0;
+            }
         }
 
         //UPDATE
@@ -748,7 +757,7 @@ int main()
 
             if (player.animation_frame >= 0 && player.animation_frame <= 7)
             {
-                if (game_timer % 4 == 0)
+                if (player_animation_counter % 4 == 0)
                 {
                     player.animation_frame++;
                     player.animation_frame %= 8;
@@ -757,7 +766,7 @@ int main()
 
             if (player.animation_frame >= 12 && player.animation_frame <= 17)
             {
-                if (game_timer % 2 == 0)
+                if (player_animation_counter % 2 == 0)
                 {
                     player.animation_frame++;
                     if (12 + player.animation_frame % 6 != 12)
@@ -774,7 +783,7 @@ int main()
             }
             if (player.animation_frame == 11)
             {
-                if (game_timer % 4 == 0)
+                if (player_animation_counter % 4 == 3)
                 {
                     player.animation_frame++;
                     player.animation_frame %= 8;
@@ -916,9 +925,9 @@ void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player, Vector camera)
                 player->sword_rb.cb.enabled = 1;
         }
     }
-    else if (player->rb.velocity.x == 0 && player->Bow_attack != 0)
+    else if (player->Bow_attack)
     {
-        if (player->animation_frame < 11)
+        if (player->animation_frame != 11)
         {
             player->animation_frame = 11;
         }
@@ -930,9 +939,9 @@ void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player, Vector camera)
     {
         player->animation_frame = 10;
     }
-    else if ((!player->can_jump || player->rb.velocity.y != 0) && player->attacking != 0 && player->Bow_attack == 0)
+    else if ((!player->can_jump || player->rb.velocity.y != 0) && player->attacking && !player->Bow_attack)
     {
-        if (player->animation_frame < 12)
+        if (player->animation_frame != 12)
         {
             player->animation_frame = 12;
         }
@@ -944,9 +953,9 @@ void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player, Vector camera)
                 player->sword_rb.cb.enabled = 1;
         }
     }
-    else if ((!player->can_jump || player->rb.velocity.y != 0) && player->attacking == 0 && player->Bow_attack != 0)
+    else if ((!player->can_jump || player->rb.velocity.y != 0) && !player->attacking && player->Bow_attack)
     {
-        if (player->animation_frame < 11)
+        if (player->animation_frame != 11)
         {
             player->animation_frame = 11;
         }
