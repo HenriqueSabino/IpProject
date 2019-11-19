@@ -278,6 +278,7 @@ void init_player(Player *player, Vector pos)
     player->animation_frame = 8;
     player->facing_right = 1;
     player->attacking = 0;
+    player->Bow_attack = 0;
     player->life = 100;
     player->invulnerability = 0;
     player->can_jump = 0;

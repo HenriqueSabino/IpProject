@@ -617,6 +617,11 @@ int main()
             if (!player.taking_damage)
                 player.attacking = 1;
         }
+        if (key_down(KEY_E))
+        {
+            if (!player.taking_damage)
+                player.Bow_attack = 1;
+        }
 
         //UPDATE
 
@@ -767,6 +772,15 @@ int main()
                     }
                 }
             }
+            if (player.animation_frame == 11)
+            {
+                if (game_timer % 4 == 0)
+                {
+                    player.animation_frame++;
+                    player.animation_frame %= 8;
+                    player.Bow_attack = 0;
+                }
+            }
 
             for (int i2 = 0; i2 < ground_count; i2++)
             {
@@ -884,11 +898,11 @@ void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player, Vector camera)
     {
         player->animation_frame = 0;
     }
-    else if (player->rb.velocity.x == 0 && player->attacking == 0)
+    else if (player->rb.velocity.x == 0 && player->attacking == 0 && player->Bow_attack == 0)
     {
         player->animation_frame = 8;
     }
-    else if (player->rb.velocity.x == 0 && player->attacking != 0)
+    else if (player->rb.velocity.x == 0 && player->attacking != 0 && player->Bow_attack == 0)
     {
         if (player->animation_frame < 12)
         {
@@ -902,12 +916,21 @@ void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player, Vector camera)
                 player->sword_rb.cb.enabled = 1;
         }
     }
+    else if (player->rb.velocity.x == 0 && player->Bow_attack != 0)
+    {
+        if (player->animation_frame < 11)
+        {
+            player->animation_frame = 11;
+        }
+    
+    }
 
-    if ((!player->can_jump || player->rb.velocity.y != 0) && player->attacking == 0)
+
+    if ((!player->can_jump || player->rb.velocity.y != 0) && player->attacking == 0 && player->Bow_attack == 0)
     {
         player->animation_frame = 10;
     }
-    else if ((!player->can_jump || player->rb.velocity.y != 0) && player->attacking != 0)
+    else if ((!player->can_jump || player->rb.velocity.y != 0) && player->attacking != 0 && player->Bow_attack == 0)
     {
         if (player->animation_frame < 12)
         {
@@ -921,7 +944,13 @@ void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player, Vector camera)
                 player->sword_rb.cb.enabled = 1;
         }
     }
-
+    else if ((!player->can_jump || player->rb.velocity.y != 0) && player->attacking == 0 && player->Bow_attack != 0)
+    {
+        if (player->animation_frame < 11)
+        {
+            player->animation_frame = 11;
+        }
+    }
     int r_img_pos = player->animation_frame % PLAYER_SPRITE_COLS;
     int c_img_pos = player->animation_frame / PLAYER_SPRITE_COLS;
 
