@@ -379,7 +379,7 @@ int main()
 
 #pragma region menu
     //VARIABLES
-    int chx = 355, chy = 420, som = 0;
+    int chx = 355, chy = 420, som = FALSE;
     int py[2] = {420, 485};
 
     //BITMAPS
@@ -404,20 +404,20 @@ int main()
         //INPUT
         if (key_down(KEY_RIGHT) || key_down(KEY_LEFT))
         {
-            som = 1;
+            som = TRUE;
         }
 
         if (key_down(KEY_DOWN))
         {
             chy = (chy == py[0]) ? py[1] : py[0];
-            som = 1;
+            som = TRUE;
         }
 
         if (key_down(KEY_UP))
         {
 
             chy = (chy == py[0]) ? py[1] : py[0];
-            som = 1;
+            som = TRUE;
         }
 
         if (key_down(KEY_ENTER))
@@ -460,7 +460,7 @@ int main()
             //draw the a part of the sprite sheet to the screen and scales it
             masked_blit(arrow_sprite, buff, r_img_pos, c_img_pos, chx, chy, 32, 32);
 
-            if (som == 1)
+            if (som)
             {
                 play_sample(select, 255, 128, 1000, 0);
                 som = 0;
@@ -498,7 +498,9 @@ int main()
             if (player.rb.pos.y >= grounds[ground_count - 1].rb.cb.max.y + 512)
             {
                 //VARIABLES
-                int shx = 235, shy = 390, snd = 0;
+                int shx = 290;
+                int shy = 417;
+                int snd = FALSE;
 
                 //BITMAPS
                 BITMAP *death = load_bitmap(DEATHSCREEN_PATH, NULL);
@@ -522,7 +524,7 @@ int main()
                     //INPUT
                     if (key_down(KEY_RIGHT) || key_down(KEY_LEFT) || key_down(KEY_DOWN) || key_down(KEY_UP))
                     {
-                        snd = 1;
+                        snd = TRUE;
                     }
 
                     if (key_down(KEY_ENTER))
@@ -557,10 +559,10 @@ int main()
                         //draw the a part of the sprite sheet to the screen and scales it
                         masked_blit(arrow_sprite, buff, r_img_pos, c_img_pos, shx, shy, 32, 32);
 
-                        if (snd == 1)
+                        if (snd)
                         {
                             play_sample(select, 255, 128, 1000, 0);
-                            snd = 0;
+                            snd = FALSE;
                         }
 
                         draw_sprite(screen, buff, 0, 0);
