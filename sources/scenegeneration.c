@@ -42,3 +42,9 @@ int readMap(char **map, char *path)
         return rows * cols;
     }
 }
+
+void init_object(Object *object, Vector pos, int sprite_frame)
+{
+    object->position = pos;
+    object->sprite_frame = sprite_frame;
+}

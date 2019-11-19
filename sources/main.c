@@ -53,6 +53,8 @@ void draw_lava(BITMAP *bmp, BITMAP *sprite, Ground *lava, Vector camera);
 
 void draw_bridge(BITMAP *bmp, BITMAP *sprite, Ground *bridge, Vector camera);
 
+void draw_object(BITMAP *bmp, BITMAP *sprite, Object *scenario, Vector camera);
+
 void draw_lifebar(BITMAP *bmp, BITMAP *sprite, Player player);
 
 void draw_arrow(BITMAP *bmp, BITMAP *sprite);
@@ -128,6 +130,11 @@ int main()
     BITMAP *bridge_sprite = load_bitmap(BRIDGE, NULL);
     if (bridge_sprite == NULL)
         allegro_message("error");
+
+    BITMAP *scenario_sprite = load_bitmap(SCENARIO, NULL);
+    if (scenario_sprite == NULL)
+        allegro_message("error");
+
 
     BITMAP *lifebar_sprite = load_bitmap("../assets/Canvas/LifeBar.bmp", NULL);
     if (lifebar_sprite == NULL)
@@ -252,7 +259,7 @@ int main()
 
         Player player;
 
-        int row = 0, col = 0, not_objs = 0, ground_count = 0, enemy_count = 0, actived = 0, spike_an = 0;
+        int row = 0, col = 0, not_objs = 0, ground_count = 0, enemy_count = 0, object_count = 0;
 
         for (int i = 0; i < map_size; i++)
         {
@@ -268,14 +275,20 @@ int main()
             {
                 enemy_count++;
             }
+            else if(map[i] == 'n' || map[i] == 'o' || map[i] == 'p' || map[i] == 'q')
+            {
+                object_count++;
+            }
         }
 
         Ground grounds[ground_count];
         ground_count = 0;
 
         Enemy enemies[enemy_count];
-
         enemy_count = 0;
+
+        Object objects[object_count];
+        object_count = 0;
 
         for (int i = 0; i < map_size; i++)
         {
@@ -452,6 +465,34 @@ int main()
             {
                 init_bridge(&grounds[ground_count], create_vector(col * 128, row * 128), 5);
                 ground_count++;
+                col++;
+            }
+            else if (map[i] == 'n')
+            {
+                init_object(&objects[object_count], create_vector(col * 128, row * 128), 0);
+                object_count++;
+                not_objs++;
+                col++;
+            }
+            else if (map[i] == 'o')
+            {
+                init_object(&objects[object_count], create_vector(col * 128, row * 128), 1);
+                object_count++;
+                not_objs++;
+                col++;
+            }
+            else if (map[i] == 'p')
+            {
+                init_object(&objects[object_count], create_vector(col * 128, row * 128), 2);
+                object_count++;
+                not_objs++;
+                col++;
+            }
+            else if (map[i] == 'q')
+            {
+                init_object(&objects[object_count], create_vector(col * 128, row * 128), 3);
+                object_count++;
+                not_objs++;
                 col++;
             }
             else if (map[i] == 'L')
@@ -737,6 +778,11 @@ int main()
             }
 
             //DRAWING
+            
+            for (int i = 0; i < object_count; i++)
+            {
+                draw_object(buffer, scenario_sprite, &objects[i], camera);
+            }
 
             for (int i = 0; i < ground_count; i++)
             {
@@ -1318,6 +1364,25 @@ void draw_spike(BITMAP *bmp, BITMAP *sprite, Enemy *spike, Vector camera)
     draw_sprite_ex(bmp, spike_sprite, spike->rb.pos.x - camera.x, spike->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
 
     destroy_bitmap(spike_sprite);
+}
+
+void draw_object(BITMAP *bmp, BITMAP *sprite, Object *scenario, Vector camera)
+{
+    BITMAP *scenario_sprite = create_bitmap(128, 128);
+    clear_to_color(scenario_sprite, makecol(255, 0, 255));
+
+    int r_img_pos = scenario->sprite_frame % SCENARIO_SPRITE_COLS;
+    int c_img_pos = scenario->sprite_frame / SCENARIO_SPRITE_COLS;
+
+    r_img_pos *= SCENARIO_TILE_SIZE;
+    c_img_pos *= SCENARIO_TILE_SIZE;
+
+    //draw the a part of the sprite sheet to the screen and scales it
+    masked_stretch_blit(sprite, scenario_sprite, r_img_pos, c_img_pos, 64, 64, 0, 0, 128, 128);
+
+    draw_sprite_ex(bmp, scenario_sprite, scenario->position.x - camera.x, scenario->position.y + 28 - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+
+    destroy_bitmap(scenario_sprite);
 }
 
 void draw_lifebar(BITMAP *bmp, BITMAP *sprite, Player player)
