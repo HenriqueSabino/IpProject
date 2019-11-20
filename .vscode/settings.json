@@ -5,6 +5,8 @@
         "string": "c",
         "unordered_map": "c",
         "vector": "c",
-        "system_error": "c"
+        "system_error": "c",
+        "stdio.h": "c",
+        "string.h": "c"
     }
 }

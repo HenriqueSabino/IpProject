@@ -75,7 +75,7 @@ void onCollisionEnter(RigidBody *self, RigidBody *other)
         }
     }
 
-    if (strcmp(other->cb.tag, "platform") == 0)
+    else if (strcmp(other->cb.tag, "platform") == 0)
     {
         if (self->cb.max.y < other->cb.min.y)
         {
@@ -95,7 +95,7 @@ void onCollisionEnter(RigidBody *self, RigidBody *other)
         }
     }
 
-    if ((strcmp(other->cb.tag, "bat") == 0 || strcmp(other->cb.tag, "fox") == 0 || strcmp(other->cb.tag, "harpy") == 0 || strcmp(other->cb.tag, "ghost") == 0 || strcmp(other->cb.tag, "spike") == 0) && player_ref->invulnerability == 0)
+    else if ((strcmp(other->cb.tag, "bat") == 0 || strcmp(other->cb.tag, "fox") == 0 || strcmp(other->cb.tag, "harpy") == 0 || strcmp(other->cb.tag, "ghost") == 0 || strcmp(other->cb.tag, "spike") == 0) && player_ref->invulnerability == 0)
     {
         if (strcmp(other->cb.tag, "bat") == 0)
         {
@@ -153,12 +153,26 @@ void onCollisionEnter(RigidBody *self, RigidBody *other)
         }
     }
 
-    if (strcmp(other->cb.tag, "lava") == 0)
+    else if (strcmp(other->cb.tag, "lava") == 0)
     {
         player_ref->taking_damage = 1;
         player_ref->life = 0;
         self->velocity = create_vector(0, -15);
         self->acceleration = create_vector(0, 0);
+    }
+
+    else if (strcmp(other->cb.tag, "potion") == 0)
+    {
+        if (player_ref->life < 80)
+        {
+            player_ref->life += 20;
+        }
+        else
+        {
+            player_ref->life = 100;
+        }
+        
+        other->cb.enabled = 0;
     }
 }
 

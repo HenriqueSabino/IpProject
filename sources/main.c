@@ -10,6 +10,7 @@
 #include "../headers/ground.h"
 #include "../headers/scenegeneration.h"
 #include "../headers/menu.h"
+#include "../headers/item.h"
 
 #pragma region functions
 volatile int close_game = 0;
@@ -58,6 +59,8 @@ void draw_object(BITMAP *bmp, BITMAP *sprite, Object *scenario, Vector camera);
 void draw_lifebar(BITMAP *bmp, BITMAP *sprite, Player player);
 
 void draw_arrow(BITMAP *bmp, BITMAP *sprite);
+
+void draw_potion(BITMAP *bmp, BITMAP *sprite, Item *potion, Vector camera);
 
 #pragma endregion
 
@@ -143,6 +146,12 @@ int main()
     BITMAP *arrow_sprite = load_bitmap(ARROW_PATH, NULL);
     if (arrow_sprite == NULL)
         allegro_message("error");
+
+    BITMAP *potion_sprite = load_bitmap(ITEM_PATH, NULL);
+    if (potion_sprite == NULL)
+    {
+        allegro_message("error");
+    }
 
 #pragma endregion
 
@@ -259,7 +268,7 @@ int main()
 
         Player player;
 
-        int row = 0, col = 0, not_objs = 0, ground_count = 0, enemy_count = 0, object_count = 0;
+        int row = 0, col = 0, not_objs = 0, ground_count = 0, item_count = 0, enemy_count = 0, object_count = 0;
 
         for (int i = 0; i < map_size; i++)
         {
@@ -279,6 +288,10 @@ int main()
             {
                 object_count++;
             }
+            else if (map[i] == 'r')
+            {
+                item_count++;
+            }
         }
 
         Ground grounds[ground_count];
@@ -290,9 +303,18 @@ int main()
         Object objects[object_count];
         object_count = 0;
 
+        Item items[item_count];
+        item_count = 0;
+
         for (int i = 0; i < map_size; i++)
         {
-            if (map[i] == 'P')
+            if (map[i] == 'r')
+            {
+                init_potion(&items[item_count], create_vector(col * 128, row * 128), 0);
+                item_count++;
+                col++;
+            }
+            else if (map[i] == 'P')
             {
                 init_player(&player, create_vector(col * 128, row * 128));
                 init_timer_invulnerability();
@@ -531,6 +553,11 @@ int main()
         for (int i = 0; i < enemy_count; i++)
         {
             rbs[i + ground_count + 1] = &enemies[i].rb;
+        }
+
+        for (int i = 0; i < item_count; i++)
+        {
+            rbs[i + ground_count + enemy_count + 1] = &items[i].rb;
         }
 
         set_enemies_ref(enemies, enemy_count);
@@ -797,6 +824,14 @@ int main()
                 else if (strcmp(grounds[i].rb.cb.tag, "lava") == 0)
                 {
                     draw_lava(buffer, lava_sprite, &grounds[i], camera);
+                }
+            }
+    
+            for (int i = 0; i < item_count; i++)
+            {
+                if (strcmp(items[i].rb.cb.tag, "potion") == 0)
+                {
+                    draw_potion(buffer, potion_sprite, &items[i], camera);
                 }
             }
 
@@ -1383,6 +1418,28 @@ void draw_object(BITMAP *bmp, BITMAP *sprite, Object *scenario, Vector camera)
     draw_sprite_ex(bmp, scenario_sprite, scenario->position.x - camera.x, scenario->position.y + 28 - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
 
     destroy_bitmap(scenario_sprite);
+}
+
+void draw_potion(BITMAP *bmp, BITMAP *sprite, Item *potion, Vector camera)
+{
+    if (potion->rb.cb.enabled)
+    {
+        BITMAP *potion_sprite = create_bitmap(64, 64);
+        clear_to_color(potion_sprite, makecol(255, 0, 255));
+
+        int r_img_pos = potion->animation_frame % POTION_SPRITE_COLS;
+        int c_img_pos = potion->animation_frame / POTION_SPRITE_COLS;
+
+        r_img_pos *= POTION_TILE_SIZE;
+        c_img_pos *= POTION_TILE_SIZE;
+
+        //draw the a part of the sprite sheet to the screen and scales it
+        masked_stretch_blit(sprite, potion_sprite, r_img_pos, c_img_pos, 32, 32, 0, 0, 64, 64);
+
+        draw_sprite_ex(bmp, potion_sprite, potion->rb.pos.x - camera.x, potion->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+
+        destroy_bitmap(potion_sprite);
+    }
 }
 
 void draw_lifebar(BITMAP *bmp, BITMAP *sprite, Player player)
