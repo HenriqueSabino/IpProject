@@ -11,15 +11,16 @@
 #include "../headers/scenegeneration.h"
 #include "../headers/menu.h"
 
-volatile int close_game = FALSE;
+#pragma region functions
+volatile int close_game = 0;
 void close_program()
 {
-    close_game = TRUE;
+    close_game = 1;
 }
 END_OF_FUNCTION(close_program)
 
-volatile int menu_on = TRUE;
-volatile int death_on = TRUE;
+int menu_on = 1;
+int death_on = 0;
 volatile int counter = 0;
 volatile int player_animation_counter = 0;
 volatile long game_timer = 0;
@@ -29,7 +30,6 @@ void increment()
     counter++;
     game_timer++;
     player_animation_counter++;
-    
 }
 END_OF_FUNCTION(increment)
 
@@ -57,11 +57,11 @@ void draw_lifebar(BITMAP *bmp, BITMAP *sprite, Player player);
 
 void draw_arrow(BITMAP *bmp, BITMAP *sprite);
 
+#pragma endregion
+
 int main()
 {
-    char *map;
-    int map_size = readMap(&map, "../sources/map.txt");
-
+#pragma region allegro initialization
     allegro_init();
     install_keyboard();
     install_sound(DIGI_AUTODETECT, MIDI_AUTODETECT, NULL);
@@ -82,12 +82,13 @@ int main()
 
     install_int_ex(increment, MSEC_TO_TIMER(1.0 / FPS * 1000));
 
-    Vector camera;
-
-    Player player;
+    int playing_first_level = 0;
 
     BITMAP *buffer = create_bitmap(SCREEN_W, SCREEN_H);
 
+#pragma endregion
+
+#pragma region loading sprites
     BITMAP *player_sprite = load_bitmap(PLAYER_SPRITE_SHEET, NULL);
     if (player_sprite == NULL)
         allegro_message("error");
@@ -136,571 +137,476 @@ int main()
     if (arrow_sprite == NULL)
         allegro_message("error");
 
-    int row = 0, col = 0, not_objs = 0, ground_count = 0, enemy_count = 0, actived = 0, spike_an = 0;
-
-    for (int i = 0; i < map_size; i++)
-    {
-        if (map[i] == '0' || map[i] == '1' || map[i] == '2' || map[i] == '3' || map[i] == '4' ||
-            map[i] == '5' || map[i] == '6' || map[i] == '7' || map[i] == '8' || map[i] == '9' ||
-            map[i] == 'a' || map[i] == 'b' || map[i] == 'c' || map[i] == 'd' || map[i] == 'e' ||
-            map[i] == 'f' || map[i] == 'g' || map[i] == 'h' || map[i] == 'i' || map[i] == 'j' ||
-            map[i] == 'k' || map[i] == 'l' || map[i] == 'm' || map[i] == 'L' || map[i] == 'S')
-        {
-            ground_count++;
-        }
-        else if (map[i] == 'B' || map[i] == 'F' || map[i] == 'H' || map[i] == 'G' || map[i] == 'I')
-        {
-            enemy_count++;
-        }
-    }
-
-    Ground grounds[ground_count];
-    ground_count = 0;
-
-    Enemy enemies[enemy_count];
-
-    enemy_count = 0;
-
-    for (int i = 0; i < map_size; i++)
-    {
-        if (map[i] == 'P')
-        {
-            init_player(&player, create_vector(col * 128, row * 128));
-            init_timer_invulnerability();
-            camera = sum(player.rb.pos, create_vector(-100, -200));
-            col++;
-        }
-        else if (map[i] == 'B')
-        {
-            init_bat(&enemies[enemy_count], create_vector(col * 128, row * 128));
-            enemy_count++;
-            col++;
-        }
-        else if (map[i] == 'F')
-        {
-            init_fox(&enemies[enemy_count], create_vector(col * 128, row * 128));
-            enemy_count++;
-            col++;
-        }
-        else if (map[i] == 'H')
-        {
-            init_harpy(&enemies[enemy_count], create_vector(col * 128, row * 128));
-            enemy_count++;
-            col++;
-        }
-        else if (map[i] == 'G')
-        {
-            init_ghost(&enemies[enemy_count], create_vector(col * 128, row * 128));
-            enemy_count++;
-            col++;
-        }
-        else if (map[i] == 'I')
-        {
-            init_spike(&enemies[enemy_count], create_vector(col * 128, row * 128));
-            enemy_count++;
-            col++;
-        }
-        else if (map[i] == '0')
-        {
-            init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 0);
-            ground_count++;
-            col++;
-        }
-        else if (map[i] == '1')
-        {
-            init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 1);
-            ground_count++;
-            col++;
-        }
-        else if (map[i] == '2')
-        {
-            init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 2);
-            ground_count++;
-            col++;
-        }
-        else if (map[i] == '3')
-        {
-            init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 3);
-            ground_count++;
-            col++;
-        }
-        else if (map[i] == '4')
-        {
-            init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 4);
-            ground_count++;
-            col++;
-        }
-        else if (map[i] == '5')
-        {
-            init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 5);
-            ground_count++;
-            col++;
-        }
-        else if (map[i] == '6')
-        {
-            init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 6);
-            ground_count++;
-            col++;
-        }
-        else if (map[i] == '7')
-        {
-            init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 7);
-            ground_count++;
-            col++;
-        }
-        else if (map[i] == '8')
-        {
-            init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 8);
-            ground_count++;
-            col++;
-        }
-        else if (map[i] == '9')
-        {
-            init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 9);
-            ground_count++;
-            col++;
-        }
-        else if (map[i] == 'a')
-        {
-            init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 10);
-            ground_count++;
-            col++;
-        }
-        else if (map[i] == 'b')
-        {
-            init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 11);
-            ground_count++;
-            col++;
-        }
-        else if (map[i] == 'c')
-        {
-            init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 12);
-            ground_count++;
-            col++;
-        }
-        else if (map[i] == 'd')
-        {
-            init_platform(&grounds[ground_count], create_vector(col * 128, row * 128), 0);
-            ground_count++;
-            col++;
-        }
-        else if (map[i] == 'e')
-        {
-            init_platform(&grounds[ground_count], create_vector(col * 128, row * 128), 1);
-            ground_count++;
-            col++;
-        }
-        else if (map[i] == 'f')
-        {
-            init_platform(&grounds[ground_count], create_vector(col * 128, row * 128), 2);
-            ground_count++;
-            col++;
-        }
-        else if (map[i] == 'g')
-        {
-            init_platform(&grounds[ground_count], create_vector(col * 128, row * 128), 3);
-            ground_count++;
-            col++;
-        }
-        else if (map[i] == 'h')
-        {
-            init_bridge(&grounds[ground_count], create_vector(col * 128, row * 128), 0);
-            ground_count++;
-            col++;
-        }
-        else if (map[i] == 'i')
-        {
-            init_bridge(&grounds[ground_count], create_vector(col * 128, row * 128), 1);
-            ground_count++;
-            col++;
-        }
-        else if (map[i] == 'j')
-        {
-            init_bridge(&grounds[ground_count], create_vector(col * 128, row * 128), 2);
-            ground_count++;
-            col++;
-        }
-        else if (map[i] == 'k')
-        {
-            init_bridge(&grounds[ground_count], create_vector(col * 128, row * 128), 3);
-            ground_count++;
-            col++;
-        }
-        else if (map[i] == 'l')
-        {
-            init_bridge(&grounds[ground_count], create_vector(col * 128, row * 128), 4);
-            ground_count++;
-            col++;
-        }
-        else if (map[i] == 'm')
-        {
-            init_bridge(&grounds[ground_count], create_vector(col * 128, row * 128), 5);
-            ground_count++;
-            col++;
-        }
-        else if (map[i] == 'L')
-        {
-            init_lava(&grounds[ground_count], create_vector(col * 128, row * 128), 0);
-            ground_count++;
-            col++;
-        }
-        else if (map[i] == 'S')
-        {
-            init_lava(&grounds[ground_count], create_vector(col * 128, row * 128), 4);
-            ground_count++;
-            col++;
-        }
-        else if (map[i] == '*')
-        {
-            not_objs++;
-            col++;
-        }
-        else if (map[i] == '\n')
-        {
-            row++;
-            not_objs++;
-            col = 0;
-        }
-    }
-
-    int rbs_size = map_size - not_objs + 1;
-    RigidBody *rbs[rbs_size];
-    rbs[0] = &player.rb;
-    for (int i = 0; i < ground_count; i++)
-    {
-        rbs[i + 1] = &grounds[i].rb;
-    }
-
-    for (int i = 0; i < enemy_count; i++)
-    {
-        rbs[i + ground_count + 1] = &enemies[i].rb;
-    }
-
-    set_enemies_ref(enemies, enemy_count);
-
-    rbs[rbs_size - 1] = &player.sword_rb;
-
-#pragma region menu
-    //VARIABLES
-    int chx = 355, chy = 420, som = FALSE;
-    int py[2] = {420, 485};
-
-    //BITMAPS
-    BITMAP *menu = load_bitmap(LOGO_PATH, NULL);
-    BITMAP *arrow = load_bitmap(ARROW_PATH, NULL);
-    BITMAP *buff = create_bitmap(64 * 16, 64 * 9);
-
-    //SAMPLES
-    SAMPLE *select = load_sample(SELECT_SOUND);
-    SAMPLE *intro = load_sample(INTRO_SOUND);
-    SAMPLE *enter = load_sample(ENTER_SOUND);
-
-    //INTRODUCTION SAMPLE
-    play_sample(intro, 255, 128, 1000, 1);
-
-    int animation_frame = 0;
-
-    while (menu_on)
-    {
-        keyboard_input();
-
-        //INPUT
-        if (key_down(KEY_RIGHT) || key_down(KEY_LEFT))
-        {
-            som = TRUE;
-        }
-
-        if (key_down(KEY_DOWN))
-        {
-            chy = (chy == py[0]) ? py[1] : py[0];
-            som = TRUE;
-        }
-
-        if (key_down(KEY_UP))
-        {
-
-            chy = (chy == py[0]) ? py[1] : py[0];
-            som = TRUE;
-        }
-
-        if (key_down(KEY_ENTER))
-        {
-            if (chy == py[0])
-            {
-                stop_sample(intro);
-                menu_on = FALSE;
-            }
-            else
-            {
-                // OUTPUT FUNCTION
-                return 0;
-            }
-        }
-
-        if (key_down(KEY_ESC))
-        {
-            // OUTPUT FUNCTION
-            return 0;
-        }
-
-        while (counter > 0)
-        {
-            if (animation_frame >= 0 && animation_frame <= 15)
-            {
-                if (game_timer % 2 == 0)
-                {
-                    animation_frame++;
-                    animation_frame %= 16;
-                }
-            }
-
-            int r_img_pos = animation_frame % ARROW_SPRITE_COLS;
-            int c_img_pos = animation_frame / ARROW_SPRITE_COLS;
-
-            r_img_pos *= ARROW_TILE_SIZE;
-            c_img_pos *= ARROW_TILE_SIZE;
-
-            //draw the a part of the sprite sheet to the screen and scales it
-            masked_blit(arrow_sprite, buff, r_img_pos, c_img_pos, chx, chy, 32, 32);
-
-            if (som)
-            {
-                play_sample(select, 255, 128, 1000, 0);
-                som = 0;
-            }
-
-            draw_sprite(screen, buff, 0, 0);
-            clear(buff);
-            draw_sprite(buff, menu, 0, 0);
-
-            counter--;
-        }
-    }
-
-    destroy_bitmap(buff);
-    destroy_bitmap(menu);
-    destroy_bitmap(arrow);
-    destroy_sample(select);
-    destroy_sample(intro);
-
 #pragma endregion
-
-    clear_to_color(buffer, 0x40AEBF);
 
     while (!close_game)
     {
-        if (player.rb.pos.y >= grounds[ground_count - 1].rb.cb.max.y)
-        {
-            player.life = 0;
-        }
+#pragma region menu
+        //VARIABLES
+        int chx = 355, chy = 420, som = 0;
+        int py[2] = {420, 485};
 
-        if (player.life <= 0)
+        //BITMAPS
+        BITMAP *menu = load_bitmap(LOGO_PATH, NULL);
+        BITMAP *arrow = load_bitmap(ARROW_PATH, NULL);
+
+        //SAMPLES
+        SAMPLE *select = load_sample(SELECT_SOUND);
+        SAMPLE *intro = load_sample(INTRO_SOUND);
+        SAMPLE *enter = load_sample(ENTER_SOUND);
+
+        //INTRODUCTION SAMPLE
+        play_sample(intro, 255, 128, 1000, 1);
+
+        int animation_frame = 0;
+
+        while (menu_on && !close_game)
         {
-            player.rb.cb.enabled = 0;
-            player.sword_rb.cb.enabled = 0;
-            if (player.rb.pos.y >= grounds[ground_count - 1].rb.cb.max.y + 256)
+            keyboard_input();
+
+            //INPUT
+            if (key_down(KEY_RIGHT) || key_down(KEY_LEFT))
             {
-                //VARIABLES
-                int shx = 290;
-                int shy = 417;
-                int snd = FALSE;
+                som = 1;
+            }
 
-                //BITMAPS
-                BITMAP *death = load_bitmap(DEATHSCREEN_PATH, NULL);
-                BITMAP *arrow = load_bitmap(ARROW_PATH, NULL);
-                BITMAP *buff = create_bitmap(64 * 16, 64 * 9);
+            if (key_down(KEY_DOWN))
+            {
+                chy = (chy == py[0]) ? py[1] : py[0];
+                som = 1;
+            }
 
-                //SAMPLES
-                SAMPLE *select = load_sample(SELECT_SOUND);
-                SAMPLE *sound_death = load_sample(DEATH_SOUND);
-                SAMPLE *enter = load_sample(ENTER_SOUND);
+            if (key_down(KEY_UP))
+            {
 
-                //DEATH SAMPLE
-                play_sample(sound_death, 255, 128, 1000, 1);
+                chy = (chy == py[0]) ? py[1] : py[0];
+                som = 1;
+            }
 
-                int animation_frame = 0;
-
-                while (death_on)
+            if (key_down(KEY_ENTER))
+            {
+                if (chy == py[0])
                 {
-                    keyboard_input();
+                    stop_sample(intro);
+                    menu_on = 0;
+                    playing_first_level = 1;
+                }
+                else
+                {
+                    close_program();
+                }
+            }
 
-                    //INPUT
-                    if (key_down(KEY_RIGHT) || key_down(KEY_LEFT) || key_down(KEY_DOWN) || key_down(KEY_UP))
+            if (key_down(KEY_ESC))
+            {
+                close_program();
+            }
+
+            while (counter > 0)
+            {
+                if (animation_frame >= 0 && animation_frame <= 15)
+                {
+                    if (game_timer % 2 == 0)
                     {
-                        snd = TRUE;
-                    }
-
-                    if (key_down(KEY_ENTER))
-                    {
-
-                        return 0;
-                    }
-
-                    if (key_down(KEY_ESC))
-                    {
-                        // OUTPUT FUNCTION
-                        return 0;
-                    }
-
-                    while (counter > 0)
-                    {
-                        if (animation_frame >= 0 && animation_frame <= 15)
-                        {
-                            if (game_timer % 2 == 0)
-                            {
-                                animation_frame++;
-                                animation_frame %= 16;
-                            }
-                        }
-
-                        int r_img_pos = animation_frame % ARROW_SPRITE_COLS;
-                        int c_img_pos = animation_frame / ARROW_SPRITE_COLS;
-
-                        r_img_pos *= ARROW_TILE_SIZE;
-                        c_img_pos *= ARROW_TILE_SIZE;
-
-                        //draw the a part of the sprite sheet to the screen and scales it
-                        masked_blit(arrow_sprite, buff, r_img_pos, c_img_pos, shx, shy, 32, 32);
-
-                        if (snd)
-                        {
-                            play_sample(select, 255, 128, 1000, 0);
-                            snd = FALSE;
-                        }
-
-                        draw_sprite(screen, buff, 0, 0);
-                        clear(buff);
-                        draw_sprite(buff, death, 0, 0);
-
-                        counter--;
+                        animation_frame++;
+                        animation_frame %= 16;
                     }
                 }
 
-                destroy_bitmap(buff);
-                destroy_bitmap(death);
-                destroy_bitmap(arrow);
-                destroy_sample(select);
-                destroy_sample(sound_death);
+                int r_img_pos = animation_frame % ARROW_SPRITE_COLS;
+                int c_img_pos = animation_frame / ARROW_SPRITE_COLS;
+
+                r_img_pos *= ARROW_TILE_SIZE;
+                c_img_pos *= ARROW_TILE_SIZE;
+
+                //draw the a part of the sprite sheet to the screen and scales it
+                masked_blit(arrow_sprite, buffer, r_img_pos, c_img_pos, chx, chy, 32, 32);
+
+                if (som)
+                {
+                    play_sample(select, 255, 128, 1000, 0);
+                    som = 0;
+                }
+
+                draw_sprite(screen, buffer, 0, 0);
+                clear(buffer);
+                draw_sprite(buffer, menu, 0, 0);
+
+                counter--;
             }
         }
 
-        keyboard_input();
-        //USER INPUT
-        if (key_down(KEY_ESC))
+        destroy_bitmap(menu);
+        destroy_sample(intro);
+
+#pragma endregion
+
+        clear_to_color(buffer, 0x40AEBF);
+#pragma region first level
+#pragma region generating first level
+
+        char *map;
+        int map_size = readMap(&map, "../sources/map.txt");
+
+        Vector camera;
+
+        Player player;
+
+        int row = 0, col = 0, not_objs = 0, ground_count = 0, enemy_count = 0, actived = 0, spike_an = 0;
+
+        for (int i = 0; i < map_size; i++)
         {
-            close_program();
-        }
-        if (key_down(KEY_W) || key_down(KEY_SPACE))
-        {
-            if (player.can_jump)
+            if (map[i] == '0' || map[i] == '1' || map[i] == '2' || map[i] == '3' || map[i] == '4' ||
+                map[i] == '5' || map[i] == '6' || map[i] == '7' || map[i] == '8' || map[i] == '9' ||
+                map[i] == 'a' || map[i] == 'b' || map[i] == 'c' || map[i] == 'd' || map[i] == 'e' ||
+                map[i] == 'f' || map[i] == 'g' || map[i] == 'h' || map[i] == 'i' || map[i] == 'j' ||
+                map[i] == 'k' || map[i] == 'l' || map[i] == 'm' || map[i] == 'L' || map[i] == 'S')
             {
-                set_velocity_axis(&player, "vertical", -20);
+                ground_count++;
+            }
+            else if (map[i] == 'B' || map[i] == 'F' || map[i] == 'H' || map[i] == 'G' || map[i] == 'I')
+            {
+                enemy_count++;
             }
         }
-        if ((key_holding(KEY_A) || key_holding(KEY_D)) && !player.attacking && !player.Bow_attack)
+
+        Ground grounds[ground_count];
+        ground_count = 0;
+
+        Enemy enemies[enemy_count];
+
+        enemy_count = 0;
+
+        for (int i = 0; i < map_size; i++)
         {
-            if (key_holding(KEY_A))
+            if (map[i] == 'P')
             {
-                set_velocity_axis(&player, "horizontal", -5);
-                player.facing_right = 0;
+                init_player(&player, create_vector(col * 128, row * 128));
+                init_timer_invulnerability();
+                camera = sum(player.rb.pos, create_vector(-100, -200));
+                col++;
+            }
+            else if (map[i] == 'B')
+            {
+                init_bat(&enemies[enemy_count], create_vector(col * 128, row * 128));
+                enemy_count++;
+                col++;
+            }
+            else if (map[i] == 'F')
+            {
+                init_fox(&enemies[enemy_count], create_vector(col * 128, row * 128));
+                enemy_count++;
+                col++;
+            }
+            else if (map[i] == 'H')
+            {
+                init_harpy(&enemies[enemy_count], create_vector(col * 128, row * 128));
+                enemy_count++;
+                col++;
+            }
+            else if (map[i] == 'G')
+            {
+                init_ghost(&enemies[enemy_count], create_vector(col * 128, row * 128));
+                enemy_count++;
+                col++;
+            }
+            else if (map[i] == 'I')
+            {
+                init_spike(&enemies[enemy_count], create_vector(col * 128, row * 128));
+                enemy_count++;
+                col++;
+            }
+            else if (map[i] == '0')
+            {
+                init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 0);
+                ground_count++;
+                col++;
+            }
+            else if (map[i] == '1')
+            {
+                init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 1);
+                ground_count++;
+                col++;
+            }
+            else if (map[i] == '2')
+            {
+                init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 2);
+                ground_count++;
+                col++;
+            }
+            else if (map[i] == '3')
+            {
+                init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 3);
+                ground_count++;
+                col++;
+            }
+            else if (map[i] == '4')
+            {
+                init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 4);
+                ground_count++;
+                col++;
+            }
+            else if (map[i] == '5')
+            {
+                init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 5);
+                ground_count++;
+                col++;
+            }
+            else if (map[i] == '6')
+            {
+                init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 6);
+                ground_count++;
+                col++;
+            }
+            else if (map[i] == '7')
+            {
+                init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 7);
+                ground_count++;
+                col++;
+            }
+            else if (map[i] == '8')
+            {
+                init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 8);
+                ground_count++;
+                col++;
+            }
+            else if (map[i] == '9')
+            {
+                init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 9);
+                ground_count++;
+                col++;
+            }
+            else if (map[i] == 'a')
+            {
+                init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 10);
+                ground_count++;
+                col++;
+            }
+            else if (map[i] == 'b')
+            {
+                init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 11);
+                ground_count++;
+                col++;
+            }
+            else if (map[i] == 'c')
+            {
+                init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 12);
+                ground_count++;
+                col++;
+            }
+            else if (map[i] == 'd')
+            {
+                init_platform(&grounds[ground_count], create_vector(col * 128, row * 128), 0);
+                ground_count++;
+                col++;
+            }
+            else if (map[i] == 'e')
+            {
+                init_platform(&grounds[ground_count], create_vector(col * 128, row * 128), 1);
+                ground_count++;
+                col++;
+            }
+            else if (map[i] == 'f')
+            {
+                init_platform(&grounds[ground_count], create_vector(col * 128, row * 128), 2);
+                ground_count++;
+                col++;
+            }
+            else if (map[i] == 'g')
+            {
+                init_platform(&grounds[ground_count], create_vector(col * 128, row * 128), 3);
+                ground_count++;
+                col++;
+            }
+            else if (map[i] == 'h')
+            {
+                init_bridge(&grounds[ground_count], create_vector(col * 128, row * 128), 0);
+                ground_count++;
+                col++;
+            }
+            else if (map[i] == 'i')
+            {
+                init_bridge(&grounds[ground_count], create_vector(col * 128, row * 128), 1);
+                ground_count++;
+                col++;
+            }
+            else if (map[i] == 'j')
+            {
+                init_bridge(&grounds[ground_count], create_vector(col * 128, row * 128), 2);
+                ground_count++;
+                col++;
+            }
+            else if (map[i] == 'k')
+            {
+                init_bridge(&grounds[ground_count], create_vector(col * 128, row * 128), 3);
+                ground_count++;
+                col++;
+            }
+            else if (map[i] == 'l')
+            {
+                init_bridge(&grounds[ground_count], create_vector(col * 128, row * 128), 4);
+                ground_count++;
+                col++;
+            }
+            else if (map[i] == 'm')
+            {
+                init_bridge(&grounds[ground_count], create_vector(col * 128, row * 128), 5);
+                ground_count++;
+                col++;
+            }
+            else if (map[i] == 'L')
+            {
+                init_lava(&grounds[ground_count], create_vector(col * 128, row * 128), 0);
+                ground_count++;
+                col++;
+            }
+            else if (map[i] == 'S')
+            {
+                init_lava(&grounds[ground_count], create_vector(col * 128, row * 128), 4);
+                ground_count++;
+                col++;
+            }
+            else if (map[i] == '*')
+            {
+                not_objs++;
+                col++;
+            }
+            else if (map[i] == '\n')
+            {
+                row++;
+                not_objs++;
+                col = 0;
+            }
+        }
+
+        int rbs_size = map_size - not_objs + 1;
+        RigidBody *rbs[rbs_size];
+        rbs[0] = &player.rb;
+        for (int i = 0; i < ground_count; i++)
+        {
+            rbs[i + 1] = &grounds[i].rb;
+        }
+
+        for (int i = 0; i < enemy_count; i++)
+        {
+            rbs[i + ground_count + 1] = &enemies[i].rb;
+        }
+
+        set_enemies_ref(enemies, enemy_count);
+
+        rbs[rbs_size - 1] = &player.sword_rb;
+
+#pragma endregion
+        while (playing_first_level && !close_game)
+        {
+            if (player.rb.pos.y >= grounds[ground_count - 1].rb.cb.max.y ||
+                player.rb.pos.x <= -256 || player.life <= 0)
+            {
+                player.life = 0;
+                player.rb.cb.enabled = 0;
+                player.sword_rb.cb.enabled = 0;
+            }
+            if (player.rb.pos.y >= grounds[ground_count - 1].rb.cb.max.y + 256)
+            {
+                playing_first_level = 0;
+                death_on = 1;
+                break;
+            }
+            keyboard_input();
+            //USER INPUT
+            if (key_down(KEY_ESC))
+            {
+                playing_first_level = 0;
+                menu_on = 1;
+                break;
+            }
+            if (key_down(KEY_W) || key_down(KEY_SPACE))
+            {
+                if (player.can_jump)
+                {
+                    set_velocity_axis(&player, "vertical", -20);
+                }
+            }
+            if ((key_holding(KEY_A) || key_holding(KEY_D)) && !player.attacking && !player.Bow_attack)
+            {
+                if (key_holding(KEY_A))
+                {
+                    set_velocity_axis(&player, "horizontal", -5);
+                    player.facing_right = 0;
+                }
+                else
+                {
+                    set_velocity_axis(&player, "horizontal", 5);
+                    player.facing_right = 1;
+                }
             }
             else
             {
-                set_velocity_axis(&player, "horizontal", 5);
-                player.facing_right = 1;
+                set_velocity_axis(&player, "horizontal", 0);
             }
-        }
-        else
-        {
-            set_velocity_axis(&player, "horizontal", 0);
-        }
 
-        if (key_down(KEY_Q))
-        {
-            if (!player.taking_damage)
+            if (key_down(KEY_Q))
             {
-                player.attacking = 1;
-                player_animation_counter = 0;
-            }
-        }
-        if (key_down(KEY_E))
-        {
-            if (!player.taking_damage)
-            {
-                player.Bow_attack = 1;
-                player_animation_counter = 0;
-            }
-        }
-
-        //UPDATE
-
-        while (counter > 0)
-        {
-            update_all(rbs, rbs_size, camera);
-
-            //linear interpolation between camera and player's position
-            Vector offset_camera = create_vector(-100, -200);
-
-            if (player.life > 0)
-            {
-                camera = lerp(camera, sum(player.rb.pos, offset_camera), 0.9f);
-
-                if (camera.x <= 0)
+                if (!player.taking_damage)
                 {
-                    camera.x = 0;
+                    player.attacking = 1;
+                    player_animation_counter = 0;
                 }
-                else if (camera.x + SCREEN_W >= grounds[ground_count - 1].rb.cb.max.x)
+            }
+            if (key_down(KEY_E))
+            {
+                if (!player.taking_damage)
                 {
-                    camera.x = grounds[ground_count - 1].rb.cb.max.x - SCREEN_W;
-                }
-
-                if (camera.y + SCREEN_H >= grounds[ground_count - 1].rb.cb.max.y)
-                {
-                    camera.y = grounds[ground_count - 1].rb.cb.max.y - SCREEN_H;
+                    player.Bow_attack = 1;
+                    player_animation_counter = 0;
                 }
             }
 
-            for (int i = 0; i < enemy_count; i++)
+            //UPDATE
+
+            while (counter > 0)
             {
-                if (enemies[i].alive)
+                update_all(rbs, rbs_size, camera);
+
+                //linear interpolation between camera and player's position
+                Vector offset_camera = create_vector(-100, -200);
+
+                if (player.life > 0)
                 {
-                    if (strcmp(enemies[i].rb.cb.tag, "ghost") != 0)
+                    camera = lerp(camera, sum(player.rb.pos, offset_camera), 0.9f);
+
+                    if (camera.x <= 0)
                     {
-                        atk(&enemies[i], player.rb);
+                        camera.x = 0;
                     }
-                    else
+                    else if (camera.x + SCREEN_W >= grounds[ground_count - 1].rb.cb.max.x)
                     {
-                        atk_ghost(&enemies[i], &player);
+                        camera.x = grounds[ground_count - 1].rb.cb.max.x - SCREEN_W;
+                    }
+
+                    if (camera.y + SCREEN_H >= grounds[ground_count - 1].rb.cb.max.y)
+                    {
+                        camera.y = grounds[ground_count - 1].rb.cb.max.y - SCREEN_H;
                     }
                 }
 
-                if (!enemies[i].taking_damage && enemies[i].alive)
+                for (int i = 0; i < enemy_count; i++)
                 {
-                    if (strcmp(enemies[i].rb.cb.tag, "bat") == 0 || strcmp(enemies[i].rb.cb.tag, "fox") == 0)
+                    if (enemies[i].alive)
                     {
-                        if (enemies[i].animation_frame >= 0 && enemies[i].animation_frame <= 3)
+                        if (strcmp(enemies[i].rb.cb.tag, "ghost") != 0)
                         {
-                            if (game_timer % 4 == 0)
-                            {
-                                enemies[i].animation_frame++;
-                                enemies[i].animation_frame %= 4;
-                            }
+                            atk(&enemies[i], player.rb);
+                        }
+                        else
+                        {
+                            atk_ghost(&enemies[i], &player);
                         }
                     }
-                    else if (strcmp(enemies[i].rb.cb.tag, "harpy") == 0)
+
+                    if (!enemies[i].taking_damage && enemies[i].alive)
                     {
-                        if (enemies[i].animation_frame >= 0 && enemies[i].animation_frame <= 4)
-                        {
-                            if (game_timer % 4 == 0)
-                            {
-                                enemies[i].animation_frame++;
-                                enemies[i].animation_frame %= 5;
-                            }
-                        }
-                    }
-                    else if (strcmp(enemies[i].rb.cb.tag, "ghost") == 0)
-                    {
-                        if (enemies[i].attack == 1)
+                        if (strcmp(enemies[i].rb.cb.tag, "bat") == 0 || strcmp(enemies[i].rb.cb.tag, "fox") == 0)
                         {
                             if (enemies[i].animation_frame >= 0 && enemies[i].animation_frame <= 3)
                             {
@@ -711,171 +617,274 @@ int main()
                                 }
                             }
                         }
-                        else
+                        else if (strcmp(enemies[i].rb.cb.tag, "harpy") == 0)
                         {
-                            enemies[i].animation_frame = 0;
+                            if (enemies[i].animation_frame >= 0 && enemies[i].animation_frame <= 4)
+                            {
+                                if (game_timer % 4 == 0)
+                                {
+                                    enemies[i].animation_frame++;
+                                    enemies[i].animation_frame %= 5;
+                                }
+                            }
                         }
-                    }
-                    else if (strcmp(enemies[i].rb.cb.tag, "spike") == 0)
-                    {
-
-                        if (game_timer % 70 < 32 && game_timer % 70 != 0)
+                        else if (strcmp(enemies[i].rb.cb.tag, "ghost") == 0)
                         {
-                            enemies[i].animation_frame = 0;
+                            if (enemies[i].attack == 1)
+                            {
+                                if (enemies[i].animation_frame >= 0 && enemies[i].animation_frame <= 3)
+                                {
+                                    if (game_timer % 4 == 0)
+                                    {
+                                        enemies[i].animation_frame++;
+                                        enemies[i].animation_frame %= 4;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                enemies[i].animation_frame = 0;
+                            }
                         }
-                        else if (game_timer % 70 > 36 && game_timer % 70 < 66)
+                        else if (strcmp(enemies[i].rb.cb.tag, "spike") == 0)
                         {
-                            enemies[i].animation_frame = 4;
+
+                            if (game_timer % 70 < 32 && game_timer % 70 != 0)
+                            {
+                                enemies[i].animation_frame = 0;
+                            }
+                            else if (game_timer % 70 > 36 && game_timer % 70 < 66)
+                            {
+                                enemies[i].animation_frame = 4;
+                            }
+                            else if (game_timer % 4 == 0)
+                            {
+                                enemies[i].animation_frame++;
+                                enemies[i].animation_frame %= 8;
+                            }
                         }
-                        else if (game_timer % 4 == 0)
-                        {
-                            enemies[i].animation_frame++;
-                            enemies[i].animation_frame %= 8;
-                        }
-                    }
-                }
-                else
-                {
-                    if (strcmp(enemies[i].rb.cb.tag, "bat") == 0)
-                        enemies[i].animation_frame = 3;
-                    else if (strcmp(enemies[i].rb.cb.tag, "spike") != 0)
-                        enemies[i].animation_frame = 0;
-                }
-            }
-
-            // Kill enemy
-            for (int i = 0; i < enemy_count; i++)
-            {
-                if (enemies[i].life <= 0)
-                {
-                    enemies[i].alive = 0;
-                    enemies[i].attack = 0;
-                    enemies[i].rb.gravity_scale = 0.2f;
-                    enemies[i].rb.cb.enabled = 0;
-                }
-            }
-
-            if (player.animation_frame >= 0 && player.animation_frame <= 7)
-            {
-                if (player_animation_counter % 4 == 0)
-                {
-                    player.animation_frame++;
-                    player.animation_frame %= 8;
-                }
-            }
-
-            if (player.animation_frame >= 12 && player.animation_frame <= 17)
-            {
-                if (player_animation_counter % 2 == 0)
-                {
-                    player.animation_frame++;
-                    if (12 + player.animation_frame % 6 != 12)
-                    {
-                        player.animation_frame = 12 + player.animation_frame % 6;
                     }
                     else
                     {
-                        player.animation_frame = 8;
-                        player.attacking = 0;
-                        player.sword_rb.cb.enabled = 0;
+                        if (strcmp(enemies[i].rb.cb.tag, "bat") == 0)
+                            enemies[i].animation_frame = 3;
+                        else if (strcmp(enemies[i].rb.cb.tag, "spike") != 0)
+                            enemies[i].animation_frame = 0;
                     }
                 }
-            }
-            if (player.animation_frame == 11)
-            {
-                if (player_animation_counter % 4 == 3)
-                {
-                    player.animation_frame++;
-                    player.animation_frame %= 8;
-                    player.Bow_attack = 0;
-                }
-            }
 
-            for (int i2 = 0; i2 < ground_count; i2++)
-            {
-                if (strcmp(grounds[i2].rb.cb.tag, "lava") == 0)
+                // Kill enemy
+                for (int i = 0; i < enemy_count; i++)
                 {
-                    if (grounds[i2].animation_frame >= 0 && grounds[i2].animation_frame <= 3)
+                    if (enemies[i].life <= 0)
                     {
-                        if (game_timer % 4 == 0)
+                        enemies[i].alive = 0;
+                        enemies[i].attack = 0;
+                        enemies[i].rb.gravity_scale = 0.2f;
+                        enemies[i].rb.cb.enabled = 0;
+                    }
+                }
+
+                if (player.animation_frame >= 0 && player.animation_frame <= 7)
+                {
+                    if (player_animation_counter % 4 == 0)
+                    {
+                        player.animation_frame++;
+                        player.animation_frame %= 8;
+                    }
+                }
+
+                if (player.animation_frame >= 12 && player.animation_frame <= 17)
+                {
+                    if (player_animation_counter % 2 == 0)
+                    {
+                        player.animation_frame++;
+
+                        if (player.animation_frame > 17)
                         {
-                            grounds[i2].animation_frame++;
-                            grounds[i2].animation_frame %= 4;
+                            player.animation_frame = 8;
+                            player.attacking = 0;
+                            player.sword_rb.cb.enabled = 0;
                         }
                     }
                 }
+                if (player.animation_frame == 11)
+                {
+                    if (player_animation_counter % 4 == 3)
+                    {
+                        player.animation_frame++;
+                        player.animation_frame %= 8;
+                        player.Bow_attack = 0;
+                    }
+                }
+
+                for (int i2 = 0; i2 < ground_count; i2++)
+                {
+                    if (strcmp(grounds[i2].rb.cb.tag, "lava") == 0)
+                    {
+                        if (grounds[i2].animation_frame >= 0 && grounds[i2].animation_frame <= 3)
+                        {
+                            if (game_timer % 4 == 0)
+                            {
+                                grounds[i2].animation_frame++;
+                                grounds[i2].animation_frame %= 4;
+                            }
+                        }
+                    }
+                }
+
+                counter--;
             }
 
-            counter--;
+            //DRAWING
+
+            for (int i = 0; i < ground_count; i++)
+            {
+                if (strcmp(grounds[i].rb.cb.tag, "ground") == 0)
+                {
+                    draw_ground(buffer, ground_sprite, &grounds[i], camera);
+                }
+                else if (strcmp(grounds[i].rb.cb.tag, "platform") == 0)
+                {
+                    draw_platform(buffer, platform_sprite, &grounds[i], camera);
+                }
+                else if (strcmp(grounds[i].rb.cb.tag, "lava") == 0)
+                {
+                    draw_lava(buffer, lava_sprite, &grounds[i], camera);
+                }
+            }
+
+            draw_player(buffer, player_sprite, &player, camera);
+
+            for (int i = 0; i < enemy_count; i++)
+            {
+                if (strcmp(enemies[i].rb.cb.tag, "bat") == 0 && enemies[i].rb.pos.y <= 1000)
+                {
+                    draw_bat(buffer, bat_sprite, &enemies[i], camera);
+                    if (enemies[i].alive == 0 && enemies[i].rb.pos.y >= 1000)
+                        enemies[i].rb.pos.y = 1001;
+                }
+                else if (strcmp(enemies[i].rb.cb.tag, "fox") == 0 && enemies[i].rb.pos.y <= 1000)
+                {
+                    draw_fox(buffer, fox_sprite, &enemies[i], camera);
+                    if (enemies[i].alive == 0 && enemies[i].rb.pos.y >= 1000)
+                        enemies[i].rb.pos.y = 1001;
+                }
+                else if (strcmp(enemies[i].rb.cb.tag, "harpy") == 0 && enemies[i].rb.pos.y <= 1000)
+                {
+                    draw_harpy(buffer, harpy_sprite, &enemies[i], camera);
+                    if (enemies[i].alive == 0 && enemies[i].rb.pos.y >= 1000)
+                        enemies[i].rb.pos.y = 1001;
+                }
+                else if (strcmp(enemies[i].rb.cb.tag, "ghost") == 0 && enemies[i].rb.pos.y <= 1000)
+                {
+                    draw_ghost(buffer, ghost_sprite, &enemies[i], camera);
+                    if (enemies[i].alive == 0 && enemies[i].rb.pos.y >= 1000)
+                        enemies[i].rb.pos.y = 1001;
+                }
+                else if (strcmp(enemies[i].rb.cb.tag, "spike") == 0)
+                {
+                    draw_spike(buffer, spike_sprite, &enemies[i], camera);
+                }
+            }
+
+            for (int i = 0; i < ground_count; i++)
+            {
+                if (strcmp(grounds[i].rb.cb.tag, "bridge") == 0)
+                {
+                    draw_bridge(buffer, bridge_sprite, &grounds[i], camera);
+                }
+            }
+
+            draw_lifebar(buffer, lifebar_sprite, player);
+
+            draw_sprite(screen, buffer, 0, 0);
+            clear_to_color(buffer, 0x40AEBF);
         }
 
-        //DRAWING
+        free(map);
 
-        for (int i = 0; i < ground_count; i++)
+        for (int i = 0; i < rbs_size; i++)
         {
-            if (strcmp(grounds[i].rb.cb.tag, "ground") == 0)
-            {
-                draw_ground(buffer, ground_sprite, &grounds[i], camera);
-            }
-            else if (strcmp(grounds[i].rb.cb.tag, "platform") == 0)
-            {
-                draw_platform(buffer, platform_sprite, &grounds[i], camera);
-            }
-            else if (strcmp(grounds[i].rb.cb.tag, "lava") == 0)
-            {
-                draw_lava(buffer, lava_sprite, &grounds[i], camera);
-            }
+            destroy_list(rbs[i]->collidingWith);
         }
+#pragma endregion
 
-        draw_player(buffer, player_sprite, &player, camera);
+#pragma region death screen
+        //VARIABLES
+        int shx = 290;
+        int shy = 417;
+        int snd = 0;
 
-        for (int i = 0; i < enemy_count; i++)
+        //BITMAPS
+        BITMAP *death = load_bitmap(DEATHSCREEN_PATH, NULL);
+
+        //SAMPLES
+        SAMPLE *sound_death = load_sample(DEATH_SOUND);
+
+        //DEATH SAMPLE
+        play_sample(sound_death, 255, 128, 1000, 1);
+
+        animation_frame = 0;
+
+        while (death_on)
         {
-            if (strcmp(enemies[i].rb.cb.tag, "bat") == 0 && enemies[i].rb.pos.y <= 1000)
+            keyboard_input();
+
+            //INPUT
+            if (key_down(KEY_RIGHT) || key_down(KEY_LEFT) || key_down(KEY_DOWN) || key_down(KEY_UP))
             {
-                draw_bat(buffer, bat_sprite, &enemies[i], camera);
-                if (enemies[i].alive == 0 && enemies[i].rb.pos.y >= 1000)
-                    enemies[i].rb.pos.y = 1001;
+                snd = 1;
             }
-            else if (strcmp(enemies[i].rb.cb.tag, "fox") == 0 && enemies[i].rb.pos.y <= 1000)
+
+            if (key_down(KEY_ENTER) || key_down(KEY_ESC))
             {
-                draw_fox(buffer, fox_sprite, &enemies[i], camera);
-                if (enemies[i].alive == 0 && enemies[i].rb.pos.y >= 1000)
-                    enemies[i].rb.pos.y = 1001;
+                death_on = 0;
+                menu_on = 1;
+                break;
             }
-            else if (strcmp(enemies[i].rb.cb.tag, "harpy") == 0 && enemies[i].rb.pos.y <= 1000)
+
+            while (counter > 0)
             {
-                draw_harpy(buffer, harpy_sprite, &enemies[i], camera);
-                if (enemies[i].alive == 0 && enemies[i].rb.pos.y >= 1000)
-                    enemies[i].rb.pos.y = 1001;
-            }
-            else if (strcmp(enemies[i].rb.cb.tag, "ghost") == 0 && enemies[i].rb.pos.y <= 1000)
-            {
-                draw_ghost(buffer, ghost_sprite, &enemies[i], camera);
-                if (enemies[i].alive == 0 && enemies[i].rb.pos.y >= 1000)
-                    enemies[i].rb.pos.y = 1001;
-            }
-            else if (strcmp(enemies[i].rb.cb.tag, "spike") == 0)
-            {
-                draw_spike(buffer, spike_sprite, &enemies[i], camera);
+                if (animation_frame >= 0 && animation_frame <= 15)
+                {
+                    if (game_timer % 2 == 0)
+                    {
+                        animation_frame++;
+                        animation_frame %= 16;
+                    }
+                }
+
+                int r_img_pos = animation_frame % ARROW_SPRITE_COLS;
+                int c_img_pos = animation_frame / ARROW_SPRITE_COLS;
+
+                r_img_pos *= ARROW_TILE_SIZE;
+                c_img_pos *= ARROW_TILE_SIZE;
+
+                //draw the a part of the sprite sheet to the screen and scales it
+                masked_blit(arrow_sprite, buffer, r_img_pos, c_img_pos, shx, shy, 32, 32);
+
+                if (snd)
+                {
+                    play_sample(select, 255, 128, 1000, 0);
+                    snd = 0;
+                }
+
+                draw_sprite(screen, buffer, 0, 0);
+                clear(buffer);
+                draw_sprite(buffer, death, 0, 0);
+
+                counter--;
             }
         }
 
-        for (int i = 0; i < ground_count; i++)
-        {
-            if (strcmp(grounds[i].rb.cb.tag, "bridge") == 0)
-            {
-                draw_bridge(buffer, bridge_sprite, &grounds[i], camera);
-            }
-        }
-
-        draw_lifebar(buffer, lifebar_sprite, player);
-
-        draw_sprite(screen, buffer, 0, 0);
-        clear_to_color(buffer, 0x40AEBF);
+        destroy_bitmap(death);
+        destroy_bitmap(arrow);
+        destroy_sample(select);
+        destroy_sample(sound_death);
+#pragma endregion
     }
 
-    free(map);
     destroy_bitmap(buffer);
     destroy_bitmap(lifebar_sprite);
     destroy_bitmap(lava_sprite);
@@ -888,11 +897,6 @@ int main()
     destroy_bitmap(platform_sprite);
     destroy_bitmap(bridge_sprite);
     destroy_bitmap(spike_sprite);
-
-    for (int i = 0; i < rbs_size; i++)
-    {
-        destroy_list(rbs[i]->collidingWith);
-    }
 
     return 0;
 }
@@ -931,9 +935,7 @@ void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player, Vector camera)
         {
             player->animation_frame = 11;
         }
-    
     }
-
 
     if ((!player->can_jump || player->rb.velocity.y != 0) && player->attacking == 0 && player->Bow_attack == 0)
     {
