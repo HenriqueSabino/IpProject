@@ -14,7 +14,7 @@ void init_potion (Item *potion, Vector pos, int animation_frame)
 
     potion->rb.cb.width = 32;
     potion->rb.cb.height = 32;
-    potion->rb.cb.offset = create_vector(0, 0);
+    potion->rb.cb.offset = create_vector(0, 12);
 
     potion->rb.cb.min = create_vector(potion->rb.pos.x, potion->rb.pos.y);
     potion->rb.cb.max = create_vector(potion->rb.cb.min.x + potion->rb.cb.width, potion->rb.cb.min.y + potion->rb.cb.height);

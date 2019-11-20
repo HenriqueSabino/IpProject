@@ -163,15 +163,15 @@ void onCollisionEnter(RigidBody *self, RigidBody *other)
 
     else if (strcmp(other->cb.tag, "potion") == 0)
     {
-        if (player_ref->life < 80)
+        if (player_ref->life < 90)
         {
-            player_ref->life += 20;
+            player_ref->life += 10;
         }
         else
         {
             player_ref->life = 100;
         }
-        
+
         other->cb.enabled = 0;
     }
 }
