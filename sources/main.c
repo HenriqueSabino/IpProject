@@ -854,6 +854,14 @@ int main()
                     draw_lava(buffer, lava_sprite, &grounds[i], camera);
                 }
             }
+    
+            for (int i = 0; i < item_count; i++)
+            {
+                if (strcmp(items[i].rb.cb.tag, "potion") == 0)
+                {
+                    draw_potion(buffer, potion_sprite, &items[i], camera);
+                }
+            }
 
             for (int i = 0; i < item_count; i++)
             {
