@@ -1,0 +1,31 @@
+7
+69
+
+
+
+
+
+
+
+
+********************************************************************
+********************************************************************
+**********************************XXXXXXXXWWWWWWWWXXXXXX************
+*********************************XXXX55555wwwwwwww55555XXXXX********
+***********1******44*2********XXXX55555555wwwwwwww555555555XX*******
+*1*313****XXWWWWWWXXXXXXXX***XXXX555555555wwwwwwww5555555555XXXXXXXX
+XXXXXXXXXXX5wwwwww5555555XXXXX555555555555wwwwwwww55555555555555555X
+
+Captions:
+
+* => air
+X => solo
+1 => tree sprite 1
+2 => tree sprite 2
+3 => bush sprite 1
+4 => bush sprite 2
+5 => overworld ground
+W => water fluid
+w => water static
+C => cave ground
+L => lava static

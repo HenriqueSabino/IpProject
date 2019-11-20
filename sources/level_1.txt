@@ -11,10 +11,10 @@
 ***************************************H*****H*B******B*************
 *****************************************************F*******B******
 **********************************II1000002hiiiij1000002*********B**
-************************B********100a555553mkkkkl45555590002********
-***B*******p*F****n**o*******FII1a555555553mkkkkl455555555592*****F*
-Pp*npn*B**102hiij100000002***100a5555555553mkkkkl4555555555590000000
-1000000000a53mkkl455555559000a5555555555553mkkkkl4555555555555555555
+************************B********1009*****3******4*****80002********
+***B*********Fp*****p********FII19********3******4*********82*****F*
+P**p***B**102hiij100000002***1009*********3******4**********80000002
+10000000009*3****4*******80009************3******4*****************3
 
 Captions:
 
@@ -25,8 +25,7 @@ F => fox
 H => harpy
 G => ghost
 I => spike
-L => fluid lava
-S => static lava 
+L => fluid lava 
 0 => ground sprite 0
 1 => ground sprite 1
 2 => ground sprite 2
@@ -39,7 +38,6 @@ S => static lava
 9 => ground sprite 9
 a => ground sprite 10
 b => ground sprite 11
-c => ground sprite 12
 d => platform sprite 0
 e => platform sprite 1
 f => platform sprite 2
@@ -47,11 +45,5 @@ g => platform sprite 3
 h => bridge sprite 0
 i => bridge sprite 1
 j => bridge sprite 2
-k => bridge sprite 3
-l => bridge sprite 4
-m => bridge sprite 5
-n => tree sprite 1
-o => tree sprite 2
-p => n sei em ingles 1
-q => n sei em ingles 2
+p => potion
 

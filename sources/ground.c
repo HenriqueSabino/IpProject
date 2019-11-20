@@ -12,7 +12,7 @@ void init_ground(Ground *ground, Vector pos, int animation_frame)
     ground->rb.acceleration = create_vector(0, 0);
     ground->rb.pos = pos;
 
-    if (animation_frame == 0 || animation_frame == 9 || animation_frame == 10)
+    if (animation_frame == 0 || animation_frame == 8 || animation_frame == 9)
     {
         ground->rb.cb.width = 128;
         ground->rb.cb.height = 100;
@@ -120,19 +120,9 @@ void init_lava(Ground *lava, Vector pos, int animation_frame)
     lava->rb.acceleration = create_vector(0, 0);
     lava->rb.pos = pos;
 
-    if (animation_frame == 4)
-    {
-        lava->rb.cb.width = 128;
-        lava->rb.cb.height = 128;
-        lava->rb.cb.offset = create_vector(0, 0);
-    }
-    else if (animation_frame == 0 || animation_frame == 1 || animation_frame == 2 || animation_frame == 3)
-    {
-        lava->rb.cb.width = 128;
-        lava->rb.cb.height = 80;
-        lava->rb.cb.offset = create_vector(0, 48);
-    }
-    
+    lava->rb.cb.width = 128;
+    lava->rb.cb.height = 80;
+    lava->rb.cb.offset = create_vector(0, 48);
 
     lava->rb.cb.min = create_vector(lava->rb.pos.x, lava->rb.pos.y);
     lava->rb.cb.max = create_vector(lava->rb.cb.min.x + lava->rb.cb.width, lava->rb.cb.min.y + lava->rb.cb.height);
@@ -154,19 +144,9 @@ void init_bridge(Ground *bridge, Vector pos, int animation_frame)
     bridge->rb.acceleration = create_vector(0, 0);
     bridge->rb.pos = pos;
 
-    if (animation_frame == 3 || animation_frame == 4 || animation_frame == 5)
-    {
-        bridge->rb.cb.width = 128;
-        bridge->rb.cb.height = 128;
-        bridge->rb.cb.offset = create_vector(0, 0);
-    }
-    else if (animation_frame == 0 || animation_frame == 1 || animation_frame == 2)
-    {
-        bridge->rb.cb.width = 128;
-        bridge->rb.cb.height = 116;
-        bridge->rb.cb.offset = create_vector(0, 28);
-    }
-    
+    bridge->rb.cb.width = 128;
+    bridge->rb.cb.height = 116;
+    bridge->rb.cb.offset = create_vector(0, 28);
 
     bridge->rb.cb.min = create_vector(bridge->rb.pos.x, bridge->rb.pos.y);
     bridge->rb.cb.max = create_vector(bridge->rb.cb.min.x + bridge->rb.cb.width, bridge->rb.cb.min.y + bridge->rb.cb.height);

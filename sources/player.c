@@ -263,6 +263,20 @@ void onCollisionStay(RigidBody *self, RigidBody *other)
         self->velocity = create_vector(0, -15);
         self->acceleration = create_vector(0, 0);
     }
+
+    else if (strcmp(other->cb.tag, "potion") == 0)
+    {
+        if (player_ref->life < 90)
+        {
+            player_ref->life += 10;
+        }
+        else
+        {
+            player_ref->life = 100;
+        }
+
+        other->cb.enabled = 0;
+    }
 }
 
 void onCollisionExit(RigidBody *self, RigidBody *other)

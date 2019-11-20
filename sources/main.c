@@ -10,6 +10,7 @@
 #include "../headers/ground.h"
 #include "../headers/scenegeneration.h"
 #include "../headers/menu.h"
+#include "../headers/item.h"
 
 #pragma region functions
 volatile int close_game = 0;
@@ -58,6 +59,8 @@ void draw_object(BITMAP *bmp, BITMAP *sprite, Object *scenario, Vector camera);
 void draw_lifebar(BITMAP *bmp, BITMAP *sprite, Player player);
 
 void draw_arrow(BITMAP *bmp, BITMAP *sprite);
+
+void draw_potion(BITMAP *bmp, BITMAP *sprite, Item *potion, Vector camera);
 
 #pragma endregion
 
@@ -135,13 +138,16 @@ int main()
     if (scenario_sprite == NULL)
         allegro_message("error");
 
-
     BITMAP *lifebar_sprite = load_bitmap("../assets/Canvas/LifeBar.bmp", NULL);
     if (lifebar_sprite == NULL)
         allegro_message("error");
 
     BITMAP *arrow_sprite = load_bitmap(ARROW_PATH, NULL);
     if (arrow_sprite == NULL)
+        allegro_message("error");
+    
+    BITMAP *potion_sprite = load_bitmap(ITEM_PATH, NULL);
+    if (potion_sprite == NULL)
         allegro_message("error");
 
 #pragma endregion
@@ -253,13 +259,16 @@ int main()
 #pragma region generating first level
 
         char *map;
-        int map_size = readMap(&map, "../sources/map.txt");
+        int map_size = readMap(&map, "../sources/level_1.txt");
+
+        char *scenario_map;
+        int scenario_map_size = readMap(&scenario_map, "../sources/level_1_scenario.txt");
 
         Vector camera;
 
         Player player;
 
-        int row = 0, col = 0, not_objs = 0, ground_count = 0, enemy_count = 0, object_count = 0;
+        int row = 0, col = 0, not_objs = 0, ground_count = 0, enemy_count = 0, object_count = 0, item_count = 0;
 
         for (int i = 0; i < map_size; i++)
         {
@@ -267,7 +276,7 @@ int main()
                 map[i] == '5' || map[i] == '6' || map[i] == '7' || map[i] == '8' || map[i] == '9' ||
                 map[i] == 'a' || map[i] == 'b' || map[i] == 'c' || map[i] == 'd' || map[i] == 'e' ||
                 map[i] == 'f' || map[i] == 'g' || map[i] == 'h' || map[i] == 'i' || map[i] == 'j' ||
-                map[i] == 'k' || map[i] == 'l' || map[i] == 'm' || map[i] == 'L' || map[i] == 'S')
+                map[i] == 'L')
             {
                 ground_count++;
             }
@@ -275,10 +284,19 @@ int main()
             {
                 enemy_count++;
             }
-            else if(map[i] == 'n' || map[i] == 'o' || map[i] == 'p' || map[i] == 'q')
+            else if (map[i] == 'p')
             {
-                object_count++;
+                item_count++;
             }
+        }
+
+        for (int i = 0; i < scenario_map_size; i++)
+        {
+            if (scenario_map[i] == '1' || scenario_map[i] == '2' || scenario_map[i] == '3' || scenario_map[i] == '4' || scenario_map[i] == '5' ||
+                scenario_map[i] == 'W' || scenario_map[i] == 'w' || scenario_map[i] == 'C' || scenario_map[i] == 'L' )
+                {
+                    object_count++;
+                }
         }
 
         Ground grounds[ground_count];
@@ -289,6 +307,9 @@ int main()
 
         Object objects[object_count];
         object_count = 0;
+
+        Item items[item_count];
+        item_count = 0;
 
         for (int i = 0; i < map_size; i++)
         {
@@ -401,12 +422,6 @@ int main()
                 ground_count++;
                 col++;
             }
-            else if (map[i] == 'c')
-            {
-                init_ground(&grounds[ground_count], create_vector(col * 128, row * 128), 12);
-                ground_count++;
-                col++;
-            }
             else if (map[i] == 'd')
             {
                 init_platform(&grounds[ground_count], create_vector(col * 128, row * 128), 0);
@@ -449,62 +464,16 @@ int main()
                 ground_count++;
                 col++;
             }
-            else if (map[i] == 'k')
-            {
-                init_bridge(&grounds[ground_count], create_vector(col * 128, row * 128), 3);
-                ground_count++;
-                col++;
-            }
-            else if (map[i] == 'l')
-            {
-                init_bridge(&grounds[ground_count], create_vector(col * 128, row * 128), 4);
-                ground_count++;
-                col++;
-            }
-            else if (map[i] == 'm')
-            {
-                init_bridge(&grounds[ground_count], create_vector(col * 128, row * 128), 5);
-                ground_count++;
-                col++;
-            }
-            else if (map[i] == 'n')
-            {
-                init_object(&objects[object_count], create_vector(col * 128, row * 128), 0);
-                object_count++;
-                not_objs++;
-                col++;
-            }
-            else if (map[i] == 'o')
-            {
-                init_object(&objects[object_count], create_vector(col * 128, row * 128), 1);
-                object_count++;
-                not_objs++;
-                col++;
-            }
-            else if (map[i] == 'p')
-            {
-                init_object(&objects[object_count], create_vector(col * 128, row * 128), 2);
-                object_count++;
-                not_objs++;
-                col++;
-            }
-            else if (map[i] == 'q')
-            {
-                init_object(&objects[object_count], create_vector(col * 128, row * 128), 3);
-                object_count++;
-                not_objs++;
-                col++;
-            }
             else if (map[i] == 'L')
             {
                 init_lava(&grounds[ground_count], create_vector(col * 128, row * 128), 0);
                 ground_count++;
                 col++;
             }
-            else if (map[i] == 'S')
+            else if (map[i] == 'p')
             {
-                init_lava(&grounds[ground_count], create_vector(col * 128, row * 128), 4);
-                ground_count++;
+                init_potion(&items[item_count], create_vector(col * 128, row * 128), 0);
+                item_count++;
                 col++;
             }
             else if (map[i] == '*')
@@ -520,6 +489,74 @@ int main()
             }
         }
 
+        row = col = 0;
+        for (int i = 0; i < scenario_map_size; i++)
+        {
+            if (scenario_map[i] == '1')
+            {
+                init_object(&objects[object_count], create_vector(col * 128, row * 128), 0);
+                object_count++;
+                col++;
+            }
+            else if (scenario_map[i] == '2')
+            {
+                init_object(&objects[object_count], create_vector(col * 128, row * 128), 1);
+                object_count++;
+                col++;
+            }
+            else if (scenario_map[i] == '3')
+            {
+                init_object(&objects[object_count], create_vector(col * 128, row * 128), 2);
+                object_count++;
+                col++;
+            }
+            else if (scenario_map[i] == '4')
+            {
+                init_object(&objects[object_count], create_vector(col * 128, row * 128), 3);
+                object_count++;
+                col++;
+            }
+            else if (scenario_map[i] == '5')
+            {
+                init_object(&objects[object_count], create_vector(col * 128, row * 128), 9);
+                object_count++;
+                col++;
+            }
+            else if (scenario_map[i] == 'W')
+            {
+                init_object(&objects[object_count], create_vector(col * 128, row * 128), 4);
+                object_count++;
+                col++;
+            }
+            else if (scenario_map[i] == 'w')
+            {
+                init_object(&objects[object_count], create_vector(col * 128, row * 128), 8);
+                object_count++;
+                col++;
+            }
+            else if (scenario_map[i] == 'C')
+            {
+                init_object(&objects[object_count], create_vector(col * 128, row * 128), 10);
+                object_count++;
+                col++;
+            }
+            else if (scenario_map[i] == 'L')
+            {
+                init_object(&objects[object_count], create_vector(col * 128, row * 128), 11);
+                object_count++;
+                col++;
+            }
+            else if (scenario_map[i] == '*' || scenario_map[i] == 'X')
+            {
+                col++;
+            }
+            else if (scenario_map[i] == '\n')
+            {
+                row++;
+                col = 0;
+            }
+        }
+
         int rbs_size = map_size - not_objs + 1;
         RigidBody *rbs[rbs_size];
         rbs[0] = &player.rb;
@@ -531,6 +568,11 @@ int main()
         for (int i = 0; i < enemy_count; i++)
         {
             rbs[i + ground_count + 1] = &enemies[i].rb;
+        }
+
+        for (int i = 0; i < item_count; i++)
+        {
+            rbs[i + ground_count + enemy_count + 1] = &items[i].rb;
         }
 
         set_enemies_ref(enemies, enemy_count);
@@ -714,6 +756,19 @@ int main()
                     }
                 }
 
+                for(int i = 0; i < object_count; i++)
+                {
+                    if(objects[i].sprite_frame >= 4 && objects[i].sprite_frame <= 7)
+                    {
+                        if (game_timer % 4 == 0)
+                        {
+                            objects[i].sprite_frame++;
+                            objects[i].sprite_frame %= 4;
+                            objects[i].sprite_frame += 4;
+                        }
+                    }
+                }
+
                 // Kill enemy
                 for (int i = 0; i < enemy_count; i++)
                 {
@@ -800,6 +855,14 @@ int main()
                 }
             }
 
+            for (int i = 0; i < item_count; i++)
+            {
+                if (strcmp(items[i].rb.cb.tag, "potion") == 0)
+                {
+                    draw_potion(buffer, potion_sprite, &items[i], camera);
+                }
+            }
+
             draw_player(buffer, player_sprite, &player, camera);
 
             for (int i = 0; i < enemy_count; i++)
@@ -849,6 +912,7 @@ int main()
         }
 
         free(map);
+        free(scenario_map);
 
         for (int i = 0; i < rbs_size; i++)
         {
@@ -943,6 +1007,8 @@ int main()
     destroy_bitmap(platform_sprite);
     destroy_bitmap(bridge_sprite);
     destroy_bitmap(spike_sprite);
+    destroy_bitmap(scenario_sprite);
+    destroy_bitmap(potion_sprite);
 
     return 0;
 }
@@ -1380,9 +1446,34 @@ void draw_object(BITMAP *bmp, BITMAP *sprite, Object *scenario, Vector camera)
     //draw the a part of the sprite sheet to the screen and scales it
     masked_stretch_blit(sprite, scenario_sprite, r_img_pos, c_img_pos, 64, 64, 0, 0, 128, 128);
 
-    draw_sprite_ex(bmp, scenario_sprite, scenario->position.x - camera.x, scenario->position.y + 28 - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+    if(scenario->sprite_frame >= 0 && scenario->sprite_frame <= 3)
+        draw_sprite_ex(bmp, scenario_sprite, scenario->position.x - camera.x, scenario->position.y + 28 - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+    else
+        draw_sprite_ex(bmp, scenario_sprite, scenario->position.x - camera.x, scenario->position.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
 
     destroy_bitmap(scenario_sprite);
+}
+
+void draw_potion(BITMAP *bmp, BITMAP *sprite, Item *potion, Vector camera)
+{
+    if (potion->rb.cb.enabled)
+    {
+        BITMAP *potion_sprite = create_bitmap(64, 64);
+        clear_to_color(potion_sprite, makecol(255, 0, 255));
+
+        int r_img_pos = potion->animation_frame % POTION_SPRITE_COLS;
+        int c_img_pos = potion->animation_frame / POTION_SPRITE_COLS;
+
+        r_img_pos *= POTION_TILE_SIZE;
+        c_img_pos *= POTION_TILE_SIZE;
+
+        //draw the a part of the sprite sheet to the screen and scales it
+        masked_stretch_blit(sprite, potion_sprite, r_img_pos, c_img_pos, 32, 32, 0, 0, 64, 64);
+
+        draw_sprite_ex(bmp, potion_sprite, potion->rb.pos.x - camera.x, potion->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+
+        destroy_bitmap(potion_sprite);
+    }
 }
 
 void draw_lifebar(BITMAP *bmp, BITMAP *sprite, Player player)
