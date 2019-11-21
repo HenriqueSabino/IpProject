@@ -145,7 +145,7 @@ int main()
     BITMAP *arrow_sprite = load_bitmap(ARROW_PATH, NULL);
     if (arrow_sprite == NULL)
         allegro_message("error");
-    
+
     BITMAP *potion_sprite = load_bitmap(ITEM_PATH, NULL);
     if (potion_sprite == NULL)
         allegro_message("error");
@@ -293,10 +293,10 @@ int main()
         for (int i = 0; i < scenario_map_size; i++)
         {
             if (scenario_map[i] == '1' || scenario_map[i] == '2' || scenario_map[i] == '3' || scenario_map[i] == '4' || scenario_map[i] == '5' ||
-                scenario_map[i] == 'W' || scenario_map[i] == 'w' || scenario_map[i] == 'C' || scenario_map[i] == 'L' )
-                {
-                    object_count++;
-                }
+                scenario_map[i] == 'W' || scenario_map[i] == 'w' || scenario_map[i] == 'C' || scenario_map[i] == 'L')
+            {
+                object_count++;
+            }
         }
 
         Ground grounds[ground_count];
@@ -780,9 +780,9 @@ int main()
                     }
                 }
 
-                for(int i = 0; i < object_count; i++)
+                for (int i = 0; i < object_count; i++)
                 {
-                    if(objects[i].sprite_frame >= 4 && objects[i].sprite_frame <= 7)
+                    if (objects[i].sprite_frame >= 4 && objects[i].sprite_frame <= 7)
                     {
                         if (game_timer % 4 == 0)
                         {
@@ -816,7 +816,7 @@ int main()
 
                 if (player.animation_frame >= 11 && player.animation_frame <= 16)
                 {
-                    if (player_animation_counter % 2 == 0)
+                    if (player_animation_counter % 2 == 1)
                     {
                         player.animation_frame++;
 
@@ -828,7 +828,7 @@ int main()
                         }
                     }
                 }
-              
+
                 if (player.animation_frame >= 17 && player.animation_frame <= 21)
                 {
                     if (player_animation_counter % 2 == 0)
@@ -870,7 +870,7 @@ int main()
                     draw_platform(buffer, platform_sprite, &grounds[i], camera);
                 }
             }
-            
+
             for (int i = 0; i < object_count; i++)
             {
                 draw_object(buffer, scenario_sprite, &objects[i], camera);
@@ -887,7 +887,7 @@ int main()
                     draw_lava(buffer, lava_sprite, &grounds[i], camera);
                 }
             }
-    
+
             for (int i = 0; i < item_count; i++)
             {
                 if (strcmp(items[i].rb.cb.tag, "potion") == 0)
@@ -1082,43 +1082,64 @@ void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player, Vector camera)
                 player->sword_rb.cb.enabled = 1;
         }
     }
-     else if (player->rb.velocity.x == 0 && player->attacking == 0 && player->bow_attack != 0)
+    else if (player->rb.velocity.x == 0 && player->attacking == 0 && player->bow_attack != 0)
     {
         if (player->animation_frame < 17)
         {
             player->animation_frame = 17;
         }
     }
-  
 
-    if ((!player->can_jump || player->rb.velocity.y != 0) && player->attacking == 0 && player->bow_attack == 0)
+    if (!player->can_jump || player->rb.velocity.y != 0)
     {
-        player->animation_frame = 10;
-    }
-    else if ((!player->can_jump || player->rb.velocity.y != 0) && player->attacking && !player->bow_attack)
-    {
-        if (player->animation_frame != 12)
+        if (player->attacking && !player->bow_attack)
         {
-            player->animation_frame = 12;
+            if (player->animation_frame < 11)
+            {
+                player->animation_frame = 11;
+            }
+            if (player->animation_frame < 17)
+            {
+                player->attacking = 1;
+                if (player->animation_frame >= 16)
+                {
+                    player->sword_rb.cb.enabled = 1;
+                }
+            }
         }
-
-        if (player->animation_frame < 17)
+        else if (!player->attacking && player->bow_attack)
         {
-            player->attacking = 1;
-            if (player->animation_frame >= 16)
-                player->sword_rb.cb.enabled = 1;
+            if (player->animation_frame < 17)
+            {
+                player->animation_frame = 17;
+            }
+        }
+        else if (!player->attacking && !player->bow_attack)
+        {
+            player->animation_frame = 10;
         }
     }
-    else if ((!player->can_jump || player->rb.velocity.y != 0) && !player->attacking && player->bow_attack)
-    {
-        if (player->animation_frame != 17)
-        {
-            player->animation_frame = 17;
-        }
+    // else if ((!player->can_jump || player->rb.velocity.y != 0) && player->attacking && !player->bow_attack)
+    // {
+    //     if (player->animation_frame != 12)
+    //     {
+    //         player->animation_frame = 12;
+    //     }
 
-    }
-
-
+    //     if (player->animation_frame < 17)
+    //     {
+    //         player->attacking = 1;
+    //         if (player->animation_frame >= 16)
+    //             player->sword_rb.cb.enabled = 1;
+    //     }
+    // }
+    // else if ((!player->can_jump || player->rb.velocity.y != 0) && !player->attacking && player->bow_attack)
+    // {
+    //     if (player->animation_frame != 17)
+    //     {
+    //         player->animation_frame = 17;
+    //     }
+    //}
 
     int r_img_pos = player->animation_frame % PLAYER_SPRITE_COLS;
     int c_img_pos = player->animation_frame / PLAYER_SPRITE_COLS;
@@ -1492,7 +1513,7 @@ void draw_object(BITMAP *bmp, BITMAP *sprite, Object *scenario, Vector camera)
     //draw the a part of the sprite sheet to the screen and scales it
     masked_stretch_blit(sprite, scenario_sprite, r_img_pos, c_img_pos, 64, 64, 0, 0, 128, 128);
 
-    if(scenario->sprite_frame >= 0 && scenario->sprite_frame <= 3)
+    if (scenario->sprite_frame >= 0 && scenario->sprite_frame <= 3)
         draw_sprite_ex(bmp, scenario_sprite, scenario->position.x - camera.x, scenario->position.y + 28 - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
     else
         draw_sprite_ex(bmp, scenario_sprite, scenario->position.x - camera.x, scenario->position.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
