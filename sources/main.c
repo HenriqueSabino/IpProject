@@ -156,7 +156,7 @@ int main()
     {
 #pragma region menu
         //VARIABLES
-        int chx = 355, chy = 420, som = 0;
+        int chx = 355, chy = 420, som = FALSE;
         int py[2] = {420, 485};
 
         //BITMAPS
@@ -180,20 +180,20 @@ int main()
             //INPUT
             if (key_down(KEY_RIGHT) || key_down(KEY_LEFT))
             {
-                som = 1;
+                som = TRUE;
             }
 
             if (key_down(KEY_DOWN))
             {
                 chy = (chy == py[0]) ? py[1] : py[0];
-                som = 1;
+                som = TRUE;
             }
 
             if (key_down(KEY_UP))
             {
 
                 chy = (chy == py[0]) ? py[1] : py[0];
-                som = 1;
+                som = TRUE;
             }
 
             if (key_down(KEY_ENTER))
@@ -238,7 +238,7 @@ int main()
                 if (som)
                 {
                     play_sample(select, 255, 128, 1000, 0);
-                    som = 0;
+                    som = FALSE;
                 }
 
                 draw_sprite(screen, buffer, 0, 0);
@@ -610,7 +610,7 @@ int main()
                     set_velocity_axis(&player, "vertical", -20);
                 }
             }
-            if ((key_holding(KEY_A) || key_holding(KEY_D)) && !player.attacking && !player.Bow_attack)
+            if ((key_holding(KEY_A) || key_holding(KEY_D)) && !player.attacking && !player.bow_attack)
             {
                 if (key_holding(KEY_A))
                 {
@@ -640,7 +640,7 @@ int main()
             {
                 if (!player.taking_damage)
                 {
-                    player.Bow_attack = 1;
+                    player.bow_attack = 1;
                     player_animation_counter = 0;
                 }
             }
@@ -790,13 +790,13 @@ int main()
                     }
                 }
 
-                if (player.animation_frame >= 12 && player.animation_frame <= 17)
+                if (player.animation_frame >= 11 && player.animation_frame <= 16)
                 {
                     if (player_animation_counter % 2 == 0)
                     {
                         player.animation_frame++;
 
-                        if (player.animation_frame > 17)
+                        if (player.animation_frame > 16)
                         {
                             player.animation_frame = 8;
                             player.attacking = 0;
@@ -804,13 +804,18 @@ int main()
                         }
                     }
                 }
-                if (player.animation_frame == 11)
+              
+                if (player.animation_frame >= 17 && player.animation_frame <= 21)
                 {
-                    if (player_animation_counter % 4 == 3)
+                    if (player_animation_counter % 2 == 0)
                     {
                         player.animation_frame++;
-                        player.animation_frame %= 8;
-                        player.Bow_attack = 0;
+
+                        if (player.animation_frame > 21)
+                        {
+                            player.animation_frame = 8;
+                            player.bow_attack = 0;
+                        }
                     }
                 }
 
@@ -1031,37 +1036,38 @@ void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player, Vector camera)
     {
         player->animation_frame = 0;
     }
-    else if (player->rb.velocity.x == 0 && player->attacking == 0 && player->Bow_attack == 0)
+    else if (player->rb.velocity.x == 0 && player->attacking == 0 && player->bow_attack == 0)
     {
         player->animation_frame = 8;
     }
-    else if (player->rb.velocity.x == 0 && player->attacking != 0 && player->Bow_attack == 0)
+    else if (player->rb.velocity.x == 0 && player->attacking != 0 && player->bow_attack == 0)
     {
-        if (player->animation_frame < 12)
-        {
-            player->animation_frame = 12;
-        }
-
-        if (player->animation_frame < 17)
-        {
-            player->attacking = 1;
-            if (player->animation_frame >= 16)
-                player->sword_rb.cb.enabled = 1;
-        }
-    }
-    else if (player->Bow_attack)
-    {
-        if (player->animation_frame != 11)
+        if (player->animation_frame < 11)
         {
             player->animation_frame = 11;
         }
-    }
 
-    if ((!player->can_jump || player->rb.velocity.y != 0) && player->attacking == 0 && player->Bow_attack == 0)
+        if (player->animation_frame < 16)
+        {
+            player->attacking = 1;
+            if (player->animation_frame >= 15)
+                player->sword_rb.cb.enabled = 1;
+        }
+    }
+     else if (player->rb.velocity.x == 0 && player->attacking == 0 && player->bow_attack != 0)
+    {
+        if (player->animation_frame < 17)
+        {
+            player->animation_frame = 17;
+        }
+    }
+  
+
+    if ((!player->can_jump || player->rb.velocity.y != 0) && player->attacking == 0 && player->bow_attack == 0)
     {
         player->animation_frame = 10;
     }
-    else if ((!player->can_jump || player->rb.velocity.y != 0) && player->attacking && !player->Bow_attack)
+    else if ((!player->can_jump || player->rb.velocity.y != 0) && player->attacking && !player->bow_attack)
     {
         if (player->animation_frame != 12)
         {
@@ -1075,13 +1081,17 @@ void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player, Vector camera)
                 player->sword_rb.cb.enabled = 1;
         }
     }
-    else if ((!player->can_jump || player->rb.velocity.y != 0) && !player->attacking && player->Bow_attack)
+    else if ((!player->can_jump || player->rb.velocity.y != 0) && !player->attacking && player->bow_attack)
     {
-        if (player->animation_frame != 11)
+        if (player->animation_frame != 17)
         {
-            player->animation_frame = 11;
+            player->animation_frame = 17;
         }
+
     }
+
+
+
     int r_img_pos = player->animation_frame % PLAYER_SPRITE_COLS;
     int c_img_pos = player->animation_frame / PLAYER_SPRITE_COLS;
 
