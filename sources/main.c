@@ -276,7 +276,7 @@ int main()
                 map[i] == '5' || map[i] == '6' || map[i] == '7' || map[i] == '8' || map[i] == '9' ||
                 map[i] == 'a' || map[i] == 'b' || map[i] == 'c' || map[i] == 'd' || map[i] == 'e' ||
                 map[i] == 'f' || map[i] == 'g' || map[i] == 'h' || map[i] == 'i' || map[i] == 'j' ||
-                map[i] == 'L')
+                map[i] == 'L' || map[i] == 'k' || map[i] == 'l' || map[i] == 'm' || map[i] == 'n')
             {
                 ground_count++;
             }
@@ -443,6 +443,30 @@ int main()
             else if (map[i] == 'g')
             {
                 init_platform(&grounds[ground_count], create_vector(col * 128, row * 128), 3);
+                ground_count++;
+                col++;
+            }
+            else if (map[i] == 'k')
+            {
+                init_platform(&grounds[ground_count], create_vector(col * 128, row * 128), 4);
+                ground_count++;
+                col++;
+            }
+            else if (map[i] == 'l')
+            {
+                init_platform(&grounds[ground_count], create_vector(col * 128, row * 128), 5);
+                ground_count++;
+                col++;
+            }
+            else if (map[i] == 'm')
+            {
+                init_platform(&grounds[ground_count], create_vector(col * 128, row * 128), 6);
+                ground_count++;
+                col++;
+            }
+            else if (map[i] == 'n')
+            {
+                init_platform(&grounds[ground_count], create_vector(col * 128, row * 128), 7);
                 ground_count++;
                 col++;
             }
@@ -838,6 +862,14 @@ int main()
             }
 
             //DRAWING
+
+            for (int i = 0; i < ground_count; i++)
+            {
+                if (strcmp(grounds[i].rb.cb.tag, "platform") == 0)
+                {
+                    draw_platform(buffer, platform_sprite, &grounds[i], camera);
+                }
+            }
             
             for (int i = 0; i < object_count; i++)
             {
@@ -849,10 +881,6 @@ int main()
                 if (strcmp(grounds[i].rb.cb.tag, "ground") == 0)
                 {
                     draw_ground(buffer, ground_sprite, &grounds[i], camera);
-                }
-                else if (strcmp(grounds[i].rb.cb.tag, "platform") == 0)
-                {
-                    draw_platform(buffer, platform_sprite, &grounds[i], camera);
                 }
                 else if (strcmp(grounds[i].rb.cb.tag, "lava") == 0)
                 {

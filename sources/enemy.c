@@ -290,7 +290,7 @@ void init_spike(Enemy *spike, Vector pos)
     spike->taking_damage = 0;
 
     spike->rb.acceleration = create_vector(0, 0);
-    spike->rb.gravity_scale = 4.0f;
+    spike->rb.gravity_scale = 0.1f;
     spike->rb.pos = pos;
     spike->rb.velocity = create_vector(0, 0);
 

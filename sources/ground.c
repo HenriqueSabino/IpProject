@@ -73,27 +73,31 @@ void init_platform(Ground *platform, Vector pos, int animation_frame)
     platform->rb.gravity_scale = 0;
     platform->rb.velocity = create_vector(0, 0);
     platform->rb.acceleration = create_vector(0, 0);
-    platform->rb.pos = pos;
 
-    if (animation_frame == 0)
+    if(animation_frame == 0 || animation_frame == 1 || animation_frame == 2 || animation_frame == 3)
+        platform->rb.pos = pos;
+    else
+        platform->rb.pos = sum(pos, create_vector(0, 28));
+
+    if (animation_frame == 0 || animation_frame == 4)
     {
         platform->rb.cb.width = 128;
         platform->rb.cb.height = 1;
         platform->rb.cb.offset = create_vector(0, 28);
     }
-    else if (animation_frame == 1)
+    else if (animation_frame == 1 || animation_frame == 5)
     {
         platform->rb.cb.width = 116;
         platform->rb.cb.height = 1;
         platform->rb.cb.offset = create_vector(12, 28);
     }
-    else if (animation_frame == 2)
+    else if (animation_frame == 2 || animation_frame == 6)
     {
         platform->rb.cb.width = 116;
         platform->rb.cb.height = 1;
         platform->rb.cb.offset = create_vector(0, 28);
     }
-    else if (animation_frame == 3)
+    else if (animation_frame == 3 || animation_frame == 7)
     {
         platform->rb.cb.width = 104;
         platform->rb.cb.height = 1;
