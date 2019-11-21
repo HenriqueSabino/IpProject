@@ -867,24 +867,48 @@ int main()
             {
                 if (strcmp(grounds[i].rb.cb.tag, "platform") == 0)
                 {
-                    draw_platform(buffer, platform_sprite, &grounds[i], camera);
+                    if (grounds[i].rb.pos.x + 128 >= camera.x && grounds[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
+                    {
+                        if (grounds[i].rb.pos.y + 128 >= camera.y && grounds[i].rb.pos.y <= camera.y + SCREEN_HEIGHT)
+                        {
+                            draw_platform(buffer, platform_sprite, &grounds[i], camera);
+                        }
+                    }
                 }
             }
 
             for (int i = 0; i < object_count; i++)
             {
-                draw_object(buffer, scenario_sprite, &objects[i], camera);
+                if (objects[i].position.x + 128 >= camera.x && objects[i].position.x <= camera.x + SCREEN_WIDTH)
+                {
+                    if (objects[i].position.y + 128 >= camera.y && objects[i].position.y <= camera.y + SCREEN_HEIGHT)
+                    {
+                        draw_object(buffer, scenario_sprite, &objects[i], camera);
+                    }
+                }
             }
 
             for (int i = 0; i < ground_count; i++)
             {
                 if (strcmp(grounds[i].rb.cb.tag, "ground") == 0)
                 {
-                    draw_ground(buffer, ground_sprite, &grounds[i], camera);
+                    if (grounds[i].rb.pos.x + 128 >= camera.x && grounds[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
+                    {
+                        if (grounds[i].rb.pos.y + 128 >= camera.y && grounds[i].rb.pos.y <= camera.y + SCREEN_HEIGHT)
+                        {
+                            draw_ground(buffer, ground_sprite, &grounds[i], camera);
+                        }
+                    }
                 }
                 else if (strcmp(grounds[i].rb.cb.tag, "lava") == 0)
                 {
-                    draw_lava(buffer, lava_sprite, &grounds[i], camera);
+                    if (grounds[i].rb.pos.x + 128 >= camera.x && grounds[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
+                    {
+                        if (grounds[i].rb.pos.y + 128 >= camera.y && grounds[i].rb.pos.y <= camera.y + SCREEN_HEIGHT)
+                        {
+                            draw_lava(buffer, lava_sprite, &grounds[i], camera);
+                        }
+                    }
                 }
             }
 
@@ -892,15 +916,13 @@ int main()
             {
                 if (strcmp(items[i].rb.cb.tag, "potion") == 0)
                 {
-                    draw_potion(buffer, potion_sprite, &items[i], camera);
-                }
-            }
-
-            for (int i = 0; i < item_count; i++)
-            {
-                if (strcmp(items[i].rb.cb.tag, "potion") == 0)
-                {
-                    draw_potion(buffer, potion_sprite, &items[i], camera);
+                    if (items[i].rb.pos.x + 128 >= camera.x && items[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
+                    {
+                        if (items[i].rb.pos.y + 128 >= camera.y && items[i].rb.pos.y <= camera.y + SCREEN_HEIGHT)
+                        {
+                            draw_potion(buffer, potion_sprite, &items[i], camera);
+                        }
+                    }
                 }
             }
 
@@ -910,31 +932,61 @@ int main()
             {
                 if (strcmp(enemies[i].rb.cb.tag, "bat") == 0 && enemies[i].rb.pos.y <= 1000)
                 {
-                    draw_bat(buffer, bat_sprite, &enemies[i], camera);
+                    if (enemies[i].rb.pos.x + 128 >= camera.x && enemies[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
+                    {
+                        if (enemies[i].rb.pos.y + 128 >= camera.y && enemies[i].rb.pos.y <= camera.y + SCREEN_HEIGHT)
+                        {
+                            draw_bat(buffer, bat_sprite, &enemies[i], camera);
+                        }
+                    }
                     if (enemies[i].alive == 0 && enemies[i].rb.pos.y >= 1000)
                         enemies[i].rb.pos.y = 1001;
                 }
                 else if (strcmp(enemies[i].rb.cb.tag, "fox") == 0 && enemies[i].rb.pos.y <= 1000)
                 {
-                    draw_fox(buffer, fox_sprite, &enemies[i], camera);
+                    if (enemies[i].rb.pos.x + 128 >= camera.x && enemies[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
+                    {
+                        if (enemies[i].rb.pos.y + 128 >= camera.y && enemies[i].rb.pos.y <= camera.y + SCREEN_HEIGHT)
+                        {
+                            draw_fox(buffer, fox_sprite, &enemies[i], camera);
+                        }
+                    }
                     if (enemies[i].alive == 0 && enemies[i].rb.pos.y >= 1000)
                         enemies[i].rb.pos.y = 1001;
                 }
                 else if (strcmp(enemies[i].rb.cb.tag, "harpy") == 0 && enemies[i].rb.pos.y <= 1000)
                 {
-                    draw_harpy(buffer, harpy_sprite, &enemies[i], camera);
+                    if (enemies[i].rb.pos.x + 128 >= camera.x && enemies[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
+                    {
+                        if (enemies[i].rb.pos.y + 128 >= camera.y && enemies[i].rb.pos.y <= camera.y + SCREEN_HEIGHT)
+                        {
+                            draw_harpy(buffer, harpy_sprite, &enemies[i], camera);
+                        }
+                    }
                     if (enemies[i].alive == 0 && enemies[i].rb.pos.y >= 1000)
                         enemies[i].rb.pos.y = 1001;
                 }
                 else if (strcmp(enemies[i].rb.cb.tag, "ghost") == 0 && enemies[i].rb.pos.y <= 1000)
                 {
-                    draw_ghost(buffer, ghost_sprite, &enemies[i], camera);
+                    if (enemies[i].rb.pos.x + 128 >= camera.x && enemies[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
+                    {
+                        if (enemies[i].rb.pos.y + 128 >= camera.y && enemies[i].rb.pos.y <= camera.y + SCREEN_HEIGHT)
+                        {
+                            draw_ghost(buffer, ghost_sprite, &enemies[i], camera);
+                        }
+                    }
                     if (enemies[i].alive == 0 && enemies[i].rb.pos.y >= 1000)
                         enemies[i].rb.pos.y = 1001;
                 }
                 else if (strcmp(enemies[i].rb.cb.tag, "spike") == 0)
                 {
-                    draw_spike(buffer, spike_sprite, &enemies[i], camera);
+                    if (enemies[i].rb.pos.x + 128 >= camera.x && enemies[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
+                    {
+                        if (enemies[i].rb.pos.y + 128 >= camera.y && enemies[i].rb.pos.y <= camera.y + SCREEN_HEIGHT)
+                        {
+                            draw_spike(buffer, spike_sprite, &enemies[i], camera);
+                        }
+                    }
                 }
             }
 
@@ -942,7 +994,13 @@ int main()
             {
                 if (strcmp(grounds[i].rb.cb.tag, "bridge") == 0)
                 {
-                    draw_bridge(buffer, bridge_sprite, &grounds[i], camera);
+                    if (grounds[i].rb.pos.x + 128 >= camera.x && grounds[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
+                    {
+                        if (grounds[i].rb.pos.y + 128 >= camera.y && grounds[i].rb.pos.y <= camera.y + SCREEN_HEIGHT)
+                        {
+                            draw_bridge(buffer, bridge_sprite, &grounds[i], camera);
+                        }
+                    }
                 }
             }
 
