@@ -12,8 +12,8 @@
 *************************************2332**********1231*************
 *********************************1XXXXXXXXWWWWWWWWXXXXXX3223********
 *********************************XXXX55555wwwwwwww55555XXXXX********
-***********1*******4*2*131***2XXXX55555555wwwwwwww555555555XX131231*
-*133*3*213XXWWWWWWXXXXXXXX323XXXX555555555wwwwwwww5555555555XXXXXXXX
+89***6*****1*******4*2*13****2XXXX55555555wwwwwwww555555555XX131231*
+ab1****213XXWWWWWWXXXXXXXX323XXXX555555555wwwwwwww5555555555XXXXXXXX
 XXXXXXXXXXX5wwwwww5555555XXXXX555555555555wwwwwwww55555555555555555X
 
 Captions:
@@ -25,6 +25,12 @@ X => solo
 3 => bush sprite 1
 4 => bush sprite 2
 5 => overworld ground
+6 => tree sprite platform 1
+7 => tree sprite platform 2
+8 => house sprite 1
+9 => house sprite 2
+a => house sprite 3
+b => house sprite 4
 W => water fluid
 w => water static
 C => cave ground

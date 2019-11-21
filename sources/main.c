@@ -142,6 +142,10 @@ int main()
     if (lifebar_sprite == NULL)
         allegro_message("error");
 
+    BITMAP *teste_sprite = load_bitmap("../assets/Scenario/Montain.bmp", NULL);
+    if (teste_sprite == NULL)
+        allegro_message("error");
+
     BITMAP *arrow_sprite = load_bitmap(ARROW_PATH, NULL);
     if (arrow_sprite == NULL)
         allegro_message("error");
@@ -293,7 +297,8 @@ int main()
         for (int i = 0; i < scenario_map_size; i++)
         {
             if (scenario_map[i] == '1' || scenario_map[i] == '2' || scenario_map[i] == '3' || scenario_map[i] == '4' || scenario_map[i] == '5' ||
-                scenario_map[i] == 'W' || scenario_map[i] == 'w' || scenario_map[i] == 'C' || scenario_map[i] == 'L')
+                scenario_map[i] == '6' || scenario_map[i] == '7' || scenario_map[i] == '8' || scenario_map[i] == '9' || scenario_map[i] == 'a' ||
+                scenario_map[i] == 'b' || scenario_map[i] == 'W' || scenario_map[i] == 'w' || scenario_map[i] == 'C' || scenario_map[i] == 'L')
             {
                 object_count++;
             }
@@ -543,6 +548,42 @@ int main()
             else if (scenario_map[i] == '5')
             {
                 init_object(&objects[object_count], create_vector(col * 128, row * 128), 9);
+                object_count++;
+                col++;
+            }
+            else if (scenario_map[i] == '6')
+            {
+                init_object(&objects[object_count], create_vector(col * 128, row * 128), 16);
+                object_count++;
+                col++;
+            }
+            else if (scenario_map[i] == '7')
+            {
+                init_object(&objects[object_count], create_vector(col * 128, row * 128), 17);
+                object_count++;
+                col++;
+            }
+            else if (scenario_map[i] == '8')
+            {
+                init_object(&objects[object_count], create_vector(col * 128, row * 128), 18);
+                object_count++;
+                col++;
+            }
+            else if (scenario_map[i] == '9')
+            {
+                init_object(&objects[object_count], create_vector(col * 128, row * 128), 19);
+                object_count++;
+                col++;
+            }
+            else if (scenario_map[i] == 'a')
+            {
+                init_object(&objects[object_count], create_vector(col * 128, row * 128), 20);
+                object_count++;
+                col++;
+            }
+            else if (scenario_map[i] == 'b')
+            {
+                init_object(&objects[object_count], create_vector(col * 128, row * 128), 21);
                 object_count++;
                 col++;
             }
@@ -863,6 +904,8 @@ int main()
 
             //DRAWING
 
+            draw_sprite(buffer, teste_sprite, 0 - camera.x * 0.1f, 0);
+
             for (int i = 0; i < ground_count; i++)
             {
                 if (strcmp(grounds[i].rb.cb.tag, "platform") == 0)
@@ -879,11 +922,24 @@ int main()
 
             for (int i = 0; i < object_count; i++)
             {
-                if (objects[i].position.x + 128 >= camera.x && objects[i].position.x <= camera.x + SCREEN_WIDTH)
+                if (objects[i].sprite_frame == 0 || objects[i].sprite_frame == 1 || objects[i].sprite_frame == 16 || objects[i].sprite_frame == 17)
                 {
-                    if (objects[i].position.y + 128 >= camera.y && objects[i].position.y <= camera.y + SCREEN_HEIGHT)
+                    if (objects[i].position.x + 256 >= camera.x && objects[i].position.x <= camera.x + SCREEN_WIDTH)
                     {
-                        draw_object(buffer, scenario_sprite, &objects[i], camera);
+                        if (objects[i].position.y + 256 >= camera.y && objects[i].position.y <= camera.y + SCREEN_HEIGHT)
+                        {
+                            draw_object(buffer, scenario_sprite, &objects[i], camera);
+                        }
+                    }
+                }
+                else
+                {
+                    if (objects[i].position.x + 128 >= camera.x && objects[i].position.x <= camera.x + SCREEN_WIDTH)
+                    {
+                        if (objects[i].position.y + 128 >= camera.y && objects[i].position.y <= camera.y + SCREEN_HEIGHT)
+                        {
+                            draw_object(buffer, scenario_sprite, &objects[i], camera);
+                        }
                     }
                 }
             }
@@ -1108,6 +1164,7 @@ int main()
     destroy_bitmap(spike_sprite);
     destroy_bitmap(scenario_sprite);
     destroy_bitmap(potion_sprite);
+    destroy_bitmap(teste_sprite);
 
     return 0;
 }
@@ -1177,27 +1234,6 @@ void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player, Vector camera)
             player->animation_frame = 10;
         }
     }
-    // else if ((!player->can_jump || player->rb.velocity.y != 0) && player->attacking && !player->bow_attack)
-    // {
-    //     if (player->animation_frame != 12)
-    //     {
-    //         player->animation_frame = 12;
-    //     }
-
-    //     if (player->animation_frame < 17)
-    //     {
-    //         player->attacking = 1;
-    //         if (player->animation_frame >= 16)
-    //             player->sword_rb.cb.enabled = 1;
-    //     }
-    // }
-    // else if ((!player->can_jump || player->rb.velocity.y != 0) && !player->attacking && player->bow_attack)
-    // {
-    //     if (player->animation_frame != 17)
-    //     {
-    //         player->animation_frame = 17;
-    //     }
-    //}
 
     int r_img_pos = player->animation_frame % PLAYER_SPRITE_COLS;
     int c_img_pos = player->animation_frame / PLAYER_SPRITE_COLS;
@@ -1559,7 +1595,7 @@ void draw_spike(BITMAP *bmp, BITMAP *sprite, Enemy *spike, Vector camera)
 
 void draw_object(BITMAP *bmp, BITMAP *sprite, Object *scenario, Vector camera)
 {
-    BITMAP *scenario_sprite = create_bitmap(128, 128);
+    BITMAP *scenario_sprite = create_bitmap(256, 256);
     clear_to_color(scenario_sprite, makecol(255, 0, 255));
 
     int r_img_pos = scenario->sprite_frame % SCENARIO_SPRITE_COLS;
@@ -1569,12 +1605,27 @@ void draw_object(BITMAP *bmp, BITMAP *sprite, Object *scenario, Vector camera)
     c_img_pos *= SCENARIO_TILE_SIZE;
 
     //draw the a part of the sprite sheet to the screen and scales it
-    masked_stretch_blit(sprite, scenario_sprite, r_img_pos, c_img_pos, 64, 64, 0, 0, 128, 128);
-
-    if (scenario->sprite_frame >= 0 && scenario->sprite_frame <= 3)
-        draw_sprite_ex(bmp, scenario_sprite, scenario->position.x - camera.x, scenario->position.y + 28 - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+    if (scenario->sprite_frame == 0 || scenario->sprite_frame == 1 || scenario->sprite_frame == 16 || scenario->sprite_frame == 17)
+        masked_stretch_blit(sprite, scenario_sprite, r_img_pos, c_img_pos, 64, 64, 0, 0, 256, 256);
     else
+        masked_stretch_blit(sprite, scenario_sprite, r_img_pos, c_img_pos, 64, 64, 0, 0, 128, 128);
+
+    if (scenario->sprite_frame >= 0 && scenario->sprite_frame <= 1)
+    {
+        draw_sprite_ex(bmp, scenario_sprite, scenario->position.x - camera.x, scenario->position.y - 100 - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+    }
+    else if (scenario->sprite_frame >= 2 && scenario->sprite_frame <= 3 || scenario->sprite_frame >= 18 && scenario->sprite_frame <= 21)
+    {
+        draw_sprite_ex(bmp, scenario_sprite, scenario->position.x - camera.x, scenario->position.y + 28 - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+    }
+    else if (scenario->sprite_frame >= 16 && scenario->sprite_frame <= 17)
+    {
+        draw_sprite_ex(bmp, scenario_sprite, scenario->position.x - camera.x, scenario->position.y - 72 - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+    }
+    else
+    {
         draw_sprite_ex(bmp, scenario_sprite, scenario->position.x - camera.x, scenario->position.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+    }
 
     destroy_bitmap(scenario_sprite);
 }
