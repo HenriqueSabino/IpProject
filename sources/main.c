@@ -316,6 +316,8 @@ int main()
         Item items[item_count];
         item_count = 0;
 
+        int temp_col = 0;
+
         for (int i = 0; i < map_size; i++)
         {
             if (map[i] == 'P')
@@ -514,9 +516,13 @@ int main()
             {
                 row++;
                 not_objs++;
+                temp_col = col;
                 col = 0;
             }
         }
+
+        BITMAP *level_background = create_bitmap(temp_col * 128, row * 128);
+        clear_to_color(level_background, 0xFF00FF);
 
         row = col = 0;
         for (int i = 0; i < scenario_map_size; i++)
@@ -625,9 +631,19 @@ int main()
         int rbs_size = map_size - not_objs + 1;
         RigidBody *rbs[rbs_size];
         rbs[0] = &player.rb;
+
+        for (int i = 0; i < object_count; i++)
+        {
+            if (objects[i].sprite_frame != 4)
+                draw_object(level_background, scenario_sprite, &objects[i], create_vector(0, 0));
+        }
+
         for (int i = 0; i < ground_count; i++)
         {
             rbs[i + 1] = &grounds[i].rb;
+
+            if (!(strcmp(grounds[i].rb.cb.tag, "platform") == 0 || strcmp(grounds[i].rb.cb.tag, "bridge") == 0))
+                draw_ground(level_background, ground_sprite, &grounds[i], create_vector(0, 0));
         }
 
         for (int i = 0; i < enemy_count; i++)
@@ -904,7 +920,7 @@ int main()
 
             //DRAWING
 
-            draw_sprite(buffer, teste_sprite, 0 - camera.x * 0.1f, 0);
+            draw_sprite(buffer, teste_sprite, 0 - floor(camera.x) * 0.1f, 0);
 
             for (int i = 0; i < ground_count; i++)
             {
@@ -922,17 +938,7 @@ int main()
 
             for (int i = 0; i < object_count; i++)
             {
-                if (objects[i].sprite_frame == 0 || objects[i].sprite_frame == 1 || objects[i].sprite_frame == 16 || objects[i].sprite_frame == 17)
-                {
-                    if (objects[i].position.x + 256 >= camera.x && objects[i].position.x <= camera.x + SCREEN_WIDTH)
-                    {
-                        if (objects[i].position.y + 256 >= camera.y && objects[i].position.y <= camera.y + SCREEN_HEIGHT)
-                        {
-                            draw_object(buffer, scenario_sprite, &objects[i], camera);
-                        }
-                    }
-                }
-                else
+                if (objects[i].sprite_frame >= 4 && objects[i].sprite_frame <= 7)
                 {
                     if (objects[i].position.x + 128 >= camera.x && objects[i].position.x <= camera.x + SCREEN_WIDTH)
                     {
@@ -943,20 +949,11 @@ int main()
                     }
                 }
             }
+            masked_blit(level_background, buffer, camera.x, camera.y, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
             for (int i = 0; i < ground_count; i++)
             {
-                if (strcmp(grounds[i].rb.cb.tag, "ground") == 0)
-                {
-                    if (grounds[i].rb.pos.x + 128 >= camera.x && grounds[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
-                    {
-                        if (grounds[i].rb.pos.y + 128 >= camera.y && grounds[i].rb.pos.y <= camera.y + SCREEN_HEIGHT)
-                        {
-                            draw_ground(buffer, ground_sprite, &grounds[i], camera);
-                        }
-                    }
-                }
-                else if (strcmp(grounds[i].rb.cb.tag, "lava") == 0)
+                if (strcmp(grounds[i].rb.cb.tag, "lava") == 0)
                 {
                     if (grounds[i].rb.pos.x + 128 >= camera.x && grounds[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
                     {
@@ -1252,16 +1249,16 @@ void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player, Vector camera)
         {
             if (game_timer % 2 == 0)
             {
-                draw_sprite_ex(bmp, player_sprite, player->rb.pos.x - camera.x, player->rb.pos.y - camera.y, DRAW_SPRITE_TRANS, DRAW_SPRITE_NO_FLIP);
+                draw_sprite_ex(bmp, player_sprite, player->rb.pos.x - floor(camera.x), player->rb.pos.y - floor(camera.y), DRAW_SPRITE_TRANS, DRAW_SPRITE_NO_FLIP);
             }
             else
             {
-                draw_sprite_ex(bmp, player_sprite, player->rb.pos.x - camera.x, player->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+                draw_sprite_ex(bmp, player_sprite, player->rb.pos.x - floor(camera.x), player->rb.pos.y - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
             }
         }
         else
         {
-            draw_sprite_ex(bmp, player_sprite, player->rb.pos.x - camera.x, player->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+            draw_sprite_ex(bmp, player_sprite, player->rb.pos.x - floor(camera.x), player->rb.pos.y - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
         }
     }
     else
@@ -1270,16 +1267,16 @@ void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player, Vector camera)
         {
             if (game_timer % 4 == 0)
             {
-                draw_sprite_ex(bmp, player_sprite, player->rb.pos.x - camera.x, player->rb.pos.y - camera.y, DRAW_SPRITE_TRANS, DRAW_SPRITE_H_FLIP);
+                draw_sprite_ex(bmp, player_sprite, player->rb.pos.x - floor(camera.x), player->rb.pos.y - floor(camera.y), DRAW_SPRITE_TRANS, DRAW_SPRITE_H_FLIP);
             }
             else
             {
-                draw_sprite_ex(bmp, player_sprite, player->rb.pos.x - camera.x, player->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
+                draw_sprite_ex(bmp, player_sprite, player->rb.pos.x - floor(camera.x), player->rb.pos.y - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
             }
         }
         else
         {
-            draw_sprite_ex(bmp, player_sprite, player->rb.pos.x - camera.x, player->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
+            draw_sprite_ex(bmp, player_sprite, player->rb.pos.x - floor(camera.x), player->rb.pos.y - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
         }
     }
 
@@ -1306,17 +1303,17 @@ void draw_bat(BITMAP *bmp, BITMAP *sprite, Enemy *bat, Vector camera)
     {
         if (bat->taking_damage == 0 || bat->alive == 0)
         {
-            draw_sprite_ex(bmp, bat_sprite, bat->rb.pos.x - camera.x, bat->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+            draw_sprite_ex(bmp, bat_sprite, bat->rb.pos.x - floor(camera.x), bat->rb.pos.y - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
         }
         else
         {
             if (game_timer % 2 == 0)
             {
-                draw_sprite_ex(bmp, bat_sprite, bat->rb.pos.x - camera.x, bat->rb.pos.y - camera.y, DRAW_SPRITE_TRANS, DRAW_SPRITE_NO_FLIP);
+                draw_sprite_ex(bmp, bat_sprite, bat->rb.pos.x - floor(camera.x), bat->rb.pos.y - floor(camera.y), DRAW_SPRITE_TRANS, DRAW_SPRITE_NO_FLIP);
             }
             else
             {
-                draw_sprite_ex(bmp, bat_sprite, bat->rb.pos.x - camera.x, bat->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+                draw_sprite_ex(bmp, bat_sprite, bat->rb.pos.x - floor(camera.x), bat->rb.pos.y - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
             }
         }
     }
@@ -1324,17 +1321,17 @@ void draw_bat(BITMAP *bmp, BITMAP *sprite, Enemy *bat, Vector camera)
     {
         if (bat->taking_damage == 0 || bat->alive == 0)
         {
-            draw_sprite_ex(bmp, bat_sprite, bat->rb.pos.x - camera.x, bat->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
+            draw_sprite_ex(bmp, bat_sprite, bat->rb.pos.x - floor(camera.x), bat->rb.pos.y - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
         }
         else
         {
             if (game_timer % 2 == 0)
             {
-                draw_sprite_ex(bmp, bat_sprite, bat->rb.pos.x - camera.x, bat->rb.pos.y - camera.y, DRAW_SPRITE_TRANS, DRAW_SPRITE_H_FLIP);
+                draw_sprite_ex(bmp, bat_sprite, bat->rb.pos.x - floor(camera.x), bat->rb.pos.y - floor(camera.y), DRAW_SPRITE_TRANS, DRAW_SPRITE_H_FLIP);
             }
             else
             {
-                draw_sprite_ex(bmp, bat_sprite, bat->rb.pos.x - camera.x, bat->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
+                draw_sprite_ex(bmp, bat_sprite, bat->rb.pos.x - floor(camera.x), bat->rb.pos.y - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
             }
         }
     }
@@ -1347,7 +1344,7 @@ void draw_fox(BITMAP *bmp, BITMAP *sprite, Enemy *fox, Vector camera)
     BITMAP *fox_sprite = create_bitmap(96, 96);
     clear_to_color(fox_sprite, makecol(255, 0, 255));
 
-    //rect(bmp, fox->rb.cb.min.x - camera.x, fox->rb.cb.min.y - camera.y, fox->rb.cb.max.x - camera.x, fox->rb.cb.max.y - camera.y, makecol(255,0,0));
+    //rect(bmp, fox->rb.cb.min.x - floor(camera.x), fox->rb.cb.min.y - floor(camera.y), fox->rb.cb.max.x - floor(camera.x), fox->rb.cb.max.y - floor(camera.y), makecol(255,0,0));
 
     int r_img_pos = fox->animation_frame % FOX_SPRITE_COLS;
     int c_img_pos = fox->animation_frame / FOX_SPRITE_COLS;
@@ -1364,17 +1361,17 @@ void draw_fox(BITMAP *bmp, BITMAP *sprite, Enemy *fox, Vector camera)
     {
         if (fox->taking_damage == 0 || fox->alive == 0)
         {
-            draw_sprite_ex(bmp, fox_sprite, fox->rb.pos.x - camera.x, fox->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+            draw_sprite_ex(bmp, fox_sprite, fox->rb.pos.x - floor(camera.x), fox->rb.pos.y - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
         }
         else
         {
             if (game_timer % 2 == 0)
             {
-                draw_sprite_ex(bmp, fox_sprite, fox->rb.pos.x - camera.x, fox->rb.pos.y - camera.y, DRAW_SPRITE_TRANS, DRAW_SPRITE_NO_FLIP);
+                draw_sprite_ex(bmp, fox_sprite, fox->rb.pos.x - floor(camera.x), fox->rb.pos.y - floor(camera.y), DRAW_SPRITE_TRANS, DRAW_SPRITE_NO_FLIP);
             }
             else
             {
-                draw_sprite_ex(bmp, fox_sprite, fox->rb.pos.x - camera.x, fox->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+                draw_sprite_ex(bmp, fox_sprite, fox->rb.pos.x - floor(camera.x), fox->rb.pos.y - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
             }
         }
     }
@@ -1382,17 +1379,17 @@ void draw_fox(BITMAP *bmp, BITMAP *sprite, Enemy *fox, Vector camera)
     {
         if (fox->taking_damage == 0 || fox->alive == 0)
         {
-            draw_sprite_ex(bmp, fox_sprite, fox->rb.pos.x - camera.x, fox->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
+            draw_sprite_ex(bmp, fox_sprite, fox->rb.pos.x - floor(camera.x), fox->rb.pos.y - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
         }
         else
         {
             if (game_timer % 2 == 0)
             {
-                draw_sprite_ex(bmp, fox_sprite, fox->rb.pos.x - camera.x, fox->rb.pos.y - camera.y, DRAW_SPRITE_TRANS, DRAW_SPRITE_H_FLIP);
+                draw_sprite_ex(bmp, fox_sprite, fox->rb.pos.x - floor(camera.x), fox->rb.pos.y - floor(camera.y), DRAW_SPRITE_TRANS, DRAW_SPRITE_H_FLIP);
             }
             else
             {
-                draw_sprite_ex(bmp, fox_sprite, fox->rb.pos.x - camera.x, fox->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
+                draw_sprite_ex(bmp, fox_sprite, fox->rb.pos.x - floor(camera.x), fox->rb.pos.y - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
             }
         }
     }
@@ -1420,17 +1417,17 @@ void draw_harpy(BITMAP *bmp, BITMAP *sprite, Enemy *harpy, Vector camera)
     {
         if (harpy->taking_damage == 0 || harpy->alive == 0)
         {
-            draw_sprite_ex(bmp, harpy_sprite, harpy->rb.pos.x - camera.x, harpy->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+            draw_sprite_ex(bmp, harpy_sprite, harpy->rb.pos.x - floor(camera.x), harpy->rb.pos.y - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
         }
         else
         {
             if (game_timer % 2 == 0)
             {
-                draw_sprite_ex(bmp, harpy_sprite, harpy->rb.pos.x - camera.x, harpy->rb.pos.y - camera.y, DRAW_SPRITE_TRANS, DRAW_SPRITE_NO_FLIP);
+                draw_sprite_ex(bmp, harpy_sprite, harpy->rb.pos.x - floor(camera.x), harpy->rb.pos.y - floor(camera.y), DRAW_SPRITE_TRANS, DRAW_SPRITE_NO_FLIP);
             }
             else
             {
-                draw_sprite_ex(bmp, harpy_sprite, harpy->rb.pos.x - camera.x, harpy->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+                draw_sprite_ex(bmp, harpy_sprite, harpy->rb.pos.x - floor(camera.x), harpy->rb.pos.y - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
             }
         }
     }
@@ -1438,17 +1435,17 @@ void draw_harpy(BITMAP *bmp, BITMAP *sprite, Enemy *harpy, Vector camera)
     {
         if (harpy->taking_damage == 0 || harpy->alive == 0)
         {
-            draw_sprite_ex(bmp, harpy_sprite, harpy->rb.pos.x - camera.x, harpy->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
+            draw_sprite_ex(bmp, harpy_sprite, harpy->rb.pos.x - floor(camera.x), harpy->rb.pos.y - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
         }
         else
         {
             if (game_timer % 2 == 0)
             {
-                draw_sprite_ex(bmp, harpy_sprite, harpy->rb.pos.x - camera.x, harpy->rb.pos.y - camera.y, DRAW_SPRITE_TRANS, DRAW_SPRITE_H_FLIP);
+                draw_sprite_ex(bmp, harpy_sprite, harpy->rb.pos.x - floor(camera.x), harpy->rb.pos.y - floor(camera.y), DRAW_SPRITE_TRANS, DRAW_SPRITE_H_FLIP);
             }
             else
             {
-                draw_sprite_ex(bmp, harpy_sprite, harpy->rb.pos.x - camera.x, harpy->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
+                draw_sprite_ex(bmp, harpy_sprite, harpy->rb.pos.x - floor(camera.x), harpy->rb.pos.y - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
             }
         }
     }
@@ -1476,22 +1473,22 @@ void draw_ghost(BITMAP *bmp, BITMAP *sprite, Enemy *ghost, Vector camera)
     {
         if (ghost->attack == 1)
         {
-            draw_sprite_ex(bmp, ghost_sprite, ghost->rb.pos.x - camera.x, ghost->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+            draw_sprite_ex(bmp, ghost_sprite, ghost->rb.pos.x - floor(camera.x), ghost->rb.pos.y - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
         }
         else
         {
-            draw_sprite_ex(bmp, ghost_sprite, ghost->rb.pos.x - camera.x, ghost->rb.pos.y - camera.y, DRAW_SPRITE_TRANS, DRAW_SPRITE_NO_FLIP);
+            draw_sprite_ex(bmp, ghost_sprite, ghost->rb.pos.x - floor(camera.x), ghost->rb.pos.y - floor(camera.y), DRAW_SPRITE_TRANS, DRAW_SPRITE_NO_FLIP);
         }
     }
     else
     {
         if (ghost->attack == 1)
         {
-            draw_sprite_ex(bmp, ghost_sprite, ghost->rb.pos.x - camera.x, ghost->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
+            draw_sprite_ex(bmp, ghost_sprite, ghost->rb.pos.x - floor(camera.x), ghost->rb.pos.y - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
         }
         else
         {
-            draw_sprite_ex(bmp, ghost_sprite, ghost->rb.pos.x - camera.x, ghost->rb.pos.y - camera.y, DRAW_SPRITE_TRANS, DRAW_SPRITE_H_FLIP);
+            draw_sprite_ex(bmp, ghost_sprite, ghost->rb.pos.x - floor(camera.x), ghost->rb.pos.y - floor(camera.y), DRAW_SPRITE_TRANS, DRAW_SPRITE_H_FLIP);
         }
     }
 
@@ -1512,7 +1509,7 @@ void draw_ground(BITMAP *bmp, BITMAP *sprite, Ground *ground, Vector camera)
     //draw the a part of the sprite sheet to the screen and scales it
     masked_stretch_blit(sprite, ground_sprite, r_img_pos, c_img_pos, 32, 32, 0, 0, 128, 128);
 
-    draw_sprite_ex(bmp, ground_sprite, ground->rb.pos.x - camera.x, ground->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+    draw_sprite_ex(bmp, ground_sprite, ground->rb.pos.x - floor(camera.x), ground->rb.pos.y - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
 
     destroy_bitmap(ground_sprite);
 }
@@ -1531,7 +1528,7 @@ void draw_platform(BITMAP *bmp, BITMAP *sprite, Ground *platform, Vector camera)
     //draw the a part of the sprite sheet to the screen and scales it
     masked_stretch_blit(sprite, platform_sprite, r_img_pos, c_img_pos, 32, 32, 0, 0, 128, 128);
 
-    draw_sprite_ex(bmp, platform_sprite, platform->rb.pos.x - camera.x, platform->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+    draw_sprite_ex(bmp, platform_sprite, platform->rb.pos.x - floor(camera.x), platform->rb.pos.y - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
 
     destroy_bitmap(platform_sprite);
 }
@@ -1550,7 +1547,7 @@ void draw_lava(BITMAP *bmp, BITMAP *sprite, Ground *lava, Vector camera)
     //draw the a part of the sprite sheet to the screen and scales it
     masked_stretch_blit(sprite, lava_sprite, r_img_pos, c_img_pos, 32, 32, 0, 0, 128, 128);
 
-    draw_sprite_ex(bmp, lava_sprite, lava->rb.pos.x - camera.x, lava->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+    draw_sprite_ex(bmp, lava_sprite, lava->rb.pos.x - floor(camera.x), lava->rb.pos.y - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
 
     destroy_bitmap(lava_sprite);
 }
@@ -1569,7 +1566,7 @@ void draw_bridge(BITMAP *bmp, BITMAP *sprite, Ground *bridge, Vector camera)
     //draw the a part of the sprite sheet to the screen and scales it
     masked_stretch_blit(sprite, bridge_sprite, r_img_pos, c_img_pos, 32, 32, 0, 0, 128, 128);
 
-    draw_sprite_ex(bmp, bridge_sprite, bridge->rb.pos.x - camera.x, bridge->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+    draw_sprite_ex(bmp, bridge_sprite, bridge->rb.pos.x - floor(camera.x), bridge->rb.pos.y - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
 
     destroy_bitmap(bridge_sprite);
 }
@@ -1588,7 +1585,7 @@ void draw_spike(BITMAP *bmp, BITMAP *sprite, Enemy *spike, Vector camera)
     //draw the a part of the sprite sheet to the screen and scales it
     masked_stretch_blit(sprite, spike_sprite, r_img_pos, c_img_pos, 32, 32, 0, 0, 128, 128);
 
-    draw_sprite_ex(bmp, spike_sprite, spike->rb.pos.x - camera.x, spike->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+    draw_sprite_ex(bmp, spike_sprite, spike->rb.pos.x - floor(camera.x), spike->rb.pos.y - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
 
     destroy_bitmap(spike_sprite);
 }
@@ -1612,19 +1609,19 @@ void draw_object(BITMAP *bmp, BITMAP *sprite, Object *scenario, Vector camera)
 
     if (scenario->sprite_frame >= 0 && scenario->sprite_frame <= 1)
     {
-        draw_sprite_ex(bmp, scenario_sprite, scenario->position.x - camera.x, scenario->position.y - 100 - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+        draw_sprite_ex(bmp, scenario_sprite, scenario->position.x - floor(camera.x), scenario->position.y - 100 - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
     }
     else if (scenario->sprite_frame >= 2 && scenario->sprite_frame <= 3 || scenario->sprite_frame >= 18 && scenario->sprite_frame <= 21)
     {
-        draw_sprite_ex(bmp, scenario_sprite, scenario->position.x - camera.x, scenario->position.y + 28 - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+        draw_sprite_ex(bmp, scenario_sprite, scenario->position.x - floor(camera.x), scenario->position.y + 28 - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
     }
     else if (scenario->sprite_frame >= 16 && scenario->sprite_frame <= 17)
     {
-        draw_sprite_ex(bmp, scenario_sprite, scenario->position.x - camera.x, scenario->position.y - 72 - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+        draw_sprite_ex(bmp, scenario_sprite, scenario->position.x - floor(camera.x), scenario->position.y - 72 - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
     }
     else
     {
-        draw_sprite_ex(bmp, scenario_sprite, scenario->position.x - camera.x, scenario->position.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+        draw_sprite_ex(bmp, scenario_sprite, scenario->position.x - floor(camera.x), scenario->position.y - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
     }
 
     destroy_bitmap(scenario_sprite);
@@ -1646,7 +1643,7 @@ void draw_potion(BITMAP *bmp, BITMAP *sprite, Item *potion, Vector camera)
         //draw the a part of the sprite sheet to the screen and scales it
         masked_stretch_blit(sprite, potion_sprite, r_img_pos, c_img_pos, 32, 32, 0, 0, 64, 64);
 
-        draw_sprite_ex(bmp, potion_sprite, potion->rb.pos.x - camera.x, potion->rb.pos.y - camera.y, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+        draw_sprite_ex(bmp, potion_sprite, potion->rb.pos.x - floor(camera.x), potion->rb.pos.y - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
 
         destroy_bitmap(potion_sprite);
     }
