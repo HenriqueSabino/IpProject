@@ -717,7 +717,7 @@ int main()
                 update_all(rbs, rbs_size, camera);
 
                 //linear interpolation between camera and player's position
-                Vector offset_camera = create_vector(-100, -200);
+                Vector offset_camera = create_vector(-SCREEN_WIDTH / 2 + 64, -200);
 
                 if (player.life > 0)
                 {
