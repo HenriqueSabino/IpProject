@@ -987,7 +987,7 @@ int main()
 
             for (int i = 0; i < enemy_count; i++)
             {
-                if (strcmp(enemies[i].rb.cb.tag, "bat") == 0 && enemies[i].rb.pos.y <= 1000)
+                if (strcmp(enemies[i].rb.cb.tag, "bat") == 0 && enemies[i].rb.pos.y <= 2000)
                 {
                     if (enemies[i].rb.pos.x + 128 >= camera.x && enemies[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
                     {
@@ -996,10 +996,10 @@ int main()
                             draw_bat(buffer, bat_sprite, &enemies[i], camera);
                         }
                     }
-                    if (enemies[i].alive == 0 && enemies[i].rb.pos.y >= 1000)
-                        enemies[i].rb.pos.y = 1001;
+                    if (enemies[i].alive == 0 && enemies[i].rb.pos.y >= 2000)
+                        enemies[i].rb.pos.y = 2001;
                 }
-                else if (strcmp(enemies[i].rb.cb.tag, "fox") == 0 && enemies[i].rb.pos.y <= 1000)
+                else if (strcmp(enemies[i].rb.cb.tag, "fox") == 0 && enemies[i].rb.pos.y <= 2000)
                 {
                     if (enemies[i].rb.pos.x + 128 >= camera.x && enemies[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
                     {
@@ -1008,10 +1008,10 @@ int main()
                             draw_fox(buffer, fox_sprite, &enemies[i], camera);
                         }
                     }
-                    if (enemies[i].alive == 0 && enemies[i].rb.pos.y >= 1000)
-                        enemies[i].rb.pos.y = 1001;
+                    if (enemies[i].alive == 0 && enemies[i].rb.pos.y >= 2000)
+                        enemies[i].rb.pos.y = 2001;
                 }
-                else if (strcmp(enemies[i].rb.cb.tag, "harpy") == 0 && enemies[i].rb.pos.y <= 1000)
+                else if (strcmp(enemies[i].rb.cb.tag, "harpy") == 0 && enemies[i].rb.pos.y <= 2000)
                 {
                     if (enemies[i].rb.pos.x + 128 >= camera.x && enemies[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
                     {
@@ -1020,10 +1020,10 @@ int main()
                             draw_harpy(buffer, harpy_sprite, &enemies[i], camera);
                         }
                     }
-                    if (enemies[i].alive == 0 && enemies[i].rb.pos.y >= 1000)
-                        enemies[i].rb.pos.y = 1001;
+                    if (enemies[i].alive == 0 && enemies[i].rb.pos.y >= 2000)
+                        enemies[i].rb.pos.y = 2001;
                 }
-                else if (strcmp(enemies[i].rb.cb.tag, "ghost") == 0 && enemies[i].rb.pos.y <= 1000)
+                else if (strcmp(enemies[i].rb.cb.tag, "ghost") == 0 && enemies[i].rb.pos.y <= 2000)
                 {
                     if (enemies[i].rb.pos.x + 128 >= camera.x && enemies[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
                     {
@@ -1032,8 +1032,6 @@ int main()
                             draw_ghost(buffer, ghost_sprite, &enemies[i], camera);
                         }
                     }
-                    if (enemies[i].alive == 0 && enemies[i].rb.pos.y >= 1000)
-                        enemies[i].rb.pos.y = 1001;
                 }
                 else if (strcmp(enemies[i].rb.cb.tag, "spike") == 0)
                 {
