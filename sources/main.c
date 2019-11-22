@@ -142,8 +142,12 @@ int main()
     if (lifebar_sprite == NULL)
         allegro_message("error");
 
-    BITMAP *teste_sprite = load_bitmap("../assets/Scenario/Montain.bmp", NULL);
-    if (teste_sprite == NULL)
+    BITMAP *montain_sprite = load_bitmap("../assets/Scenario/Montain.bmp", NULL);
+    if (montain_sprite == NULL)
+        allegro_message("error");
+
+    BITMAP *ground_background_sprite = load_bitmap("../assets/Scenario/Ground_Background.bmp", NULL);
+    if (ground_background_sprite == NULL)
         allegro_message("error");
 
     BITMAP *arrow_sprite = load_bitmap(ARROW_PATH, NULL);
@@ -919,8 +923,8 @@ int main()
             }
 
             //DRAWING
-
-            draw_sprite(buffer, teste_sprite, 0 - floor(camera.x) * 0.1f, 0);
+            masked_blit(montain_sprite, buffer, camera.x * 0.1f, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+            masked_blit(ground_background_sprite, buffer, camera.x * 0.4f, camera.y - 128, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
             for (int i = 0; i < ground_count; i++)
             {
@@ -1065,6 +1069,7 @@ int main()
 
         free(map);
         free(scenario_map);
+        destroy_bitmap(level_background);
 
         for (int i = 0; i < rbs_size; i++)
         {
@@ -1161,7 +1166,8 @@ int main()
     destroy_bitmap(spike_sprite);
     destroy_bitmap(scenario_sprite);
     destroy_bitmap(potion_sprite);
-    destroy_bitmap(teste_sprite);
+    destroy_bitmap(montain_sprite);
+    destroy_bitmap(ground_background_sprite);
 
     return 0;
 }
