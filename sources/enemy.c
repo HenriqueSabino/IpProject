@@ -13,24 +13,45 @@ int enemies_ref_count;
 
 void onCollisionEnter_bat(RigidBody *self, RigidBody *other)
 {
-    if (strcmp(other->cb.tag, "sword") == 0)
+    if (strcmp(other->cb.tag, "sword") == 0 || strcmp(other->cb.tag, "arrow") == 0)
     {
         for (int i = 0; i < enemies_ref_count; i++)
         {
             if (&enemies_ref[i].rb == self)
             {
-                enemies_ref[i].taking_damage = 1;
-                enemies_ref[i].life--;
+                if (strcmp(other->cb.tag, "sword") == 0)
+                {
+                    enemies_ref[i].taking_damage = 1;
+                    enemies_ref[i].life -= 2;
+                }
+                else if (strcmp(other->cb.tag, "arrow") == 0)
+                {
+                    enemies_ref[i].life--;
+                }
 
                 if (enemies_ref[i].life > 0)
                 {
-                    if (other->pos.x > self->pos.x)
+                    if (strcmp(other->cb.tag, "sword") == 0)
                     {
-                        self->velocity = create_vector(-10, 0);
+                        if (other->pos.x > self->pos.x)
+                        {
+                            self->velocity = create_vector(-10, 0);
+                        }
+                        else
+                        {
+                            self->velocity = create_vector(10, 0);
+                        }
                     }
-                    else
+                    else if (strcmp(other->cb.tag, "arrow") == 0)
                     {
-                        self->velocity = create_vector(10, 0);
+                        if (other->velocity.x < 0)
+                        {
+                            self->velocity = create_vector(-5, 0);
+                        }
+                        else
+                        {
+                            self->velocity = create_vector(5, 0);
+                        }
                     }
                 }
                 else
@@ -49,7 +70,7 @@ void init_bat(Enemy *bat, Vector pos)
     bat->animation_frame = 0;
     bat->facing_right = 0;
     bat->player_pos = create_vector(200, -32);
-    bat->life = 3;
+    bat->life = 6;
     bat->attack = 1;
     bat->alive = 1;
     bat->taking_damage = 0;
@@ -109,24 +130,42 @@ void onCollisionEnter_fox(RigidBody *self, RigidBody *other)
         }
     }
 
-    if (strcmp(other->cb.tag, "sword") == 0)
+    if (strcmp(other->cb.tag, "sword") == 0 || strcmp(other->cb.tag, "arrow") == 0)
     {
         for (int i = 0; i < enemies_ref_count; i++)
         {
             if (&enemies_ref[i].rb == self)
             {
                 enemies_ref[i].taking_damage = 1;
-                enemies_ref[i].life--;
+
+                if (strcmp(other->cb.tag, "sword") == 0)
+                    enemies_ref[i].life -= 2;
+                else if (strcmp(other->cb.tag, "arrow") == 0)
+                    enemies_ref[i].life--;
 
                 if (enemies_ref[i].life > 0)
                 {
-                    if (other->pos.x > self->pos.x)
+                    if (strcmp(other->cb.tag, "sword") == 0)
                     {
-                        self->velocity = create_vector(-10, -5);
+                        if (other->pos.x > self->pos.x)
+                        {
+                            self->velocity = create_vector(-10, -5);
+                        }
+                        else
+                        {
+                            self->velocity = create_vector(10, -5);
+                        }
                     }
-                    else
+                    else if (strcmp(other->cb.tag, "arrow") == 0)
                     {
-                        self->velocity = create_vector(10, -5);
+                        if (other->velocity.x < 0)
+                        {
+                            self->velocity = create_vector(-5, -5);
+                        }
+                        else
+                        {
+                            self->velocity = create_vector(5, -5);
+                        }
                     }
                 }
                 else
@@ -182,7 +221,7 @@ void init_fox(Enemy *fox, Vector pos)
     fox->facing_right = 1;
     fox->player_pos = create_vector(0, 0);
     fox->attack = 1;
-    fox->life = 5;
+    fox->life = 10;
     fox->alive = 1;
 
     fox->rb.acceleration = create_vector(0, 0);
@@ -210,7 +249,7 @@ void init_harpy(Enemy *harpy, Vector pos)
     harpy->animation_frame = 0;
     harpy->facing_right = 0;
     harpy->player_pos = create_vector(200, -32);
-    harpy->life = 6;
+    harpy->life = 12;
     harpy->attack = 1;
     harpy->alive = 1;
     harpy->taking_damage = 0;
@@ -392,13 +431,13 @@ void init_jumperboss(Enemy *jumper_boss, Vector pos)
     jumper_boss->taking_damage = 0;
 
     jumper_boss->rb.acceleration = create_vector(0, 0);
-    jumper_boss->rb.gravity_scale = 0;
+    jumper_boss->rb.gravity_scale = 0.1f;
     jumper_boss->rb.pos = pos;
     jumper_boss->rb.velocity = create_vector(0, 0);
 
-    jumper_boss->rb.cb.width = 100;
-    jumper_boss->rb.cb.height = 130;
-    jumper_boss->rb.cb.offset = create_vector(20, 26);
+    jumper_boss->rb.cb.width = 68;
+    jumper_boss->rb.cb.height = 88;
+    jumper_boss->rb.cb.offset = create_vector(40, 36);
     jumper_boss->rb.cb.min = create_vector(jumper_boss->rb.pos.x + jumper_boss->rb.cb.offset.x, jumper_boss->rb.pos.y + jumper_boss->rb.cb.offset.y);
     jumper_boss->rb.cb.max = create_vector(jumper_boss->rb.cb.min.x + jumper_boss->rb.cb.width, jumper_boss->rb.cb.min.y + jumper_boss->rb.cb.height);
     jumper_boss->rb.cb.solid = 1;

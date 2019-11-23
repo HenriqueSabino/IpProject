@@ -105,7 +105,7 @@ void onCollisionEnter(RigidBody *self, RigidBody *other)
         {
             player_ref->life -= 5;
         }
-        else if(strcmp(other->cb.tag, "spike") == 0)
+        else if (strcmp(other->cb.tag, "spike") == 0)
         {
             player_ref->life -= 10;
         }
@@ -117,7 +117,7 @@ void onCollisionEnter(RigidBody *self, RigidBody *other)
         else
             player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(-9, 28));
 
-        if(player_ref->life > 0)
+        if (player_ref->life > 0)
         {
             if (other->pos.x > self->pos.x)
             {
@@ -172,6 +172,15 @@ void onCollisionEnter(RigidBody *self, RigidBody *other)
             player_ref->life = 100;
         }
 
+        if (player_ref->arrows_amount < 15)
+        {
+            player_ref->arrows_amount += 5;
+        }
+        else
+        {
+            player_ref->arrows_amount = 20;
+        }
+
         other->cb.enabled = 0;
     }
 }
@@ -222,7 +231,7 @@ void onCollisionStay(RigidBody *self, RigidBody *other)
         {
             player_ref->life -= 5;
         }
-        else if(strcmp(other->cb.tag, "spike") == 0)
+        else if (strcmp(other->cb.tag, "spike") == 0)
         {
             player_ref->life -= 10;
         }
@@ -234,7 +243,7 @@ void onCollisionStay(RigidBody *self, RigidBody *other)
         else
             player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(-9, 28));
 
-        if(player_ref->life > 0)
+        if (player_ref->life > 0)
         {
             if (other->pos.x > self->pos.x)
             {
@@ -289,6 +298,15 @@ void onCollisionStay(RigidBody *self, RigidBody *other)
             player_ref->life = 100;
         }
 
+        if (player_ref->arrows_amount < 15)
+        {
+            player_ref->arrows_amount += 5;
+        }
+        else
+        {
+            player_ref->arrows_amount = 20;
+        }
+
         other->cb.enabled = 0;
     }
 }
@@ -310,6 +328,7 @@ void init_player(Player *player, Vector pos)
     player->life = 100;
     player->invulnerability = 0;
     player->can_jump = 0;
+    player->arrows_amount = 10;
 
     player->taking_damage = 0;
     player->rb.acceleration = create_vector(0, 0);

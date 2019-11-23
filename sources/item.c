@@ -49,3 +49,35 @@ void onCollisionStay_potion(RigidBody *self, RigidBody *other)
         }
     }
 }
+
+void init_arrow_attack(Item *arrow_attack, Vector pos)
+{
+    arrow_attack->animation_frame = 0;
+
+    arrow_attack->rb.gravity_scale = 0;
+    arrow_attack->rb.velocity = create_vector(0, 0);
+    arrow_attack->rb.acceleration = create_vector(0, 0);
+    arrow_attack->rb.pos = pos;
+
+    arrow_attack->rb.cb.width = 5;
+    arrow_attack->rb.cb.height = 8;
+    arrow_attack->rb.cb.offset = create_vector(7, 21);
+
+    arrow_attack->rb.cb.min = create_vector(arrow_attack->rb.pos.x, arrow_attack->rb.pos.y);
+    arrow_attack->rb.cb.max = create_vector(arrow_attack->rb.cb.min.x + arrow_attack->rb.cb.width, arrow_attack->rb.cb.min.y + arrow_attack->rb.cb.height);
+    strcpy(arrow_attack->rb.cb.tag, "arrow");
+    arrow_attack->rb.cb.solid = 0;
+    arrow_attack->rb.cb.enabled = 0;
+    arrow_attack->rb.collidingWith = createList();
+    arrow_attack->rb.onCollisionEnter = onCollisionEnter_arrow;
+    arrow_attack->rb.onCollisionExit = NULL;
+    arrow_attack->rb.onCollisionStay = NULL;
+}
+
+void onCollisionEnter_arrow(RigidBody *self, RigidBody *other)
+{
+    if (strcmp(other->cb.tag, "bat") == 0 || strcmp(other->cb.tag, "fox") == 0 || strcmp(other->cb.tag, "harpy") == 0)
+    {
+        self->cb.enabled = 0;
+    }
+}

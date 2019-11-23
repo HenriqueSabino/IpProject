@@ -63,6 +63,8 @@ void draw_arrow(BITMAP *bmp, BITMAP *sprite);
 
 void draw_potion(BITMAP *bmp, BITMAP *sprite, Item *potion, Vector camera);
 
+void draw_arrow_attack(BITMAP *bmp, BITMAP *sprite, Item *arrow_attack, Vector camera);
+
 void draw_jumperboss(BITMAP *bmp, BITMAP *sprite, Enemy *jumperboss, Vector camera);
 
 #pragma endregion
@@ -150,7 +152,7 @@ int main()
     if (montain_sprite == NULL)
         allegro_message("error");
 
-    BITMAP *cloud_sprite = load_bitmap("../assets/Scenario/cloud.bmp", NULL);
+    BITMAP *cloud_sprite = load_bitmap("../assets/Scenario/Clouds.bmp", NULL);
     if (cloud_sprite == NULL)
         allegro_message("error");
 
@@ -164,6 +166,10 @@ int main()
 
     BITMAP *potion_sprite = load_bitmap(ITEM_PATH, NULL);
     if (potion_sprite == NULL)
+        allegro_message("error");
+
+    BITMAP *arrow_attack_sprite = load_bitmap(ARROW_ATTACK, NULL);
+    if (arrow_attack_sprite == NULL)
         allegro_message("error");
 
     BITMAP *jumperboss_sprite = load_bitmap(JUMPER_BOSS, NULL);
@@ -288,6 +294,8 @@ int main()
 
         Player player;
 
+        Item arrow_attack;
+
         int row = 0, col = 0, not_objs = 0, ground_count = 0, enemy_count = 0, object_count = 0, item_count = 0;
 
         for (int i = 0; i < map_size; i++)
@@ -340,6 +348,7 @@ int main()
             if (map[i] == 'P')
             {
                 init_player(&player, create_vector(col * 128, row * 128));
+                init_arrow_attack(&arrow_attack, player.rb.pos);
                 init_timer_invulnerability();
                 camera = sum(player.rb.pos, create_vector(-100, -200));
                 col++;
@@ -651,7 +660,7 @@ int main()
             }
         }
 
-        int rbs_size = map_size - not_objs + 1;
+        int rbs_size = map_size - not_objs + 2;
         RigidBody *rbs[rbs_size];
         rbs[0] = &player.rb;
 
@@ -681,7 +690,8 @@ int main()
 
         set_enemies_ref(enemies, enemy_count);
 
-        rbs[rbs_size - 1] = &player.sword_rb;
+        rbs[rbs_size - 2] = &player.sword_rb;
+        rbs[rbs_size - 1] = &arrow_attack.rb;
 
 #pragma endregion
         while (playing_first_level && !close_game)
@@ -742,7 +752,7 @@ int main()
             }
             if (key_down(KEY_E))
             {
-                if (!player.taking_damage)
+                if (!player.taking_damage && !arrow_attack.rb.cb.enabled && player.arrows_amount > 0)
                 {
                     player.bow_attack = 1;
                     player_animation_counter = 0;
@@ -928,8 +938,20 @@ int main()
 
                         if (player.animation_frame > 21)
                         {
+                            arrow_attack.rb.cb.enabled = 1;
+                            if (player.facing_right)
+                            {
+                                arrow_attack.rb.pos = sum(player.rb.pos, create_vector(53, 44));
+                                arrow_attack.rb.velocity.x = 20;
+                            }
+                            else
+                            {
+                                arrow_attack.rb.pos = sum(player.rb.pos, create_vector(-9, 44));
+                                arrow_attack.rb.velocity.x = -20;
+                            }
                             player.animation_frame = 8;
                             player.bow_attack = 0;
+                            player.arrows_amount--;
                         }
                     }
                 }
@@ -953,16 +975,10 @@ int main()
             }
 
             //DRAWING
-            masked_blit(cloud_sprite, buffer, 0, 0, -(camera.x * 0.1f), 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-            masked_blit(cloud_sprite, buffer, 0, 0, -(camera.x * 0.1f) + 200, 50, SCREEN_WIDTH, SCREEN_HEIGHT);
-            masked_blit(cloud_sprite, buffer, 0, 0, -(camera.x * 0.1f) + 400, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-            masked_blit(cloud_sprite, buffer, 0, 0, -(camera.x * 0.1f) + 800, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-            masked_blit(cloud_sprite, buffer, 0, 0, -(camera.x * 0.1f) + 1000, 50, SCREEN_WIDTH, SCREEN_HEIGHT);
-            masked_blit(cloud_sprite, buffer, 0, 0, -(camera.x * 0.1f) + 1400, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-            masked_blit(cloud_sprite, buffer, 0, 0, -(camera.x * 0.1f) + 1800, 60, SCREEN_WIDTH, SCREEN_HEIGHT);
-            masked_blit(montain_sprite, buffer, camera.x * 0.1f, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+            masked_blit(cloud_sprite, buffer, camera.x * 0.1f, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+            masked_blit(montain_sprite, buffer, camera.x * 0.2f, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
             masked_blit(ground_background_sprite, buffer, camera.x * 0.4f, camera.y - 128, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-            //masked_blit(cloud_sprite, buffer, camera.x * 0.1f, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
             for (int i = 0; i < ground_count; i++)
             {
@@ -1107,6 +1123,12 @@ int main()
                 }
             }
 
+            if (arrow_attack.rb.cb.enabled)
+                draw_arrow_attack(buffer, arrow_attack_sprite, &arrow_attack, camera);
+
+            if ((arrow_attack.rb.pos.x - player.rb.pos.x > (SCREEN_WIDTH / 2) + 128 && arrow_attack.rb.velocity.x > 0) || ((arrow_attack.rb.pos.x - player.rb.pos.x) * -1 > SCREEN_WIDTH / 2 && arrow_attack.rb.velocity.x < 0))
+                arrow_attack.rb.cb.enabled = 0;
+
             draw_lifebar(buffer, lifebar_sprite, player);
 
             draw_sprite(screen, buffer, 0, 0);
@@ -1213,6 +1235,9 @@ int main()
     destroy_bitmap(scenario_sprite);
     destroy_bitmap(potion_sprite);
     destroy_bitmap(montain_sprite);
+    destroy_bitmap(jumperboss_sprite);
+    destroy_bitmap(cloud_sprite);
+    destroy_bitmap(arrow_attack_sprite);
     destroy_bitmap(ground_background_sprite);
 
     return 0;
@@ -1701,22 +1726,52 @@ void draw_potion(BITMAP *bmp, BITMAP *sprite, Item *potion, Vector camera)
     }
 }
 
+void draw_arrow_attack(BITMAP *bmp, BITMAP *sprite, Item *arrow_attack, Vector camera)
+{
+    BITMAP *arrow_attack_sprite = create_bitmap(50, 50);
+    clear_to_color(arrow_attack_sprite, makecol(255, 0, 255));
+
+    int r_img_pos = arrow_attack->animation_frame % ARROW_ATTACK_SPRITE_COLS;
+    int c_img_pos = arrow_attack->animation_frame / ARROW_ATTACK_SPRITE_COLS;
+
+    r_img_pos *= ARROW_ATTACK_TILE_SIZE;
+    c_img_pos *= ARROW_ATTACK_TILE_SIZE;
+
+    //draw the a part of the sprite sheet to the screen and scales it
+    masked_stretch_blit(sprite, arrow_attack_sprite, r_img_pos, c_img_pos, 50, 50, 0, 0, 50, 50);
+
+    if (arrow_attack->rb.velocity.x > 0)
+        draw_sprite_ex(bmp, arrow_attack_sprite, arrow_attack->rb.pos.x - floor(camera.x), arrow_attack->rb.pos.y - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+    else if (arrow_attack->rb.velocity.x < 0)
+        draw_sprite_ex(bmp, arrow_attack_sprite, arrow_attack->rb.pos.x - floor(camera.x), arrow_attack->rb.pos.y - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
+
+    destroy_bitmap(arrow_attack_sprite);
+}
+
 void draw_lifebar(BITMAP *bmp, BITMAP *sprite, Player player)
 {
     char player_life[4];
     itoa(player.life, player_life, 10);
     strcat(player_life, "%");
+
+    char player_arrows_amount[3];
+    itoa(player.arrows_amount, player_arrows_amount, 10);
+
+    char ex[2] = "x";
+
     rectfill(bmp, 73, 34, 73 + floor(122 * player.life / 100.0f), 49, makecol(255, 0, 0));
     draw_sprite(bmp, sprite, 10, 10);
     textout_ex(bmp, font, player_life, 64 + 55, 38, makecol(255, 255, 0), -1);
+    textout_ex(bmp, font, ex, 170, 62, makecol(255, 255, 0), -1);
+    textout_ex(bmp, font, player_arrows_amount, 180, 62, makecol(255, 255, 0), -1);
 }
 
 void draw_jumperboss(BITMAP *bmp, BITMAP *sprite, Enemy *jumperboss, Vector camera)
 {
-    BITMAP *jumperboss_sprite = create_bitmap(132, 180);
+    BITMAP *jumperboss_sprite = create_bitmap(128, 128);
     clear_to_color(jumperboss_sprite, makecol(255, 0, 255));
 
-    //rect(bmp, jumperboss->rb.cb.min.x - floor(camera.x), jumperboss->rb.cb.min.y - floor(camera.y), jumperboss->rb.cb.max.x - floor(camera.x), jumperboss->rb.cb.max.y - floor(camera.y), makecol(255, 0, 0));
+    rect(bmp, jumperboss->rb.cb.min.x - floor(camera.x), jumperboss->rb.cb.min.y - floor(camera.y), jumperboss->rb.cb.max.x - floor(camera.x), jumperboss->rb.cb.max.y - floor(camera.y), makecol(255, 0, 0));
 
     int r_img_pos = jumperboss->animation_frame % JUMPERBOSS_SPRITE_COLS;
     int c_img_pos = jumperboss->animation_frame / JUMPERBOSS_SPRITE_COLS;
@@ -1725,11 +1780,11 @@ void draw_jumperboss(BITMAP *bmp, BITMAP *sprite, Enemy *jumperboss, Vector came
     c_img_pos *= JUMPERBOSS_TILE_SIZE;
 
     //draw the a part of the sprite sheet to the screen and scales it
-    masked_stretch_blit(sprite, jumperboss_sprite, r_img_pos, c_img_pos, 33, 36, 0, 0, 132, 180);
+    masked_stretch_blit(sprite, jumperboss_sprite, r_img_pos, c_img_pos, 32, 32, 0, 0, 128, 128);
 
     set_trans_blender(255, 255, 255, 64);
 
-    draw_sprite_ex(bmp, jumperboss_sprite, jumperboss->rb.pos.x - floor(camera.x), jumperboss->rb.pos.y - 19 - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+    draw_sprite_ex(bmp, jumperboss_sprite, jumperboss->rb.pos.x - floor(camera.x), jumperboss->rb.pos.y - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
 
     destroy_bitmap(jumperboss_sprite);
 }
