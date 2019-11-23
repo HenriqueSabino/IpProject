@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include <time.h>
 #include "../headers/constants.h"
 #include "../headers/player.h"
 #include "../headers/enemy.h"
@@ -66,6 +67,7 @@ void draw_potion(BITMAP *bmp, BITMAP *sprite, Item *potion, Vector camera);
 
 int main()
 {
+    srand(time(NULL));
 #pragma region allegro initialization
     allegro_init();
     install_keyboard();
@@ -144,6 +146,10 @@ int main()
 
     BITMAP *montain_sprite = load_bitmap("../assets/Scenario/Montain.bmp", NULL);
     if (montain_sprite == NULL)
+        allegro_message("error");
+
+    BITMAP *cloud_sprite = load_bitmap("../assets/Scenario/cloud.bmp", NULL);
+    if (cloud_sprite == NULL)
         allegro_message("error");
 
     BITMAP *ground_background_sprite = load_bitmap("../assets/Scenario/Ground_Background.bmp", NULL);
@@ -923,8 +929,16 @@ int main()
             }
 
             //DRAWING
+            masked_blit(cloud_sprite, buffer, 0, 0, -(camera.x * 0.1f), 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+            masked_blit(cloud_sprite, buffer, 0, 0, -(camera.x * 0.1f) + 200, 50, SCREEN_WIDTH, SCREEN_HEIGHT);
+            masked_blit(cloud_sprite, buffer, 0, 0, -(camera.x * 0.1f) + 400, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+            masked_blit(cloud_sprite, buffer, 0, 0, -(camera.x * 0.1f) + 800, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+            masked_blit(cloud_sprite, buffer, 0, 0, -(camera.x * 0.1f) + 1000, 50, SCREEN_WIDTH, SCREEN_HEIGHT);
+            masked_blit(cloud_sprite, buffer, 0, 0, -(camera.x * 0.1f) + 1400, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+            masked_blit(cloud_sprite, buffer, 0, 0, -(camera.x * 0.1f) + 1800, 60, SCREEN_WIDTH, SCREEN_HEIGHT);
             masked_blit(montain_sprite, buffer, camera.x * 0.1f, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
             masked_blit(ground_background_sprite, buffer, camera.x * 0.4f, camera.y - 128, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+            //masked_blit(cloud_sprite, buffer, camera.x * 0.1f, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
             for (int i = 0; i < ground_count; i++)
             {
