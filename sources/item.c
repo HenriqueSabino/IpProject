@@ -3,7 +3,7 @@
 #include "../headers/item.h"
 #include "../headers/vector.h"
 
-void init_potion (Item *potion, Vector pos, int animation_frame)
+void init_potion(Item *potion, Vector pos, int animation_frame)
 {
     potion->animation_frame = animation_frame;
 

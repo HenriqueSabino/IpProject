@@ -63,6 +63,8 @@ void draw_arrow(BITMAP *bmp, BITMAP *sprite);
 
 void draw_potion(BITMAP *bmp, BITMAP *sprite, Item *potion, Vector camera);
 
+void draw_jumperboss(BITMAP *bmp, BITMAP *sprite, Enemy *jumperboss, Vector camera);
+
 #pragma endregion
 
 int main()
@@ -162,6 +164,10 @@ int main()
 
     BITMAP *potion_sprite = load_bitmap(ITEM_PATH, NULL);
     if (potion_sprite == NULL)
+        allegro_message("error");
+
+    BITMAP *jumperboss_sprite = load_bitmap(JUMPER_BOSS, NULL);
+    if (jumperboss_sprite == NULL)
         allegro_message("error");
 
 #pragma endregion
@@ -294,7 +300,8 @@ int main()
             {
                 ground_count++;
             }
-            else if (map[i] == 'B' || map[i] == 'F' || map[i] == 'H' || map[i] == 'G' || map[i] == 'I')
+            else if (map[i] == 'B' || map[i] == 'F' || map[i] == 'H' || map[i] == 'G' ||
+                     map[i] == 'I' || map[i] == 'S')
             {
                 enemy_count++;
             }
@@ -346,6 +353,12 @@ int main()
             else if (map[i] == 'F')
             {
                 init_fox(&enemies[enemy_count], create_vector(col * 128, row * 128));
+                enemy_count++;
+                col++;
+            }
+            else if (map[i] == 'S')
+            {
+                init_jumperboss(&enemies[enemy_count], create_vector(col * 128, row * 128));
                 enemy_count++;
                 col++;
             }
@@ -802,6 +815,17 @@ int main()
                                 }
                             }
                         }
+                        else if (strcmp(enemies[i].rb.cb.tag, "jumper_boss") == 0)
+                        {
+                            if (enemies[i].animation_frame >= 0 && enemies[i].animation_frame <= 1)
+                            {
+                                if (game_timer % 32 == 0)
+                                {
+                                    enemies[i].animation_frame++;
+                                    enemies[i].animation_frame %= 2;
+                                }
+                            }
+                        }
                         else if (strcmp(enemies[i].rb.cb.tag, "ghost") == 0)
                         {
                             if (enemies[i].attack == 1)
@@ -1054,6 +1078,16 @@ int main()
                         if (enemies[i].rb.pos.y + 128 >= camera.y && enemies[i].rb.pos.y <= camera.y + SCREEN_HEIGHT)
                         {
                             draw_spike(buffer, spike_sprite, &enemies[i], camera);
+                        }
+                    }
+                }
+                else if (strcmp(enemies[i].rb.cb.tag, "jumper_boss") == 0)
+                {
+                    if (enemies[i].rb.pos.x + 128 >= camera.x && enemies[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
+                    {
+                        if (enemies[i].rb.pos.y + 128 >= camera.y && enemies[i].rb.pos.y <= camera.y + SCREEN_HEIGHT)
+                        {
+                            draw_jumperboss(buffer, jumperboss_sprite, &enemies[i], camera);
                         }
                     }
                 }
@@ -1362,7 +1396,7 @@ void draw_fox(BITMAP *bmp, BITMAP *sprite, Enemy *fox, Vector camera)
     BITMAP *fox_sprite = create_bitmap(96, 96);
     clear_to_color(fox_sprite, makecol(255, 0, 255));
 
-    //rect(bmp, fox->rb.cb.min.x - floor(camera.x), fox->rb.cb.min.y - floor(camera.y), fox->rb.cb.max.x - floor(camera.x), fox->rb.cb.max.y - floor(camera.y), makecol(255,0,0));
+    //rect(bmp, fox->rb.cb.min.x - floor(camera.x), fox->rb.cb.min.y - floor(camera.y), fox->rb.cb.max.x - floor(camera.x), fox->rb.cb.max.y - floor(camera.y), makecol(255, 0, 0));
 
     int r_img_pos = fox->animation_frame % FOX_SPRITE_COLS;
     int c_img_pos = fox->animation_frame / FOX_SPRITE_COLS;
@@ -1675,4 +1709,27 @@ void draw_lifebar(BITMAP *bmp, BITMAP *sprite, Player player)
     rectfill(bmp, 73, 34, 73 + floor(122 * player.life / 100.0f), 49, makecol(255, 0, 0));
     draw_sprite(bmp, sprite, 10, 10);
     textout_ex(bmp, font, player_life, 64 + 55, 38, makecol(255, 255, 0), -1);
+}
+
+void draw_jumperboss(BITMAP *bmp, BITMAP *sprite, Enemy *jumperboss, Vector camera)
+{
+    BITMAP *jumperboss_sprite = create_bitmap(132, 180);
+    clear_to_color(jumperboss_sprite, makecol(255, 0, 255));
+
+    //rect(bmp, jumperboss->rb.cb.min.x - floor(camera.x), jumperboss->rb.cb.min.y - floor(camera.y), jumperboss->rb.cb.max.x - floor(camera.x), jumperboss->rb.cb.max.y - floor(camera.y), makecol(255, 0, 0));
+
+    int r_img_pos = jumperboss->animation_frame % JUMPERBOSS_SPRITE_COLS;
+    int c_img_pos = jumperboss->animation_frame / JUMPERBOSS_SPRITE_COLS;
+
+    r_img_pos *= JUMPERBOSS_TILE_SIZE;
+    c_img_pos *= JUMPERBOSS_TILE_SIZE;
+
+    //draw the a part of the sprite sheet to the screen and scales it
+    masked_stretch_blit(sprite, jumperboss_sprite, r_img_pos, c_img_pos, 33, 36, 0, 0, 132, 180);
+
+    set_trans_blender(255, 255, 255, 64);
+
+    draw_sprite_ex(bmp, jumperboss_sprite, jumperboss->rb.pos.x - floor(camera.x), jumperboss->rb.pos.y - 19 - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+
+    destroy_bitmap(jumperboss_sprite);
 }

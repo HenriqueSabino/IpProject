@@ -94,7 +94,7 @@ void onCollisionEnter_fox(RigidBody *self, RigidBody *other)
 
     if (strcmp(other->cb.tag, "platform") == 0)
     {
-        if (self->cb.max.y < other->cb.min.y )
+        if (self->cb.max.y < other->cb.min.y)
         {
             self->velocity.y = 0;
             self->acceleration = create_vector(0, 0);
@@ -205,7 +205,6 @@ void init_fox(Enemy *fox, Vector pos)
     strcpy(fox->rb.cb.tag, "fox");
 }
 
-
 void init_harpy(Enemy *harpy, Vector pos)
 {
     harpy->animation_frame = 0;
@@ -308,6 +307,109 @@ void init_spike(Enemy *spike, Vector pos)
     strcpy(spike->rb.cb.tag, "spike");
 }
 
+void onCollisionEnter_jumperboss(RigidBody *self, RigidBody *other)
+{
+    if (strcmp(other->cb.tag, "ground") == 0 || strcmp(other->cb.tag, "bridge") == 0)
+    {
+        if (self->cb.max.y < other->cb.min.y || self->cb.min.y > other->cb.max.y)
+        {
+            self->velocity.y = 0;
+            self->acceleration = create_vector(0, 0);
+
+            for (int i = 0; i < enemies_ref_count; i++)
+            {
+                if (&enemies_ref[i].rb == self)
+                {
+                    enemies_ref[i].taking_damage = 0;
+                }
+            }
+        }
+    }
+
+    if (strcmp(other->cb.tag, "platform") == 0)
+    {
+        if (self->cb.max.y < other->cb.min.y)
+        {
+            self->velocity.y = 0;
+            self->acceleration = create_vector(0, 0);
+
+            for (int i = 0; i < enemies_ref_count; i++)
+            {
+                if (&enemies_ref[i].rb == self)
+                {
+                    enemies_ref[i].taking_damage = 0;
+                }
+            }
+        }
+    }
+}
+
+void onCollisionStay_jumperboss(RigidBody *self, RigidBody *other)
+{
+    if (strcmp(other->cb.tag, "ground") == 0 || strcmp(other->cb.tag, "bridge") == 0)
+    {
+        if (self->cb.max.y < other->cb.min.y || self->cb.min.y > other->cb.max.y)
+        {
+            self->velocity.y = 0;
+            self->acceleration = create_vector(0, 0);
+
+            for (int i = 0; i < enemies_ref_count; i++)
+            {
+                if (&enemies_ref[i].rb == self)
+                {
+                    enemies_ref[i].taking_damage = 0;
+                }
+            }
+        }
+    }
+
+    if (strcmp(other->cb.tag, "platform") == 0)
+    {
+        if (self->cb.max.y < other->cb.min.y)
+        {
+            self->velocity.y = 0;
+            self->acceleration = create_vector(0, 0);
+
+            for (int i = 0; i < enemies_ref_count; i++)
+            {
+                if (&enemies_ref[i].rb == self)
+                {
+                    enemies_ref[i].taking_damage = 0;
+                }
+            }
+        }
+    }
+}
+
+void init_jumperboss(Enemy *jumper_boss, Vector pos)
+{
+    jumper_boss->animation_frame = 0;
+    jumper_boss->facing_right = 0;
+    jumper_boss->player_pos = create_vector(0, 0);
+    jumper_boss->life = 20;
+    jumper_boss->attack = 1;
+    jumper_boss->alive = 1;
+    jumper_boss->taking_damage = 0;
+
+    jumper_boss->rb.acceleration = create_vector(0, 0);
+    jumper_boss->rb.gravity_scale = 0;
+    jumper_boss->rb.pos = pos;
+    jumper_boss->rb.velocity = create_vector(0, 0);
+
+    jumper_boss->rb.cb.width = 100;
+    jumper_boss->rb.cb.height = 130;
+    jumper_boss->rb.cb.offset = create_vector(20, 26);
+    jumper_boss->rb.cb.min = create_vector(jumper_boss->rb.pos.x + jumper_boss->rb.cb.offset.x, jumper_boss->rb.pos.y + jumper_boss->rb.cb.offset.y);
+    jumper_boss->rb.cb.max = create_vector(jumper_boss->rb.cb.min.x + jumper_boss->rb.cb.width, jumper_boss->rb.cb.min.y + jumper_boss->rb.cb.height);
+    jumper_boss->rb.cb.solid = 1;
+    jumper_boss->rb.cb.enabled = 1;
+    jumper_boss->rb.collidingWith = createList();
+    jumper_boss->rb.onCollisionEnter = onCollisionEnter_jumperboss;
+    jumper_boss->rb.onCollisionExit = NULL;
+    jumper_boss->rb.onCollisionStay = onCollisionStay_jumperboss;
+    strcpy(jumper_boss->rb.cb.tag, "jumper_boss");
+}
+
 void atk(Enemy *enemy, RigidBody player)
 {
     Vector player_pos = mult(sum(player.cb.min, player.cb.max), 0.5f);
@@ -348,18 +450,18 @@ void atk(Enemy *enemy, RigidBody player)
         if (dist(enemy->rb.pos, player_pos) <= SCREEN_WIDTH)
         {
             if (dist(create_vector(enemy_pos.x, 0), create_vector(player_pos.x, 0)) <= 100)
-        {
-            enemy->rb.acceleration = create_vector(0, 0);
-        }
-        else if (dist(enemy->rb.pos, player_pos) <= SCREEN_WIDTH && !enemy->taking_damage)
-        {
-            if (dist(enemy_pos, sum(player_pos, enemy->player_pos)) <= 10)
             {
-                enemy->player_pos.x *= -1;
-                enemy->rb.acceleration = mult(normalized(diff(create_vector(player_pos.x, 0), create_vector(enemy_pos.x, 0))), 8);
+                enemy->rb.acceleration = create_vector(0, 0);
             }
-            enemy->rb.velocity = mult(normalized(diff(create_vector(player_pos.x, 0), create_vector(enemy_pos.x, 0))), 5);
-        }
+            else if (dist(enemy->rb.pos, player_pos) <= SCREEN_WIDTH && !enemy->taking_damage)
+            {
+                if (dist(enemy_pos, sum(player_pos, enemy->player_pos)) <= 10)
+                {
+                    enemy->player_pos.x *= -1;
+                    enemy->rb.acceleration = mult(normalized(diff(create_vector(player_pos.x, 0), create_vector(enemy_pos.x, 0))), 8);
+                }
+                enemy->rb.velocity = mult(normalized(diff(create_vector(player_pos.x, 0), create_vector(enemy_pos.x, 0))), 5);
+            }
 
             enemy->rb.acceleration.y = 0;
             enemy->rb.velocity.y = 0;
@@ -369,30 +471,30 @@ void atk(Enemy *enemy, RigidBody player)
             enemy->rb.velocity = create_vector(0, 0);
         }
     }
-    else if(strcmp(enemy->rb.cb.tag, "spike") == 0 && enemy->rb.cb.solid == 0)
+    else if (strcmp(enemy->rb.cb.tag, "spike") == 0 && enemy->rb.cb.solid == 0)
     {
-        if(enemy->animation_frame == 0)
+        if (enemy->animation_frame == 0)
         {
             enemy->rb.cb.width = 120;
             enemy->rb.cb.height = 76;
             enemy->rb.cb.offset = create_vector(4, 48);
             enemy->rb.cb.enabled = 1;
         }
-        else if(enemy->animation_frame == 1 || enemy->animation_frame == 7)
+        else if (enemy->animation_frame == 1 || enemy->animation_frame == 7)
         {
             enemy->rb.cb.width = 120;
             enemy->rb.cb.height = 56;
             enemy->rb.cb.offset = create_vector(4, 68);
             enemy->rb.cb.enabled = 1;
         }
-        else if(enemy->animation_frame == 2 || enemy->animation_frame == 6)
+        else if (enemy->animation_frame == 2 || enemy->animation_frame == 6)
         {
             enemy->rb.cb.width = 120;
             enemy->rb.cb.height = 44;
             enemy->rb.cb.offset = create_vector(4, 80);
             enemy->rb.cb.enabled = 1;
         }
-        else if(enemy->animation_frame == 3 || enemy->animation_frame == 5)
+        else if (enemy->animation_frame == 3 || enemy->animation_frame == 5)
         {
             enemy->rb.cb.width = 120;
             enemy->rb.cb.height = 28;
@@ -423,7 +525,7 @@ void atk_ghost(Enemy *enemy, Player *player)
         enemy->facing_right = 1;
     }
 
-    if(enemy->facing_right == player->facing_right)
+    if (enemy->facing_right == player->facing_right)
     {
         enemy->attack = 0;
     }
@@ -436,7 +538,7 @@ void atk_ghost(Enemy *enemy, Player *player)
     {
         if (dist(create_vector(enemy_pos.x, 0), create_vector(player_pos.x, 0)) <= 100)
         {
-                enemy->rb.acceleration = create_vector(0, 0);
+            enemy->rb.acceleration = create_vector(0, 0);
         }
         else if (dist(enemy->rb.pos, player_pos) <= SCREEN_WIDTH)
         {
@@ -450,8 +552,8 @@ void atk_ghost(Enemy *enemy, Player *player)
     }
     else
     {
-        enemy->rb.velocity = create_vector (0, 0);
-        enemy->rb.acceleration = create_vector (0, 0);
+        enemy->rb.velocity = create_vector(0, 0);
+        enemy->rb.acceleration = create_vector(0, 0);
     }
 }
 
@@ -460,4 +562,3 @@ void set_enemies_ref(Enemy *enemies, int count)
     enemies_ref = enemies;
     enemies_ref_count = count;
 }
-
