@@ -33,7 +33,7 @@ void onCollisionEnter_bat(RigidBody *self, RigidBody *other)
                 {
                     if (strcmp(other->cb.tag, "sword") == 0)
                     {
-                        if (other->pos.x > self->pos.x)
+                        if (self->velocity.x > 0)
                         {
                             self->velocity = create_vector(-10, 0);
                         }
@@ -70,7 +70,7 @@ void init_bat(Enemy *bat, Vector pos)
     bat->animation_frame = 0;
     bat->facing_right = 0;
     bat->player_pos = create_vector(200, -32);
-    bat->life = 6;
+    bat->life = 100;
     bat->attack = 1;
     bat->alive = 1;
     bat->taking_damage = 0;
@@ -465,9 +465,10 @@ void atk(Enemy *enemy, RigidBody player)
 
     if ((strcmp(enemy->rb.cb.tag, "bat") == 0 || strcmp(enemy->rb.cb.tag, "harpy") == 0) && enemy->attack)
     {
-        if (dist(create_vector(enemy_pos.x, 0), create_vector(player_pos.x, 0)) >= 200)
+        if (dist(create_vector(enemy_pos.x, 0), create_vector(player_pos.x, 0)) >= 200 && enemy->taking_damage == 1)
         {
             enemy->taking_damage = 0;
+            enemy->rb.acceleration = mult(normalized(diff(player_pos, enemy_pos)), 5);
         }
 
         if (dist(create_vector(enemy_pos.x, 0), create_vector(player_pos.x, 0)) <= 100)

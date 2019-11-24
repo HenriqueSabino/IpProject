@@ -119,7 +119,7 @@ void onCollisionEnter(RigidBody *self, RigidBody *other)
 
         if (player_ref->life > 0)
         {
-            if (other->pos.x > self->pos.x)
+            if (other->velocity.x < 0)
             {
                 player_ref->rb.velocity.x = -10;
                 player_ref->rb.velocity.y = -5;
@@ -245,7 +245,7 @@ void onCollisionStay(RigidBody *self, RigidBody *other)
 
         if (player_ref->life > 0)
         {
-            if (other->pos.x > self->pos.x)
+            if (other->velocity.x < 0)
             {
                 player_ref->rb.velocity.x = -10;
                 player_ref->rb.velocity.y = -5;
