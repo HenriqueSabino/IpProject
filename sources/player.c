@@ -37,7 +37,7 @@ void set_velocity_axis(Player *player, char *axis, float s)
             player->rb.velocity.x = s;
 
             if (player_ref->facing_right == 1)
-                player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(60, 28));
+                player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(85, 28));
             else
                 player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(-9, 28));
         }
@@ -46,7 +46,7 @@ void set_velocity_axis(Player *player, char *axis, float s)
             player->rb.velocity.y = s;
 
             if (player_ref->facing_right == 1)
-                player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(60, 28));
+                player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(85, 28));
             else
                 player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(-9, 28));
         }
@@ -67,7 +67,7 @@ void onCollisionEnter(RigidBody *self, RigidBody *other)
             player_ref->rb.acceleration = create_vector(0, 0);
 
             if (player_ref->facing_right == 1)
-                player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(60, 28));
+                player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(85, 28));
             else
                 player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(-9, 28));
 
@@ -87,7 +87,7 @@ void onCollisionEnter(RigidBody *self, RigidBody *other)
             player_ref->rb.acceleration = create_vector(0, 0);
 
             if (player_ref->facing_right == 1)
-                player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(60, 28));
+                player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(85, 28));
             else
                 player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(-9, 28));
 
@@ -112,10 +112,9 @@ void onCollisionEnter(RigidBody *self, RigidBody *other)
 
         player_ref->taking_damage = 1;
 
-        if (player_ref->facing_right == 1)
-            player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(60, 28));
-        else
-            player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(-9, 28));
+        player_ref->sword_rb.cb.enabled = 0;
+
+        player_ref->animation_frame = 10;
 
         if (player_ref->life > 0)
         {
@@ -238,10 +237,9 @@ void onCollisionStay(RigidBody *self, RigidBody *other)
 
         player_ref->taking_damage = 1;
 
-        if (player_ref->facing_right == 1)
-            player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(60, 28));
-        else
-            player_ref->sword_rb.pos = sum(player_ref->rb.pos, create_vector(-9, 28));
+        player_ref->sword_rb.cb.enabled = 0;
+
+        player_ref->animation_frame = 10;
 
         if (player_ref->life > 0)
         {
@@ -357,7 +355,7 @@ void init_player(Player *player, Vector pos)
     player->sword_rb.pos = sum(pos, create_vector(60, 28));
     player->sword_rb.velocity = player->rb.velocity;
 
-    player->sword_rb.cb.width = 68;
+    player->sword_rb.cb.width = 48;
     player->sword_rb.cb.height = 45;
     player->sword_rb.cb.offset = create_vector(0, 0);
     player->sword_rb.cb.min = create_vector(player->sword_rb.pos.x + player->sword_rb.cb.offset.x, player->sword_rb.pos.y + player->sword_rb.cb.offset.y);

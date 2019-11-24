@@ -31,18 +31,7 @@ void onCollisionEnter_bat(RigidBody *self, RigidBody *other)
 
                 if (enemies_ref[i].life > 0)
                 {
-                    if (strcmp(other->cb.tag, "sword") == 0)
-                    {
-                        if (self->velocity.x > 0)
-                        {
-                            self->velocity = create_vector(-10, 0);
-                        }
-                        else
-                        {
-                            self->velocity = create_vector(10, 0);
-                        }
-                    }
-                    else if (strcmp(other->cb.tag, "arrow") == 0)
+                    if (strcmp(other->cb.tag, "arrow") == 0)
                     {
                         if (other->velocity.x < 0)
                         {
@@ -70,7 +59,7 @@ void init_bat(Enemy *bat, Vector pos)
     bat->animation_frame = 0;
     bat->facing_right = 0;
     bat->player_pos = create_vector(200, -32);
-    bat->life = 100;
+    bat->life = 6;
     bat->attack = 1;
     bat->alive = 1;
     bat->taking_damage = 0;
@@ -465,10 +454,21 @@ void atk(Enemy *enemy, RigidBody player)
 
     if ((strcmp(enemy->rb.cb.tag, "bat") == 0 || strcmp(enemy->rb.cb.tag, "harpy") == 0) && enemy->attack)
     {
-        if (dist(create_vector(enemy_pos.x, 0), create_vector(player_pos.x, 0)) >= 200 && enemy->taking_damage == 1)
+        if (enemy->taking_damage == 1)
         {
-            enemy->taking_damage = 0;
-            enemy->rb.acceleration = mult(normalized(diff(player_pos, enemy_pos)), 5);
+            if (player_pos.x > enemy_pos.x)
+            {
+                enemy->rb.velocity = create_vector(-10, 0);
+            }
+            else
+            {
+                enemy->rb.velocity = create_vector(10, 0);
+            }
+
+            if (dist(create_vector(enemy_pos.x, 0), create_vector(player_pos.x, 0)) >= 200)
+            {
+                enemy->taking_damage = 0;
+            }
         }
 
         if (dist(create_vector(enemy_pos.x, 0), create_vector(player_pos.x, 0)) <= 100)

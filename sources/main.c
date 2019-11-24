@@ -1421,8 +1421,6 @@ void draw_fox(BITMAP *bmp, BITMAP *sprite, Enemy *fox, Vector camera)
     BITMAP *fox_sprite = create_bitmap(96, 96);
     clear_to_color(fox_sprite, makecol(255, 0, 255));
 
-    //rect(bmp, fox->rb.cb.min.x - floor(camera.x), fox->rb.cb.min.y - floor(camera.y), fox->rb.cb.max.x - floor(camera.x), fox->rb.cb.max.y - floor(camera.y), makecol(255, 0, 0));
-
     int r_img_pos = fox->animation_frame % FOX_SPRITE_COLS;
     int c_img_pos = fox->animation_frame / FOX_SPRITE_COLS;
 
@@ -1771,7 +1769,7 @@ void draw_jumperboss(BITMAP *bmp, BITMAP *sprite, Enemy *jumperboss, Vector came
     BITMAP *jumperboss_sprite = create_bitmap(128, 128);
     clear_to_color(jumperboss_sprite, makecol(255, 0, 255));
 
-    rect(bmp, jumperboss->rb.cb.min.x - floor(camera.x), jumperboss->rb.cb.min.y - floor(camera.y), jumperboss->rb.cb.max.x - floor(camera.x), jumperboss->rb.cb.max.y - floor(camera.y), makecol(255, 0, 0));
+    //rect(bmp, jumperboss->rb.cb.min.x - floor(camera.x), jumperboss->rb.cb.min.y - floor(camera.y), jumperboss->rb.cb.max.x - floor(camera.x), jumperboss->rb.cb.max.y - floor(camera.y), makecol(255, 0, 0));
 
     int r_img_pos = jumperboss->animation_frame % JUMPERBOSS_SPRITE_COLS;
     int c_img_pos = jumperboss->animation_frame / JUMPERBOSS_SPRITE_COLS;
