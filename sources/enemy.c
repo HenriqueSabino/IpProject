@@ -334,6 +334,53 @@ void init_spike(Enemy *spike, Vector pos)
 
 void onCollisionEnter_jumperboss(RigidBody *self, RigidBody *other)
 {
+    if (strcmp(other->cb.tag, "sword") == 0 || strcmp(other->cb.tag, "arrow") == 0)
+    {
+        for (int i = 0; i < enemies_ref_count; i++)
+        {
+            if (&enemies_ref[i].rb == self)
+            {
+                enemies_ref[i].taking_damage = 1;
+
+                if (strcmp(other->cb.tag, "sword") == 0)
+                    enemies_ref[i].life -= 2;
+                else if (strcmp(other->cb.tag, "arrow") == 0)
+                    enemies_ref[i].life--;
+
+                if (enemies_ref[i].life > 0)
+                {
+                    if (strcmp(other->cb.tag, "sword") == 0)
+                    {
+                        if (other->pos.x > self->pos.x)
+                        {
+                            self->velocity = create_vector(-10, -5);
+                        }
+                        else
+                        {
+                            self->velocity = create_vector(10, -5);
+                        }
+                    }
+                    else if (strcmp(other->cb.tag, "arrow") == 0)
+                    {
+                        if (other->velocity.x < 0)
+                        {
+                            self->velocity = create_vector(-5, -5);
+                        }
+                        else
+                        {
+                            self->velocity = create_vector(5, -5);
+                        }
+                    }
+                }
+                else
+                {
+                    self->velocity = create_vector(0, -15);
+                    self->acceleration = create_vector(0, 0);
+                }
+            }
+        }
+    }
+
     if (strcmp(other->cb.tag, "ground") == 0 || strcmp(other->cb.tag, "bridge") == 0)
     {
         if (self->cb.max.y < other->cb.min.y || self->cb.min.y > other->cb.max.y)
@@ -406,33 +453,33 @@ void onCollisionStay_jumperboss(RigidBody *self, RigidBody *other)
     }
 }
 
-void init_jumperboss(Enemy *jumper_boss, Vector pos)
+void init_jumperboss(Enemy *jumperboss, Vector pos)
 {
-    jumper_boss->animation_frame = 0;
-    jumper_boss->facing_right = 0;
-    jumper_boss->player_pos = create_vector(0, 0);
-    jumper_boss->life = 20;
-    jumper_boss->attack = 1;
-    jumper_boss->alive = 1;
-    jumper_boss->taking_damage = 0;
+    jumperboss->animation_frame = 0;
+    jumperboss->facing_right = 0;
+    jumperboss->player_pos = create_vector(0, 0);
+    jumperboss->life = 20;
+    jumperboss->attack = 0;
+    jumperboss->alive = 1;
+    jumperboss->taking_damage = 0;
 
-    jumper_boss->rb.acceleration = create_vector(0, 0);
-    jumper_boss->rb.gravity_scale = 0.1f;
-    jumper_boss->rb.pos = pos;
-    jumper_boss->rb.velocity = create_vector(0, 0);
+    jumperboss->rb.acceleration = create_vector(0, 0);
+    jumperboss->rb.gravity_scale = 0.1f;
+    jumperboss->rb.pos = pos;
+    jumperboss->rb.velocity = create_vector(0, 0);
 
-    jumper_boss->rb.cb.width = 68;
-    jumper_boss->rb.cb.height = 88;
-    jumper_boss->rb.cb.offset = create_vector(40, 36);
-    jumper_boss->rb.cb.min = create_vector(jumper_boss->rb.pos.x + jumper_boss->rb.cb.offset.x, jumper_boss->rb.pos.y + jumper_boss->rb.cb.offset.y);
-    jumper_boss->rb.cb.max = create_vector(jumper_boss->rb.cb.min.x + jumper_boss->rb.cb.width, jumper_boss->rb.cb.min.y + jumper_boss->rb.cb.height);
-    jumper_boss->rb.cb.solid = 1;
-    jumper_boss->rb.cb.enabled = 1;
-    jumper_boss->rb.collidingWith = createList();
-    jumper_boss->rb.onCollisionEnter = onCollisionEnter_jumperboss;
-    jumper_boss->rb.onCollisionExit = NULL;
-    jumper_boss->rb.onCollisionStay = onCollisionStay_jumperboss;
-    strcpy(jumper_boss->rb.cb.tag, "jumper_boss");
+    jumperboss->rb.cb.width = 68;
+    jumperboss->rb.cb.height = 88;
+    jumperboss->rb.cb.offset = create_vector(40, 36);
+    jumperboss->rb.cb.min = create_vector(jumperboss->rb.pos.x + jumperboss->rb.cb.offset.x, jumperboss->rb.pos.y + jumperboss->rb.cb.offset.y);
+    jumperboss->rb.cb.max = create_vector(jumperboss->rb.cb.min.x + jumperboss->rb.cb.width, jumperboss->rb.cb.min.y + jumperboss->rb.cb.height);
+    jumperboss->rb.cb.solid = 1;
+    jumperboss->rb.cb.enabled = 1;
+    jumperboss->rb.collidingWith = createList();
+    jumperboss->rb.onCollisionEnter = onCollisionEnter_jumperboss;
+    jumperboss->rb.onCollisionExit = NULL;
+    jumperboss->rb.onCollisionStay = onCollisionStay_jumperboss;
+    strcpy(jumperboss->rb.cb.tag, "jumperboss");
 }
 
 void atk(Enemy *enemy, RigidBody player)
@@ -487,7 +534,7 @@ void atk(Enemy *enemy, RigidBody player)
         if (enemy->taking_damage == 0)
             enemy->enemy_pos_ini = enemy->rb.pos;
     }
-    else if (strcmp(enemy->rb.cb.tag, "fox") == 0 && enemy->taking_damage == 0 && enemy->rb.velocity.y == 0 && enemy->attack)
+    else if ((strcmp(enemy->rb.cb.tag, "fox") == 0 || strcmp(enemy->rb.cb.tag, "jumperboss") == 0) && enemy->taking_damage == 0 && enemy->rb.velocity.y == 0 && enemy->attack)
     {
         if (dist(enemy->rb.pos, player_pos) <= SCREEN_WIDTH)
         {
