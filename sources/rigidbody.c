@@ -47,7 +47,7 @@ void update_all(RigidBody *rbs[], int amount, Vector camera)
 
             if (collided(rbs[i]->cb, rbs[j]->cb) && rbs[i]->cb.enabled && rbs[j]->cb.enabled)
             {
-                if (rbs[i]->cb.solid && rbs[j]->cb.solid && strcmp(rbs[j]->cb.tag, "fox") != 0)
+                if (rbs[i]->cb.solid && rbs[j]->cb.solid && strcmp(rbs[j]->cb.tag, "fox") != 0 && strcmp(rbs[j]->cb.tag, "jumperboss") != 0)
                 {
                     if (rbs_before_update[i].min.y >= rbs[j]->cb.max.y && strcmp(rbs[j]->cb.tag, "platform") != 0)
                     {

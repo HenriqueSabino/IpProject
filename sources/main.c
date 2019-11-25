@@ -286,10 +286,10 @@ int main()
 #pragma region generating first level
 
         char *map;
-        int map_size = readMap(&map, "../sources/level_1.txt");
+        int map_size = readMap(&map, "../sources/level_2.txt");
 
         char *scenario_map;
-        int scenario_map_size = readMap(&scenario_map, "../sources/level_1_scenario.txt");
+        int scenario_map_size = readMap(&scenario_map, "../sources/level_2_scenario.txt");
 
         Vector camera;
 
@@ -792,13 +792,17 @@ int main()
                 {
                     if (enemies[i].alive)
                     {
-                        if (strcmp(enemies[i].rb.cb.tag, "ghost") != 0)
+                        if (strcmp(enemies[i].rb.cb.tag, "ghost") == 0)
                         {
-                            atk(&enemies[i], player.rb);
+                            atk_ghost(&enemies[i], &player);
+                        }
+                        else if (strcmp(enemies[i].rb.cb.tag, "jumperboss") == 0)
+                        {
+                            atk_jumperboss(&enemies[i], &player, 1);
                         }
                         else
                         {
-                            atk_ghost(&enemies[i], &player);
+                            atk(&enemies[i], player.rb);
                         }
                     }
 
@@ -866,7 +870,7 @@ int main()
                     {
                         if (strcmp(enemies[i].rb.cb.tag, "bat") == 0)
                             enemies[i].animation_frame = 3;
-                        else if (strcmp(enemies[i].rb.cb.tag, "spike") != 0)
+                        else if (strcmp(enemies[i].rb.cb.tag, "spike") != 0 && strcmp(enemies[i].rb.cb.tag, "jumperboss") != 0)
                             enemies[i].animation_frame = 0;
                     }
 
@@ -882,21 +886,38 @@ int main()
                         {
                             enemies[i].attack = 1;
                         }
-
-                        if (enemies[i].animation_frame >= 0 && enemies[i].animation_frame <= 1 && sleepy)
+                        if (enemies[i].alive)
                         {
-                            if (game_timer % 32 == 0)
+                            if (enemies[i].animation_frame >= 0 && enemies[i].animation_frame <= 1 && sleepy)
                             {
-                                enemies[i].animation_frame++;
-                                enemies[i].animation_frame %= 2;
+                                if (game_timer % 32 == 0)
+                                {
+                                    enemies[i].animation_frame++;
+                                    enemies[i].animation_frame %= 2;
+                                }
+                            }
+                            else if (enemies[i].animation_frame >= 4 && enemies[i].animation_frame <= 9 && angry)
+                            {
+                                if (game_timer % 8 == 0)
+                                {
+                                    enemies[i].animation_frame++;
+                                    enemies[i].animation_frame %= 6;
+                                }
                             }
                         }
-                        else if (enemies[i].animation_frame >= 4 && enemies[i].animation_frame <= 9 && angry)
+                        else
                         {
-                            if (game_timer % 8 == 0)
+                            if (enemies[i].animation_frame < 10)
+                            {
+                                enemies[i].animation_frame = 10;
+                                enemies[i].rb.velocity = create_vector(5, -5);
+                            }
+
+                            if (game_timer % 4 == 0 && enemies[i].animation_frame != 18)
                             {
                                 enemies[i].animation_frame++;
-                                enemies[i].animation_frame %= 6;
+                                if (enemies[i].animation_frame == 16)
+                                    enemies[i].animation_frame = 18;
                             }
                         }
                     }
@@ -922,7 +943,8 @@ int main()
                     {
                         enemies[i].alive = 0;
                         enemies[i].attack = 0;
-                        enemies[i].rb.gravity_scale = 0.2f;
+                        if (strcmp(enemies[i].rb.cb.tag, "jumperboss") != 0)
+                            enemies[i].rb.gravity_scale = 0.2f;
                         enemies[i].rb.cb.enabled = 0;
                     }
                 }
@@ -1240,6 +1262,7 @@ int main()
         destroy_sample(sound_death);
 #pragma endregion
     }
+#pragma region destroy bitmaps
 
     destroy_bitmap(buffer);
     destroy_bitmap(lifebar_sprite);
@@ -1261,9 +1284,13 @@ int main()
     destroy_bitmap(arrow_attack_sprite);
     destroy_bitmap(ground_background_sprite);
 
+#pragma endregion
     return 0;
 }
 END_OF_MAIN();
+
+//draw functions
+#pragma region draw functions
 
 void draw_player(BITMAP *bmp, BITMAP *sprite, Player *player, Vector camera)
 {
@@ -1849,3 +1876,5 @@ void draw_jumperboss(BITMAP *bmp, BITMAP *sprite, Enemy *jumperboss, Vector came
 
     destroy_bitmap(jumperboss_sprite);
 }
+
+#pragma endregion

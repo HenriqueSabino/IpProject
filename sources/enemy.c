@@ -374,8 +374,8 @@ void onCollisionEnter_jumperboss(RigidBody *self, RigidBody *other)
                 }
                 else
                 {
-                    self->velocity = create_vector(0, -15);
                     self->acceleration = create_vector(0, 0);
+                    self->gravity_scale = 0;
                 }
             }
         }
@@ -534,7 +534,7 @@ void atk(Enemy *enemy, RigidBody player)
         if (enemy->taking_damage == 0)
             enemy->enemy_pos_ini = enemy->rb.pos;
     }
-    else if ((strcmp(enemy->rb.cb.tag, "fox") == 0 || strcmp(enemy->rb.cb.tag, "jumperboss") == 0) && enemy->taking_damage == 0 && enemy->rb.velocity.y == 0 && enemy->attack)
+    else if (strcmp(enemy->rb.cb.tag, "fox") == 0 && enemy->taking_damage == 0 && enemy->rb.velocity.y == 0 && enemy->attack)
     {
         if (dist(enemy->rb.pos, player_pos) <= SCREEN_WIDTH)
         {
@@ -634,6 +634,48 @@ void atk_ghost(Enemy *enemy, Player *player)
     {
         enemy->rb.velocity = create_vector(0, 0);
         enemy->rb.acceleration = create_vector(0, 0);
+    }
+}
+
+void atk_jumperboss(Enemy *enemy, Player *player, int behavior)
+{
+    int attack_behavior = behavior;
+
+    Vector player_pos = mult(sum(player->rb.cb.min, player->rb.cb.max), 0.5f);
+    Vector enemy_pos = mult(sum(enemy->rb.cb.min, enemy->rb.cb.max), 0.5f);
+
+    if (player->rb.cb.min.x > enemy_pos.x)
+    {
+        enemy->facing_right = 0;
+        enemy->rb.cb.offset = create_vector(40, 36);
+    }
+    else
+    {
+        enemy->facing_right = 1;
+        enemy->rb.cb.offset = create_vector(14, 36);
+    }
+
+    if (attack_behavior == 1)
+    {
+        if (enemy->taking_damage == 0 && enemy->rb.velocity.y == 0 && enemy->attack)
+        {
+            if (dist(create_vector(enemy_pos.x, 0), create_vector(player_pos.x, 0)) <= 100)
+            {
+                enemy->rb.acceleration = create_vector(0, 0);
+            }
+            else if (dist(enemy->rb.pos, player_pos) <= SCREEN_WIDTH && !enemy->taking_damage)
+            {
+                if (dist(enemy_pos, sum(player_pos, enemy->player_pos)) <= 10)
+                {
+                    enemy->player_pos.x *= -1;
+                    enemy->rb.acceleration = mult(normalized(diff(create_vector(player_pos.x, 0), create_vector(enemy_pos.x, 0))), 8);
+                }
+                enemy->rb.velocity = mult(normalized(diff(create_vector(player_pos.x, 0), create_vector(enemy_pos.x, 0))), 5);
+            }
+
+            enemy->rb.acceleration.y = 0;
+            enemy->rb.velocity.y = 0;
+        }
     }
 }
 
