@@ -943,7 +943,7 @@ int main()
                             {
                                 arrow_attack.rb.pos = sum(player.rb.pos, create_vector(53, 44));
                                 arrow_attack.rb.velocity.x = 20;
-                            }
+                                                       }
                             else
                             {
                                 arrow_attack.rb.pos = sum(player.rb.pos, create_vector(-9, 44));
@@ -1760,8 +1760,8 @@ void draw_lifebar(BITMAP *bmp, BITMAP *sprite, Player player)
     rectfill(bmp, 73, 34, 73 + floor(122 * player.life / 100.0f), 49, makecol(255, 0, 0));
     draw_sprite(bmp, sprite, 10, 10);
     textout_ex(bmp, font, player_life, 64 + 55, 38, makecol(255, 255, 0), -1);
-    textout_ex(bmp, font, ex, 170, 62, makecol(255, 255, 0), -1);
-    textout_ex(bmp, font, player_arrows_amount, 180, 62, makecol(255, 255, 0), -1);
+    textout_ex(bmp, font, ex, 170, 64, makecol(255, 255, 0), -1);
+    textout_ex(bmp, font, player_arrows_amount, 180, 64, makecol(255, 255, 0), -1);
 }
 
 void draw_jumperboss(BITMAP *bmp, BITMAP *sprite, Enemy *jumperboss, Vector camera)

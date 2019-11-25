@@ -16,6 +16,7 @@ typedef struct enemy
 {
     RigidBody rb;
     Vector player_pos;
+    Vector enemy_pos_ini;
     int animation_frame, facing_right, attack, taking_damage, life, alive;
 } Enemy;
 

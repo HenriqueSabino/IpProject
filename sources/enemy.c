@@ -19,9 +19,11 @@ void onCollisionEnter_bat(RigidBody *self, RigidBody *other)
         {
             if (&enemies_ref[i].rb == self)
             {
+
+                enemies_ref[i].taking_damage = 1;
+
                 if (strcmp(other->cb.tag, "sword") == 0)
                 {
-                    enemies_ref[i].taking_damage = 1;
                     enemies_ref[i].life -= 2;
                 }
                 else if (strcmp(other->cb.tag, "arrow") == 0)
@@ -31,17 +33,7 @@ void onCollisionEnter_bat(RigidBody *self, RigidBody *other)
 
                 if (enemies_ref[i].life > 0)
                 {
-                    if (strcmp(other->cb.tag, "arrow") == 0)
-                    {
-                        if (other->velocity.x < 0)
-                        {
-                            self->velocity = create_vector(-5, 0);
-                        }
-                        else
-                        {
-                            self->velocity = create_vector(5, 0);
-                        }
-                    }
+                    continue;
                 }
                 else
                 {
@@ -59,6 +51,7 @@ void init_bat(Enemy *bat, Vector pos)
     bat->animation_frame = 0;
     bat->facing_right = 0;
     bat->player_pos = create_vector(200, -32);
+    bat->enemy_pos_ini = pos;
     bat->life = 6;
     bat->attack = 1;
     bat->alive = 1;
@@ -209,6 +202,7 @@ void init_fox(Enemy *fox, Vector pos)
     fox->animation_frame = 0;
     fox->facing_right = 1;
     fox->player_pos = create_vector(0, 0);
+    fox->enemy_pos_ini = create_vector(0, 0);
     fox->attack = 1;
     fox->life = 10;
     fox->alive = 1;
@@ -238,6 +232,7 @@ void init_harpy(Enemy *harpy, Vector pos)
     harpy->animation_frame = 0;
     harpy->facing_right = 0;
     harpy->player_pos = create_vector(200, -32);
+    harpy->enemy_pos_ini = pos;
     harpy->life = 12;
     harpy->attack = 1;
     harpy->alive = 1;
@@ -267,6 +262,7 @@ void init_ghost(Enemy *ghost, Vector pos)
     ghost->animation_frame = 0;
     ghost->facing_right = 0;
     ghost->player_pos = create_vector(200, -32);
+    ghost->enemy_pos_ini = create_vector(0, 0);
     ghost->life = 6;
     ghost->attack = 1;
     ghost->alive = 1;
@@ -311,6 +307,7 @@ void init_spike(Enemy *spike, Vector pos)
     spike->animation_frame = 4;
     spike->facing_right = 0;
     spike->player_pos = create_vector(0, 0);
+    spike->enemy_pos_ini = create_vector(0, 0);
     spike->life = 1;
     spike->attack = 1;
     spike->alive = 1;
@@ -459,19 +456,21 @@ void atk(Enemy *enemy, RigidBody player)
             if (player_pos.x > enemy_pos.x)
             {
                 enemy->rb.velocity = create_vector(-10, 0);
+                enemy->rb.acceleration = create_vector(0, 0);
             }
             else
             {
                 enemy->rb.velocity = create_vector(10, 0);
+                enemy->rb.acceleration = create_vector(0, 0);
             }
 
-            if (dist(create_vector(enemy_pos.x, 0), create_vector(player_pos.x, 0)) >= 200)
+            if (dist(create_vector(enemy->rb.pos.x, 0), create_vector(enemy->enemy_pos_ini.x, 0)) >= 100)
             {
                 enemy->taking_damage = 0;
             }
         }
 
-        if (dist(create_vector(enemy_pos.x, 0), create_vector(player_pos.x, 0)) <= 100)
+        if (dist(create_vector(enemy_pos.x, 0), create_vector(player_pos.x, 0)) <= 100 && !enemy->taking_damage)
         {
             enemy->rb.acceleration = create_vector(0, 0);
         }
@@ -484,6 +483,9 @@ void atk(Enemy *enemy, RigidBody player)
             }
             enemy->rb.velocity = mult(normalized(diff(sum(player_pos, enemy->player_pos), enemy_pos)), 5);
         }
+
+        if (enemy->taking_damage == 0)
+            enemy->enemy_pos_ini = enemy->rb.pos;
     }
     else if (strcmp(enemy->rb.cb.tag, "fox") == 0 && enemy->taking_damage == 0 && enemy->rb.velocity.y == 0 && enemy->attack)
     {
@@ -576,18 +578,9 @@ void atk_ghost(Enemy *enemy, Player *player)
 
     if (enemy->attack == 1)
     {
-        if (dist(create_vector(enemy_pos.x, 0), create_vector(player_pos.x, 0)) <= 100)
+        if (dist(enemy->rb.pos, player_pos) <= SCREEN_WIDTH)
         {
-            enemy->rb.acceleration = create_vector(0, 0);
-        }
-        else if (dist(enemy->rb.pos, player_pos) <= SCREEN_WIDTH)
-        {
-            if (dist(enemy_pos, sum(player_pos, enemy->player_pos)) <= 10)
-            {
-                enemy->player_pos.x *= -1;
-                enemy->rb.acceleration = mult(normalized(diff(player_pos, enemy_pos)), 3);
-            }
-            enemy->rb.velocity = mult(normalized(diff(sum(player_pos, enemy->player_pos), enemy_pos)), 3);
+            enemy->rb.velocity = mult(normalized(diff(player_pos, enemy_pos)), 3);
         }
     }
     else
