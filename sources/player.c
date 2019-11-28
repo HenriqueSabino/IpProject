@@ -325,13 +325,13 @@ void onCollisionExit(RigidBody *self, RigidBody *other)
     }
 }
 
-void init_player(Player *player, Vector pos)
+void init_player(Player *player, Vector pos, int current_life)
 {
     player->animation_frame = 8;
     player->facing_right = 1;
     player->attacking = 0;
     player->bow_attack = 0;
-    player->life = 100;
+    player->life = current_life;
     player->invulnerability = 0;
     player->can_jump = 0;
     player->arrows_amount = 10;

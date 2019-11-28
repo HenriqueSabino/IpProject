@@ -14,7 +14,7 @@ typedef struct player
 
 void increment_invulnerability();
 void init_timer_invulnerability();
-void init_player(Player *player, Vector pos);
+void init_player(Player *player, Vector pos, int current_life);
 void set_velocity_axis(Player *player, char *axis, float s);
 
 #endif // !"PLAYER_H"

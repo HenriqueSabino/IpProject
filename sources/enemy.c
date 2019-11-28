@@ -263,7 +263,7 @@ void init_ghost(Enemy *ghost, Vector pos)
     ghost->facing_right = 0;
     ghost->player_pos = create_vector(200, -32);
     ghost->enemy_pos_ini = create_vector(0, 0);
-    ghost->life = 6;
+    ghost->life = 666;
     ghost->attack = 1;
     ghost->alive = 1;
     ghost->taking_damage = 0;
