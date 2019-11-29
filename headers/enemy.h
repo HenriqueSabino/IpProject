@@ -6,6 +6,7 @@
 #include "player.h"
 
 #define BAT "..\\assets\\Characters\\Bat.bmp"
+#define GREY_BAT "..\\assets\\Characters\\GreyBat.bmp"
 #define FOX "..\\assets\\Characters\\Fox.bmp"
 #define HARPY "..\\assets\\Characters\\Harpy.bmp"
 #define GHOST "..\\assets\\Characters\\Ghost.bmp"

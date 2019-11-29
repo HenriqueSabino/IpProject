@@ -42,11 +42,17 @@ void init_ground(Ground *ground, Vector pos, int animation_frame)
         ground->rb.cb.height = 128;
         ground->rb.cb.offset = create_vector(12, 0);
     }
-    else if(animation_frame == 7)
+    else if (animation_frame == 7)
     {
         ground->rb.cb.width = 104;
         ground->rb.cb.height = 100;
         ground->rb.cb.offset = create_vector(12, 28);
+    }
+    else if (animation_frame == 11)
+    {
+        ground->rb.cb.width = 128;
+        ground->rb.cb.height = 100;
+        ground->rb.cb.offset = create_vector(0, 0);
     }
     else
     {
@@ -74,7 +80,7 @@ void init_platform(Ground *platform, Vector pos, int animation_frame)
     platform->rb.velocity = create_vector(0, 0);
     platform->rb.acceleration = create_vector(0, 0);
 
-    if(animation_frame == 0 || animation_frame == 1 || animation_frame == 2 || animation_frame == 3)
+    if (animation_frame == 0 || animation_frame == 1 || animation_frame == 2 || animation_frame == 3)
         platform->rb.pos = pos;
     else
         platform->rb.pos = sum(pos, create_vector(0, 28));

@@ -627,7 +627,7 @@ void atk_ghost(Enemy *enemy, Player *player)
     {
         if (dist(enemy->rb.pos, player_pos) <= SCREEN_WIDTH)
         {
-            enemy->rb.velocity = mult(normalized(diff(player_pos, enemy_pos)), 3);
+            enemy->rb.velocity = mult(normalized(diff(player_pos, enemy_pos)), 2.5f);
         }
     }
     else
