@@ -42,6 +42,12 @@ void init_ground(Ground *ground, Vector pos, int animation_frame)
         ground->rb.cb.height = 128;
         ground->rb.cb.offset = create_vector(12, 0);
     }
+    else if (animation_frame == 6)
+    {
+        ground->rb.cb.width = 104;
+        ground->rb.cb.height = 100;
+        ground->rb.cb.offset = create_vector(12, 28);
+    }
     else if (animation_frame == 7)
     {
         ground->rb.cb.width = 104;

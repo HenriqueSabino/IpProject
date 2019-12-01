@@ -676,7 +676,7 @@ int main()
             if (player.rb.cb.max.x > grounds_lvl1[ground_count - 1].rb.cb.min.x)
             {
                 playing_first_level = 0;
-                playing_second_level = 1;
+                playing_first_level_2 = 1;
                 break;
             }
 
@@ -1055,6 +1055,776 @@ int main()
         }
 
 #pragma endregion
+
+        if (playing_first_level_2)
+        {
+#pragma region first level second part
+#pragma region generating first level second part
+
+            map_size = readMap(&map, "../sources/level_1_2.txt");
+
+            scenario_map_size = readMap(&scenario_map, "../sources/level_1_2_scenario.txt");
+
+            row = 0;
+            col = 0;
+            not_objs = 0;
+            ground_count = 0;
+            enemy_count = 0;
+            object_count = 0;
+            item_count = 0;
+
+            for (int i = 0; i < map_size; i++)
+            {
+                if (map[i] == '0' || map[i] == '1' || map[i] == '2' || map[i] == '3' || map[i] == '4' ||
+                    map[i] == '6' || map[i] == '7' || map[i] == '8' || map[i] == '9' || map[i] == 'c' ||
+                    map[i] == 'd' || map[i] == 'e' || map[i] == 'f' || map[i] == 'g' || map[i] == 'h' ||
+                    map[i] == 'i' || map[i] == 'j' || map[i] == 'k' || map[i] == 'l' || map[i] == 'm' ||
+                    map[i] == 'n')
+                {
+                    ground_count++;
+                }
+                else if (map[i] == 'B' || map[i] == 'F' || map[i] == 'H' || map[i] == 'I')
+                {
+                    enemy_count++;
+                }
+                else if (map[i] == 'p')
+                {
+                    item_count++;
+                }
+            }
+
+            for (int i = 0; i < scenario_map_size; i++)
+            {
+                if (scenario_map[i] == '1' || scenario_map[i] == '2' || scenario_map[i] == '3' || scenario_map[i] == '4' || scenario_map[i] == '5' ||
+                    scenario_map[i] == '6' || scenario_map[i] == '7' || scenario_map[i] == '8' || scenario_map[i] == '9' ||
+                    scenario_map[i] == 'a' || scenario_map[i] == 'b' || scenario_map[i] == 'c' || scenario_map[i] == 'd' ||
+                    scenario_map[i] == 'W' || scenario_map[i] == 'w' || scenario_map[i] == 'C' || scenario_map[i] == 'L')
+                {
+                    object_count++;
+                }
+            }
+
+            Ground grounds_lvl1_2[ground_count];
+            ground_count = 0;
+
+            Enemy enemies_lvl1_2[enemy_count];
+            enemy_count = 0;
+
+            Object objects_lvl1_2[object_count];
+            object_count = 0;
+
+            Item items_lvl1_2[item_count];
+            item_count = 0;
+
+            temp_col = 0;
+
+            for (int i = 0; i < map_size; i++)
+            {
+                if (map[i] == 'P')
+                {
+                    init_player(&player, create_vector(col * 128, row * 128), 100);
+                    init_arrow_attack(&arrow_attack, player.rb.pos);
+                    init_timer_invulnerability();
+                    camera = sum(player.rb.pos, create_vector(-100, -200));
+                    col++;
+                }
+                else if (map[i] == 'B')
+                {
+                    init_bat(&enemies_lvl1_2[enemy_count], create_vector(col * 128, row * 128));
+                    enemy_count++;
+                    col++;
+                }
+                else if (map[i] == 'F')
+                {
+                    init_fox(&enemies_lvl1_2[enemy_count], create_vector(col * 128, row * 128));
+                    enemy_count++;
+                    col++;
+                }
+                else if (map[i] == 'H')
+                {
+                    init_harpy(&enemies_lvl1_2[enemy_count], create_vector(col * 128, row * 128));
+                    enemy_count++;
+                    col++;
+                }
+                else if (map[i] == 'I')
+                {
+                    init_spike(&enemies_lvl1_2[enemy_count], create_vector(col * 128, row * 128));
+                    enemy_count++;
+                    col++;
+                }
+                else if (map[i] == '0')
+                {
+                    init_ground(&grounds_lvl1_2[ground_count], create_vector(col * 128, row * 128), 0);
+                    ground_count++;
+                    col++;
+                }
+                else if (map[i] == '1')
+                {
+                    init_ground(&grounds_lvl1_2[ground_count], create_vector(col * 128, row * 128), 1);
+                    ground_count++;
+                    col++;
+                }
+                else if (map[i] == '2')
+                {
+                    init_ground(&grounds_lvl1_2[ground_count], create_vector(col * 128, row * 128), 2);
+                    ground_count++;
+                    col++;
+                }
+                else if (map[i] == '3')
+                {
+                    init_ground(&grounds_lvl1_2[ground_count], create_vector(col * 128, row * 128), 3);
+                    ground_count++;
+                    col++;
+                }
+                else if (map[i] == '4')
+                {
+                    init_ground(&grounds_lvl1_2[ground_count], create_vector(col * 128, row * 128), 4);
+                    ground_count++;
+                    col++;
+                }
+                else if (map[i] == '6')
+                {
+                    init_ground(&grounds_lvl1_2[ground_count], create_vector(col * 128, row * 128), 6);
+                    ground_count++;
+                    col++;
+                }
+                else if (map[i] == '7')
+                {
+                    init_ground(&grounds_lvl1_2[ground_count], create_vector(col * 128, row * 128), 7);
+                    ground_count++;
+                    col++;
+                }
+                else if (map[i] == '8')
+                {
+                    init_ground(&grounds_lvl1_2[ground_count], create_vector(col * 128, row * 128), 8);
+                    ground_count++;
+                    col++;
+                }
+                else if (map[i] == '9')
+                {
+                    init_ground(&grounds_lvl1_2[ground_count], create_vector(col * 128, row * 128), 9);
+                    ground_count++;
+                    col++;
+                }
+                else if (map[i] == 'd')
+                {
+                    init_platform(&grounds_lvl1_2[ground_count], create_vector(col * 128, row * 128), 0);
+                    ground_count++;
+                    col++;
+                }
+                else if (map[i] == 'e')
+                {
+                    init_platform(&grounds_lvl1_2[ground_count], create_vector(col * 128, row * 128), 1);
+                    ground_count++;
+                    col++;
+                }
+                else if (map[i] == 'f')
+                {
+                    init_platform(&grounds_lvl1_2[ground_count], create_vector(col * 128, row * 128), 2);
+                    ground_count++;
+                    col++;
+                }
+                else if (map[i] == 'g')
+                {
+                    init_platform(&grounds_lvl1_2[ground_count], create_vector(col * 128, row * 128), 3);
+                    ground_count++;
+                    col++;
+                }
+                else if (map[i] == 'k')
+                {
+                    init_platform(&grounds_lvl1_2[ground_count], create_vector(col * 128, row * 128), 4);
+                    ground_count++;
+                    col++;
+                }
+                else if (map[i] == 'l')
+                {
+                    init_platform(&grounds_lvl1_2[ground_count], create_vector(col * 128, row * 128), 5);
+                    ground_count++;
+                    col++;
+                }
+                else if (map[i] == 'm')
+                {
+                    init_platform(&grounds_lvl1_2[ground_count], create_vector(col * 128, row * 128), 6);
+                    ground_count++;
+                    col++;
+                }
+                else if (map[i] == 'n')
+                {
+                    init_platform(&grounds_lvl1_2[ground_count], create_vector(col * 128, row * 128), 7);
+                    ground_count++;
+                    col++;
+                }
+                else if (map[i] == 'h')
+                {
+                    init_bridge(&grounds_lvl1_2[ground_count], create_vector(col * 128, row * 128), 0);
+                    ground_count++;
+                    col++;
+                }
+                else if (map[i] == 'i')
+                {
+                    init_bridge(&grounds_lvl1_2[ground_count], create_vector(col * 128, row * 128), 1);
+                    ground_count++;
+                    col++;
+                }
+                else if (map[i] == 'j')
+                {
+                    init_bridge(&grounds_lvl1_2[ground_count], create_vector(col * 128, row * 128), 2);
+                    ground_count++;
+                    col++;
+                }
+                else if (map[i] == 'p')
+                {
+                    init_potion(&items_lvl1_2[item_count], create_vector(col * 128, row * 128), 0);
+                    item_count++;
+                    col++;
+                }
+                else if (map[i] == '*')
+                {
+                    not_objs++;
+                    col++;
+                }
+                else if (map[i] == '\n')
+                {
+                    row++;
+                    not_objs++;
+                    temp_col = col;
+                    col = 0;
+                }
+            }
+
+            BITMAP *level_background = create_bitmap(temp_col * 128, row * 128);
+            clear_to_color(level_background, 0xFF00FF);
+
+            row = col = 0;
+
+            for (int i = 0; i < scenario_map_size; i++)
+            {
+                if (scenario_map[i] == '1')
+                {
+                    init_object(&objects_lvl1_2[object_count], create_vector(col * 128, row * 128), 0);
+                    object_count++;
+                    col++;
+                }
+                else if (scenario_map[i] == '2')
+                {
+                    init_object(&objects_lvl1_2[object_count], create_vector(col * 128, row * 128), 1);
+                    object_count++;
+                    col++;
+                }
+                else if (scenario_map[i] == '3')
+                {
+                    init_object(&objects_lvl1_2[object_count], create_vector(col * 128, row * 128), 2);
+                    object_count++;
+                    col++;
+                }
+                else if (scenario_map[i] == '4')
+                {
+                    init_object(&objects_lvl1_2[object_count], create_vector(col * 128, row * 128), 3);
+                    object_count++;
+                    col++;
+                }
+                else if (scenario_map[i] == '5')
+                {
+                    init_object(&objects_lvl1_2[object_count], create_vector(col * 128, row * 128), 9);
+                    object_count++;
+                    col++;
+                }
+                else if (scenario_map[i] == '6')
+                {
+                    init_object(&objects_lvl1_2[object_count], create_vector(col * 128, row * 128), 16);
+                    object_count++;
+                    col++;
+                }
+                else if (scenario_map[i] == '8')
+                {
+                    init_object(&objects_lvl1_2[object_count], create_vector(col * 128, row * 128), 18);
+                    object_count++;
+                    col++;
+                }
+                else if (scenario_map[i] == '9')
+                {
+                    init_object(&objects_lvl1_2[object_count], create_vector(col * 128, row * 128), 19);
+                    object_count++;
+                    col++;
+                }
+                else if (scenario_map[i] == 'a')
+                {
+                    init_object(&objects_lvl1_2[object_count], create_vector(col * 128, row * 128), 20);
+                    object_count++;
+                    col++;
+                }
+                else if (scenario_map[i] == 'b')
+                {
+                    init_object(&objects_lvl1_2[object_count], create_vector(col * 128, row * 128), 21);
+                    object_count++;
+                    col++;
+                }
+                else if (scenario_map[i] == 'c')
+                {
+                    init_object(&objects_lvl1_2[object_count], create_vector(col * 128, row * 128), 28);
+                    object_count++;
+                    col++;
+                }
+                else if (scenario_map[i] == 'd')
+                {
+                    init_object(&objects_lvl1_2[object_count], create_vector(col * 128, row * 128), 29);
+                    object_count++;
+                    col++;
+                }
+                else if (scenario_map[i] == 'W')
+                {
+                    init_object(&objects_lvl1_2[object_count], create_vector(col * 128, row * 128), 4);
+                    object_count++;
+                    col++;
+                }
+                else if (scenario_map[i] == 'w')
+                {
+                    init_object(&objects_lvl1_2[object_count], create_vector(col * 128, row * 128), 8);
+                    object_count++;
+                    col++;
+                }
+                else if (scenario_map[i] == '*' || scenario_map[i] == 'X')
+                {
+                    col++;
+                }
+                else if (scenario_map[i] == '\n')
+                {
+                    row++;
+                    col = 0;
+                }
+            }
+
+            rbs_size = map_size - not_objs + 2;
+            RigidBody *rbs_lvl1_2[rbs_size];
+            rbs_lvl1_2[0] = &player.rb;
+
+            for (int i = 0; i < object_count; i++)
+            {
+                if (objects_lvl1_2[i].sprite_frame != 4)
+                    draw_object(level_background, scenario_sprite, &objects_lvl1_2[i], create_vector(0, 0));
+            }
+
+            for (int i = 0; i < ground_count; i++)
+            {
+                rbs_lvl1_2[i + 1] = &grounds_lvl1_2[i].rb;
+
+                if (!(strcmp(grounds_lvl1_2[i].rb.cb.tag, "platform") == 0 || strcmp(grounds_lvl1_2[i].rb.cb.tag, "bridge") == 0))
+                    draw_ground(level_background, ground_sprite, &grounds_lvl1_2[i], create_vector(0, 0));
+            }
+
+            for (int i = 0; i < enemy_count; i++)
+            {
+                rbs_lvl1_2[i + ground_count + 1] = &enemies_lvl1_2[i].rb;
+            }
+
+            for (int i = 0; i < item_count; i++)
+            {
+                rbs_lvl1_2[i + ground_count + enemy_count + 1] = &items_lvl1_2[i].rb;
+            }
+
+            set_enemies_ref(enemies_lvl1_2, enemy_count);
+
+            rbs_lvl1_2[rbs_size - 2] = &player.sword_rb;
+            rbs_lvl1_2[rbs_size - 1] = &arrow_attack.rb;
+
+#pragma endregion
+            while (playing_first_level_2 && !close_game)
+            {
+                if (player.rb.pos.y >= grounds_lvl1_2[ground_count - 1].rb.cb.max.y ||
+                    player.rb.pos.x <= -256 || player.life <= 0)
+                {
+                    player.life = 0;
+                    player.rb.cb.enabled = 0;
+                    player.sword_rb.cb.enabled = 0;
+                }
+                if (player.rb.pos.y >= grounds_lvl1_2[ground_count - 1].rb.cb.max.y + 256)
+                {
+                    playing_first_level_2 = 0;
+                    death_on = 1;
+                    break;
+                }
+                if (player.rb.cb.min.x > grounds_lvl1_2[ground_count - 1].rb.cb.min.x)
+                {
+                    playing_first_level_2 = 0;
+                    playing_second_level = 1;
+                    break;
+                }
+
+                keyboard_input();
+                //USER INPUT
+                if (key_down(KEY_ESC))
+                {
+                    playing_first_level_2 = 0;
+                    menu_on = 1;
+                    break;
+                }
+                if (key_down(KEY_W) || key_down(KEY_SPACE))
+                {
+                    if (player.can_jump)
+                    {
+                        set_velocity_axis(&player, "vertical", -20);
+                    }
+                }
+                if ((key_holding(KEY_A) || key_holding(KEY_D)) && !player.attacking && !player.bow_attack)
+                {
+                    if (key_holding(KEY_A))
+                    {
+                        set_velocity_axis(&player, "horizontal", -5);
+                        player.facing_right = 0;
+                    }
+                    else
+                    {
+                        set_velocity_axis(&player, "horizontal", 5);
+                        player.facing_right = 1;
+                    }
+                }
+                else
+                {
+                    set_velocity_axis(&player, "horizontal", 0);
+                }
+
+                if (key_down(KEY_Q))
+                {
+                    if (!player.taking_damage)
+                    {
+                        player.attacking = 1;
+                        player_animation_counter = 0;
+                    }
+                }
+                if (key_down(KEY_E))
+                {
+                    if (!player.taking_damage && !arrow_attack.rb.cb.enabled && player.arrows_amount > 0)
+                    {
+                        player.bow_attack = 1;
+                        player_animation_counter = 0;
+                    }
+                }
+
+                //UPDATE
+
+                while (counter > 0)
+                {
+                    update_all(rbs_lvl1_2, rbs_size, camera);
+
+                    //linear interpolation between camera and player's position
+                    Vector offset_camera = create_vector(-SCREEN_WIDTH / 2 + 64, -200);
+
+                    if (player.life > 0)
+                    {
+                        camera = lerp(camera, sum(player.rb.pos, offset_camera), 0.9f);
+
+                        if (camera.x <= 0)
+                        {
+                            camera.x = 0;
+                        }
+                        else if (camera.x + SCREEN_W >= grounds_lvl1_2[ground_count - 1].rb.cb.max.x)
+                        {
+                            camera.x = grounds_lvl1_2[ground_count - 1].rb.cb.max.x - SCREEN_W;
+                        }
+
+                        if (camera.y + SCREEN_H >= grounds_lvl1_2[ground_count - 1].rb.cb.max.y)
+                        {
+                            camera.y = grounds_lvl1_2[ground_count - 1].rb.cb.max.y - SCREEN_H;
+                        }
+                    }
+
+                    for (int i = 0; i < enemy_count; i++)
+                    {
+                        if (enemies_lvl1_2[i].alive)
+                        {
+                            if (strcmp(enemies_lvl1_2[i].rb.cb.tag, "ghost") == 0)
+                            {
+                                atk_ghost(&enemies_lvl1_2[i], &player);
+                            }
+                            else
+                            {
+                                atk(&enemies_lvl1_2[i], player.rb);
+                            }
+                        }
+
+                        if (!enemies_lvl1_2[i].taking_damage && enemies_lvl1_2[i].alive)
+                        {
+                            if (strcmp(enemies_lvl1_2[i].rb.cb.tag, "bat") == 0 || strcmp(enemies_lvl1_2[i].rb.cb.tag, "fox") == 0)
+                            {
+                                if (enemies_lvl1_2[i].animation_frame >= 0 && enemies_lvl1_2[i].animation_frame <= 3)
+                                {
+                                    if (game_timer % 4 == 0)
+                                    {
+                                        enemies_lvl1_2[i].animation_frame++;
+                                        enemies_lvl1_2[i].animation_frame %= 4;
+                                    }
+                                }
+                            }
+                            else if (strcmp(enemies_lvl1_2[i].rb.cb.tag, "harpy") == 0)
+                            {
+                                if (enemies_lvl1_2[i].animation_frame >= 0 && enemies_lvl1_2[i].animation_frame <= 4)
+                                {
+                                    if (game_timer % 4 == 0)
+                                    {
+                                        enemies_lvl1_2[i].animation_frame++;
+                                        enemies_lvl1_2[i].animation_frame %= 5;
+                                    }
+                                }
+                            }
+                            else if (strcmp(enemies_lvl1_2[i].rb.cb.tag, "spike") == 0)
+                            {
+
+                                if (game_timer % 70 < 32 && game_timer % 70 != 0)
+                                {
+                                    enemies_lvl1_2[i].animation_frame = 0;
+                                }
+                                else if (game_timer % 70 > 36 && game_timer % 70 < 66)
+                                {
+                                    enemies_lvl1_2[i].animation_frame = 4;
+                                }
+                                else if (game_timer % 4 == 0)
+                                {
+                                    enemies_lvl1_2[i].animation_frame++;
+                                    enemies_lvl1_2[i].animation_frame %= 8;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (strcmp(enemies_lvl1_2[i].rb.cb.tag, "bat") == 0)
+                                enemies_lvl1_2[i].animation_frame = 3;
+                            else if (strcmp(enemies_lvl1_2[i].rb.cb.tag, "spike") != 0)
+                                enemies_lvl1_2[i].animation_frame = 0;
+                        }
+                    }
+
+                    for (int i = 0; i < object_count; i++)
+                    {
+                        if (objects_lvl1_2[i].sprite_frame >= 4 && objects_lvl1_2[i].sprite_frame <= 7)
+                        {
+                            if (game_timer % 4 == 0)
+                            {
+                                objects_lvl1_2[i].sprite_frame++;
+                                objects_lvl1_2[i].sprite_frame %= 4;
+                                objects_lvl1_2[i].sprite_frame += 4;
+                            }
+                        }
+                    }
+
+                    // Kill enemy
+                    for (int i = 0; i < enemy_count; i++)
+                    {
+                        if (enemies_lvl1_2[i].life <= 0)
+                        {
+                            enemies_lvl1_2[i].alive = 0;
+                            enemies_lvl1_2[i].attack = 0;
+                            enemies_lvl1_2[i].rb.gravity_scale = 0.2f;
+                            enemies_lvl1_2[i].rb.cb.enabled = 0;
+                        }
+                    }
+
+                    if (player.animation_frame >= 0 && player.animation_frame <= 7)
+                    {
+                        if (player_animation_counter % 4 == 0)
+                        {
+                            player.animation_frame++;
+                            player.animation_frame %= 8;
+                        }
+                    }
+
+                    if (player.animation_frame >= 11 && player.animation_frame <= 16)
+                    {
+                        if (player_animation_counter % 2 == 1)
+                        {
+                            player.animation_frame++;
+
+                            if (player.animation_frame > 16)
+                            {
+                                player.animation_frame = 8;
+                                player.attacking = 0;
+                                player.sword_rb.cb.enabled = 0;
+                            }
+                        }
+                    }
+
+                    if (player.animation_frame >= 17 && player.animation_frame <= 21)
+                    {
+                        if (player_animation_counter % 2 == 0)
+                        {
+                            player.animation_frame++;
+
+                            if (player.animation_frame > 21)
+                            {
+                                arrow_attack.rb.cb.enabled = 1;
+                                if (player.facing_right)
+                                {
+                                    arrow_attack.rb.pos = sum(player.rb.pos, create_vector(53, 44));
+                                    arrow_attack.rb.velocity.x = 20;
+                                }
+                                else
+                                {
+                                    arrow_attack.rb.pos = sum(player.rb.pos, create_vector(-9, 44));
+                                    arrow_attack.rb.velocity.x = -20;
+                                }
+                                player.animation_frame = 8;
+                                player.bow_attack = 0;
+                                player.arrows_amount--;
+                            }
+                        }
+                    }
+
+                    for (int i = 0; i < ground_count; i++)
+                    {
+                        if (strcmp(grounds_lvl1_2[i].rb.cb.tag, "lava") == 0)
+                        {
+                            if (grounds_lvl1_2[i].animation_frame >= 0 && grounds_lvl1_2[i].animation_frame <= 3)
+                            {
+                                if (game_timer % 4 == 0)
+                                {
+                                    grounds_lvl1_2[i].animation_frame++;
+                                    grounds_lvl1_2[i].animation_frame %= 4;
+                                }
+                            }
+                        }
+                    }
+
+                    counter--;
+                }
+
+                //DRAWING
+
+                masked_blit(cloud_sprite, buffer, camera.x * 0.1f, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+                masked_blit(montain_sprite, buffer, camera.x * 0.2f, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+                masked_blit(ground_background_sprite, buffer, camera.x * 0.4f, camera.y - 128, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+                for (int i = 0; i < ground_count; i++)
+                {
+                    if (strcmp(grounds_lvl1_2[i].rb.cb.tag, "platform") == 0)
+                    {
+                        if (grounds_lvl1_2[i].rb.pos.x + 128 >= camera.x && grounds_lvl1_2[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
+                        {
+                            if (grounds_lvl1_2[i].rb.pos.y + 128 >= camera.y && grounds_lvl1_2[i].rb.pos.y <= camera.y + SCREEN_HEIGHT)
+                            {
+                                draw_platform(buffer, platform_sprite, &grounds_lvl1_2[i], camera);
+                            }
+                        }
+                    }
+                }
+
+                for (int i = 0; i < object_count; i++)
+                {
+                    if (objects_lvl1_2[i].sprite_frame >= 4 && objects_lvl1_2[i].sprite_frame <= 7)
+                    {
+                        if (objects_lvl1_2[i].position.x + 128 >= camera.x && objects_lvl1_2[i].position.x <= camera.x + SCREEN_WIDTH)
+                        {
+                            if (objects_lvl1_2[i].position.y + 128 >= camera.y && objects_lvl1_2[i].position.y <= camera.y + SCREEN_HEIGHT)
+                            {
+                                draw_object(buffer, scenario_sprite, &objects_lvl1_2[i], camera);
+                            }
+                        }
+                    }
+                }
+
+                masked_blit(level_background, buffer, camera.x, camera.y, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+                for (int i = 0; i < item_count; i++)
+                {
+                    if (strcmp(items_lvl1_2[i].rb.cb.tag, "potion") == 0)
+                    {
+                        if (items_lvl1_2[i].rb.pos.x + 128 >= camera.x && items_lvl1_2[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
+                        {
+                            if (items_lvl1_2[i].rb.pos.y + 128 >= camera.y && items_lvl1_2[i].rb.pos.y <= camera.y + SCREEN_HEIGHT)
+                            {
+                                draw_potion(buffer, potion_sprite, &items_lvl1_2[i], camera);
+                            }
+                        }
+                    }
+                }
+
+                draw_player(buffer, player_sprite, &player, camera);
+
+                for (int i = 0; i < enemy_count; i++)
+                {
+                    if (strcmp(enemies_lvl1_2[i].rb.cb.tag, "bat") == 0 && enemies_lvl1_2[i].rb.pos.y <= 2000)
+                    {
+                        if (enemies_lvl1_2[i].rb.pos.x + 128 >= camera.x && enemies_lvl1_2[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
+                        {
+                            if (enemies_lvl1_2[i].rb.pos.y + 128 >= camera.y && enemies_lvl1_2[i].rb.pos.y <= camera.y + SCREEN_HEIGHT)
+                            {
+                                draw_bat(buffer, bat_sprite, &enemies_lvl1_2[i], camera);
+                            }
+                        }
+                        if (enemies_lvl1_2[i].alive == 0 && enemies_lvl1_2[i].rb.pos.y >= 2000)
+                            enemies_lvl1_2[i].rb.pos.y = 2001;
+                    }
+                    else if (strcmp(enemies_lvl1_2[i].rb.cb.tag, "fox") == 0 && enemies_lvl1_2[i].rb.pos.y <= 2000)
+                    {
+                        if (enemies_lvl1_2[i].rb.pos.x + 128 >= camera.x && enemies_lvl1_2[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
+                        {
+                            if (enemies_lvl1_2[i].rb.pos.y + 128 >= camera.y && enemies_lvl1_2[i].rb.pos.y <= camera.y + SCREEN_HEIGHT)
+                            {
+                                draw_fox(buffer, fox_sprite, &enemies_lvl1_2[i], camera);
+                            }
+                        }
+                        if (enemies_lvl1_2[i].alive == 0 && enemies_lvl1_2[i].rb.pos.y >= 2000)
+                            enemies_lvl1_2[i].rb.pos.y = 2001;
+                    }
+                    else if (strcmp(enemies_lvl1_2[i].rb.cb.tag, "harpy") == 0 && enemies_lvl1_2[i].rb.pos.y <= 2000)
+                    {
+                        if (enemies_lvl1_2[i].rb.pos.x + 128 >= camera.x && enemies_lvl1_2[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
+                        {
+                            if (enemies_lvl1_2[i].rb.pos.y + 128 >= camera.y && enemies_lvl1_2[i].rb.pos.y <= camera.y + SCREEN_HEIGHT)
+                            {
+                                draw_harpy(buffer, harpy_sprite, &enemies_lvl1_2[i], camera);
+                            }
+                        }
+                        if (enemies_lvl1_2[i].alive == 0 && enemies_lvl1_2[i].rb.pos.y >= 2000)
+                            enemies_lvl1_2[i].rb.pos.y = 2001;
+                    }
+                    else if (strcmp(enemies_lvl1_2[i].rb.cb.tag, "spike") == 0)
+                    {
+                        if (enemies_lvl1_2[i].rb.pos.x + 128 >= camera.x && enemies_lvl1_2[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
+                        {
+                            if (enemies_lvl1_2[i].rb.pos.y + 128 >= camera.y && enemies_lvl1_2[i].rb.pos.y <= camera.y + SCREEN_HEIGHT)
+                            {
+                                draw_spike(buffer, spike_sprite, &enemies_lvl1_2[i], camera);
+                            }
+                        }
+                    }
+                }
+
+                for (int i = 0; i < ground_count; i++)
+                {
+                    if (strcmp(grounds_lvl1_2[i].rb.cb.tag, "bridge") == 0)
+                    {
+                        if (grounds_lvl1_2[i].rb.pos.x + 128 >= camera.x && grounds_lvl1_2[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
+                        {
+                            if (grounds_lvl1_2[i].rb.pos.y + 128 >= camera.y && grounds_lvl1_2[i].rb.pos.y <= camera.y + SCREEN_HEIGHT)
+                            {
+                                draw_bridge(buffer, bridge_sprite, &grounds_lvl1_2[i], camera);
+                            }
+                        }
+                    }
+                }
+
+                if (arrow_attack.rb.cb.enabled)
+                    draw_arrow_attack(buffer, arrow_attack_sprite, &arrow_attack, camera);
+
+                if ((arrow_attack.rb.pos.x - player.rb.pos.x > (SCREEN_WIDTH / 2) + 128 && arrow_attack.rb.velocity.x > 0) || ((arrow_attack.rb.pos.x - player.rb.pos.x) * -1 > SCREEN_WIDTH / 2 && arrow_attack.rb.velocity.x < 0))
+                    arrow_attack.rb.cb.enabled = 0;
+
+                draw_lifebar(buffer, lifebar_sprite, player);
+
+                draw_sprite(screen, buffer, 0, 0);
+                clear_to_color(buffer, 0x40AEBF);
+            }
+
+            free(map);
+            free(scenario_map);
+            destroy_bitmap(level_background);
+
+            for (int i = 0; i < rbs_size; i++)
+            {
+                destroy_list(rbs_lvl1_2[i]->collidingWith);
+            }
+
+#pragma endregion
+        }
 
         if (playing_second_level)
         {
@@ -2417,7 +3187,7 @@ void draw_object(BITMAP *bmp, BITMAP *sprite, Object *scenario, Vector camera)
     {
         draw_sprite_ex(bmp, scenario_sprite, scenario->position.x - floor(camera.x), scenario->position.y - 100 - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
     }
-    else if (scenario->sprite_frame >= 2 && scenario->sprite_frame <= 3 || scenario->sprite_frame >= 18 && scenario->sprite_frame <= 21)
+    else if (scenario->sprite_frame >= 2 && scenario->sprite_frame <= 3 || scenario->sprite_frame >= 18 && scenario->sprite_frame <= 21 || scenario->sprite_frame >= 28 && scenario->sprite_frame <= 29)
     {
         draw_sprite_ex(bmp, scenario_sprite, scenario->position.x - floor(camera.x), scenario->position.y + 28 - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
     }
@@ -2568,7 +3338,7 @@ void draw_jumperboss(BITMAP *bmp, BITMAP *sprite, Enemy *jumperboss, Vector came
 
     masked_blit(sprite, test, camera.x, camera.y, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-    set_trans_blender(255, 255, 255, 100);
+    set_trans_blender(255, 255, 255, 200);
 
     draw_sprite_ex(bmp, test, 0, 0, DRAW_SPRITE_TRANS, DRAW_SPRITE_NO_FLIP);
 

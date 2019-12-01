@@ -8,7 +8,8 @@
         "system_error": "c",
         "stdio.h": "c",
         "string.h": "c",
-        "random": "c"
+        "random": "c",
+        "type_traits": "c"
     },
     "editor.fontSize": 16,
     "editor.formatOnSave": true,
