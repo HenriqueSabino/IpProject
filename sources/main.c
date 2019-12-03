@@ -264,7 +264,7 @@ int main()
                 {
                     stop_sample(intro);
                     menu_on = 0;
-                    playing_boss_fight = 1;
+                    playing_first_level = 1;
                 }
                 else
                 {
@@ -677,7 +677,7 @@ int main()
                 death_on = 1;
                 break;
             }
-            if (player.rb.cb.max.x > grounds_lvl1[ground_count - 1].rb.cb.min.x)
+            if (player.rb.cb.min.x > grounds_lvl1[ground_count - 1].rb.cb.max.x)
             {
                 playing_first_level = 0;
                 playing_first_level_2 = 1;
@@ -782,7 +782,7 @@ int main()
                         {
                             if (enemies_lvl1[i].animation_frame >= 0 && enemies_lvl1[i].animation_frame <= 3)
                             {
-                                if (game_timer % 4 == 0)
+                                if (game_timer % 3 == 0)
                                 {
                                     enemies_lvl1[i].animation_frame++;
                                     enemies_lvl1[i].animation_frame %= 4;
@@ -793,7 +793,7 @@ int main()
                         {
                             if (enemies_lvl1[i].animation_frame >= 0 && enemies_lvl1[i].animation_frame <= 4)
                             {
-                                if (game_timer % 4 == 0)
+                                if (game_timer % 3 == 0)
                                 {
                                     enemies_lvl1[i].animation_frame++;
                                     enemies_lvl1[i].animation_frame %= 5;
@@ -855,7 +855,7 @@ int main()
 
                 if (player.animation_frame >= 0 && player.animation_frame <= 7)
                 {
-                    if (player_animation_counter % 4 == 0)
+                    if (player_animation_counter % 3 == 0)
                     {
                         player.animation_frame++;
                         player.animation_frame %= 8;
@@ -1447,7 +1447,7 @@ int main()
                     death_on = 1;
                     break;
                 }
-                if (player.rb.cb.min.x > grounds_lvl1_2[ground_count - 1].rb.cb.min.x)
+                if (player.rb.cb.min.x > grounds_lvl1_2[ground_count - 1].rb.cb.max.x - 64)
                 {
                     playing_first_level_2 = 0;
                     playing_second_level = 1;
@@ -1552,7 +1552,7 @@ int main()
                             {
                                 if (enemies_lvl1_2[i].animation_frame >= 0 && enemies_lvl1_2[i].animation_frame <= 3)
                                 {
-                                    if (game_timer % 4 == 0)
+                                    if (game_timer % 3 == 0)
                                     {
                                         enemies_lvl1_2[i].animation_frame++;
                                         enemies_lvl1_2[i].animation_frame %= 4;
@@ -1563,7 +1563,7 @@ int main()
                             {
                                 if (enemies_lvl1_2[i].animation_frame >= 0 && enemies_lvl1_2[i].animation_frame <= 4)
                                 {
-                                    if (game_timer % 4 == 0)
+                                    if (game_timer % 3 == 0)
                                     {
                                         enemies_lvl1_2[i].animation_frame++;
                                         enemies_lvl1_2[i].animation_frame %= 5;
@@ -1624,7 +1624,7 @@ int main()
 
                     if (player.animation_frame >= 0 && player.animation_frame <= 7)
                     {
-                        if (player_animation_counter % 4 == 0)
+                        if (player_animation_counter % 3 == 0)
                         {
                             player.animation_frame++;
                             player.animation_frame %= 8;
@@ -2314,7 +2314,7 @@ int main()
                             {
                                 if (enemies_lvl2[i].animation_frame >= 0 && enemies_lvl2[i].animation_frame <= 3)
                                 {
-                                    if (game_timer % 4 == 0)
+                                    if (game_timer % 3 == 0)
                                     {
                                         enemies_lvl2[i].animation_frame++;
                                         enemies_lvl2[i].animation_frame %= 4;
@@ -2325,7 +2325,7 @@ int main()
                             {
                                 if (enemies_lvl2[i].animation_frame >= 0 && enemies_lvl2[i].animation_frame <= 4)
                                 {
-                                    if (game_timer % 4 == 0)
+                                    if (game_timer % 3 == 0)
                                     {
                                         enemies_lvl2[i].animation_frame++;
                                         enemies_lvl2[i].animation_frame %= 5;
@@ -2338,7 +2338,7 @@ int main()
                                 {
                                     if (enemies_lvl2[i].animation_frame >= 0 && enemies_lvl2[i].animation_frame <= 3)
                                     {
-                                        if (game_timer % 4 == 0)
+                                        if (game_timer % 3 == 0)
                                         {
                                             enemies_lvl2[i].animation_frame++;
                                             enemies_lvl2[i].animation_frame %= 4;
@@ -2413,7 +2413,7 @@ int main()
 
                     if (player.animation_frame >= 0 && player.animation_frame <= 7)
                     {
-                        if (player_animation_counter % 4 == 0)
+                        if (player_animation_counter % 3 == 0)
                         {
                             player.animation_frame++;
                             player.animation_frame %= 8;
@@ -3125,7 +3125,7 @@ int main()
                             {
                                 if (enemies_Boss[i].animation_frame >= 0 && enemies_Boss[i].animation_frame <= 3)
                                 {
-                                    if (game_timer % 4 == 0)
+                                    if (game_timer % 3 == 0)
                                     {
                                         enemies_Boss[i].animation_frame++;
                                         enemies_Boss[i].animation_frame %= 4;
@@ -3136,7 +3136,7 @@ int main()
                             {
                                 if (enemies_Boss[i].animation_frame >= 0 && enemies_Boss[i].animation_frame <= 4)
                                 {
-                                    if (game_timer % 4 == 0)
+                                    if (game_timer % 3 == 0)
                                     {
                                         enemies_Boss[i].animation_frame++;
                                         enemies_Boss[i].animation_frame %= 5;
@@ -3149,7 +3149,7 @@ int main()
                                 {
                                     if (enemies_Boss[i].animation_frame >= 0 && enemies_Boss[i].animation_frame <= 3)
                                     {
-                                        if (game_timer % 4 == 0)
+                                        if (game_timer % 3 == 0)
                                         {
                                             enemies_Boss[i].animation_frame++;
                                             enemies_Boss[i].animation_frame %= 4;
@@ -3224,7 +3224,7 @@ int main()
 
                     if (player.animation_frame >= 0 && player.animation_frame <= 7)
                     {
-                        if (player_animation_counter % 4 == 0)
+                        if (player_animation_counter % 3 == 0)
                         {
                             player.animation_frame++;
                             player.animation_frame %= 8;
