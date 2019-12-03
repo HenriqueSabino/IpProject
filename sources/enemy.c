@@ -50,7 +50,7 @@ void init_bat(Enemy *bat, Vector pos)
 {
     bat->animation_frame = 0;
     bat->facing_right = 0;
-    bat->player_pos = create_vector(200, -32);
+    bat->player_pos = create_vector(200, 0);
     bat->enemy_pos_ini = pos;
     bat->life = 6;
     bat->attack = 1;
@@ -231,7 +231,7 @@ void init_harpy(Enemy *harpy, Vector pos)
 {
     harpy->animation_frame = 0;
     harpy->facing_right = 0;
-    harpy->player_pos = create_vector(200, -32);
+    harpy->player_pos = create_vector(200, 0);
     harpy->enemy_pos_ini = pos;
     harpy->life = 12;
     harpy->attack = 1;
@@ -528,14 +528,15 @@ void atk(Enemy *enemy, RigidBody player)
                 enemy->player_pos.x *= -1;
                 enemy->rb.acceleration = mult(normalized(diff(player_pos, enemy_pos)), 8);
             }
-            enemy->rb.velocity = mult(normalized(diff(sum(player_pos, enemy->player_pos), enemy_pos)), 5);
+            enemy->rb.velocity = mult(normalized(diff(sum(player_pos, enemy->player_pos), enemy_pos)), 6);
         }
 
         if (enemy->taking_damage == 0)
             enemy->enemy_pos_ini = enemy->rb.pos;
     }
-    else if (strcmp(enemy->rb.cb.tag, "fox") == 0 && enemy->taking_damage == 0 && enemy->rb.velocity.y == 0 && enemy->attack)
+    else if (strcmp(enemy->rb.cb.tag, "fox") == 0 && enemy->rb.velocity.y == 0 && enemy->attack)
     {
+
         if (dist(enemy->rb.pos, player_pos) <= SCREEN_WIDTH)
         {
             if (dist(create_vector(enemy_pos.x, 0), create_vector(player_pos.x, 0)) <= 100)

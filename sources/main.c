@@ -339,7 +339,7 @@ int main()
             if (map[i] == '0' || map[i] == '1' || map[i] == '2' || map[i] == '3' || map[i] == '4' ||
                 map[i] == '8' || map[i] == '9' || map[i] == 'c' || map[i] == 'd' || map[i] == 'e' ||
                 map[i] == 'f' || map[i] == 'g' || map[i] == 'h' || map[i] == 'i' || map[i] == 'j' ||
-                map[i] == 'k' || map[i] == 'l' || map[i] == 'm' || map[i] == 'n')
+                map[i] == 'k' || map[i] == 'l' || map[i] == 'm' || map[i] == 'n' || map[i] == 'x')
             {
                 ground_count++;
             }
@@ -516,6 +516,12 @@ int main()
             else if (map[i] == 'j')
             {
                 init_bridge(&grounds_lvl1[ground_count], create_vector(col * 128, row * 128), 2);
+                ground_count++;
+                col++;
+            }
+            else if (map[i] == 'x')
+            {
+                init_bridge(&grounds_lvl1[ground_count], create_vector(col * 128, row * 128), 3);
                 ground_count++;
                 col++;
             }
@@ -1083,7 +1089,7 @@ int main()
                     map[i] == '6' || map[i] == '7' || map[i] == '8' || map[i] == '9' || map[i] == 'c' ||
                     map[i] == 'd' || map[i] == 'e' || map[i] == 'f' || map[i] == 'g' || map[i] == 'h' ||
                     map[i] == 'i' || map[i] == 'j' || map[i] == 'k' || map[i] == 'l' || map[i] == 'm' ||
-                    map[i] == 'n')
+                    map[i] == 'n' || map[i] == 'x')
                 {
                     ground_count++;
                 }
@@ -1128,7 +1134,6 @@ int main()
                 {
                     init_player(&player, create_vector(col * 128, row * 128), player.life);
                     init_arrow_attack(&arrow_attack, player.rb.pos);
-                    init_timer_invulnerability();
                     camera = sum(player.rb.pos, create_vector(-100, -200));
                     col++;
                 }
@@ -1273,6 +1278,12 @@ int main()
                 else if (map[i] == 'j')
                 {
                     init_bridge(&grounds_lvl1_2[ground_count], create_vector(col * 128, row * 128), 2);
+                    ground_count++;
+                    col++;
+                }
+                else if (map[i] == 'x')
+                {
+                    init_bridge(&grounds_lvl1_2[ground_count], create_vector(col * 128, row * 128), 3);
                     ground_count++;
                     col++;
                 }
@@ -1447,7 +1458,7 @@ int main()
                     death_on = 1;
                     break;
                 }
-                if (player.rb.cb.min.x > grounds_lvl1_2[ground_count - 1].rb.cb.max.x - 64)
+                if (player.rb.cb.min.x > grounds_lvl1_2[ground_count - 1].rb.cb.max.x - 96)
                 {
                     playing_first_level_2 = 0;
                     playing_second_level = 1;
@@ -1833,7 +1844,6 @@ int main()
         if (playing_second_level)
         {
 #pragma region second level
-
 #pragma region generating second level
 
             map_size = readMap(&map, "../sources/level_2.txt");
@@ -1854,7 +1864,8 @@ int main()
                     map[i] == '5' || map[i] == '6' || map[i] == '7' || map[i] == '8' || map[i] == '9' ||
                     map[i] == 'a' || map[i] == 'b' || map[i] == 'c' || map[i] == 'd' || map[i] == 'e' ||
                     map[i] == 'f' || map[i] == 'g' || map[i] == 'h' || map[i] == 'i' || map[i] == 'j' ||
-                    map[i] == 'L' || map[i] == 'k' || map[i] == 'l' || map[i] == 'm' || map[i] == 'n')
+                    map[i] == 'L' || map[i] == 'k' || map[i] == 'l' || map[i] == 'm' || map[i] == 'n' ||
+                    map[i] == 'x')
                 {
                     ground_count++;
                 }
@@ -1899,7 +1910,6 @@ int main()
                 {
                     init_player(&player, create_vector(col * 128, row * 128), player.life);
                     init_arrow_attack(&arrow_attack, player.rb.pos);
-                    init_timer_invulnerability();
                     camera = sum(player.rb.pos, create_vector(-100, -200));
                     col++;
                 }
@@ -2044,6 +2054,12 @@ int main()
                 else if (map[i] == 'j')
                 {
                     init_bridge(&grounds_lvl2[ground_count], create_vector(col * 128, row * 128), 2);
+                    ground_count++;
+                    col++;
+                }
+                else if (map[i] == 'x')
+                {
+                    init_bridge(&grounds_lvl2[ground_count], create_vector(col * 128, row * 128), 3);
                     ground_count++;
                     col++;
                 }
@@ -2641,10 +2657,17 @@ int main()
 #pragma endregion
         }
 
+        if (playing_second_level_2)
+        {
+#pragma region second level second part
+#pragma region generating second level second part
+#pragma endregion
+#pragma endregion
+        }
+
         if (playing_boss_fight)
         {
 #pragma region boss fight
-
 #pragma region generating boss fight
 
             map_size = readMap(&map, "../sources/boss_fight.txt");
@@ -2710,7 +2733,6 @@ int main()
                 {
                     init_player(&player, create_vector(col * 128, row * 128), player.life);
                     init_arrow_attack(&arrow_attack, player.rb.pos);
-                    init_timer_invulnerability();
                     camera = sum(player.rb.pos, create_vector(-100, -200));
                     col++;
                 }
@@ -2840,24 +2862,6 @@ int main()
                     ground_count++;
                     col++;
                 }
-                else if (map[i] == 'h')
-                {
-                    init_bridge(&grounds_Boss[ground_count], create_vector(col * 128, row * 128), 0);
-                    ground_count++;
-                    col++;
-                }
-                else if (map[i] == 'i')
-                {
-                    init_bridge(&grounds_Boss[ground_count], create_vector(col * 128, row * 128), 1);
-                    ground_count++;
-                    col++;
-                }
-                else if (map[i] == 'j')
-                {
-                    init_bridge(&grounds_Boss[ground_count], create_vector(col * 128, row * 128), 2);
-                    ground_count++;
-                    col++;
-                }
                 else if (map[i] == 'L')
                 {
                     init_lava(&grounds_Boss[ground_count], create_vector(col * 128, row * 128), 0);
@@ -2890,66 +2894,13 @@ int main()
             row = col = 0;
             for (int i = 0; i < scenario_map_size; i++)
             {
-                if (scenario_map[i] == '1')
-                {
-                    init_object(&objects_Boss[object_count], create_vector(col * 128, row * 128), 0);
-                    object_count++;
-                    col++;
-                }
-                else if (scenario_map[i] == '2')
-                {
-                    init_object(&objects_Boss[object_count], create_vector(col * 128, row * 128), 1);
-                    object_count++;
-                    col++;
-                }
-                else if (scenario_map[i] == '3')
-                {
-                    init_object(&objects_Boss[object_count], create_vector(col * 128, row * 128), 2);
-                    object_count++;
-                    col++;
-                }
-                else if (scenario_map[i] == '4')
-                {
-                    init_object(&objects_Boss[object_count], create_vector(col * 128, row * 128), 3);
-                    object_count++;
-                    col++;
-                }
-                else if (scenario_map[i] == '5')
+                if (scenario_map[i] == '5')
                 {
                     init_object(&objects_Boss[object_count], create_vector(col * 128, row * 128), 30);
                     object_count++;
                     col++;
                 }
-                else if (scenario_map[i] == '6')
-                {
-                    init_object(&objects_Boss[object_count], create_vector(col * 128, row * 128), 16);
-                    object_count++;
-                    col++;
-                }
-                else if (scenario_map[i] == '8')
-                {
-                    init_object(&objects_Boss[object_count], create_vector(col * 128, row * 128), 18);
-                    object_count++;
-                    col++;
-                }
-                else if (scenario_map[i] == '9')
-                {
-                    init_object(&objects_Boss[object_count], create_vector(col * 128, row * 128), 19);
-                    object_count++;
-                    col++;
-                }
-                else if (scenario_map[i] == 'a')
-                {
-                    init_object(&objects_Boss[object_count], create_vector(col * 128, row * 128), 20);
-                    object_count++;
-                    col++;
-                }
-                else if (scenario_map[i] == 'b')
-                {
-                    init_object(&objects_Boss[object_count], create_vector(col * 128, row * 128), 21);
-                    object_count++;
-                    col++;
-                }
+
                 else if (scenario_map[i] == 'L')
                 {
                     init_object(&objects_Boss[object_count], create_vector(col * 128, row * 128), 12);
@@ -2959,12 +2910,6 @@ int main()
                 else if (scenario_map[i] == 'l')
                 {
                     init_object(&objects_Boss[object_count], create_vector(col * 128, row * 128), 11);
-                    object_count++;
-                    col++;
-                }
-                else if (scenario_map[i] == 't')
-                {
-                    init_object(&objects_Boss[object_count], create_vector(col * 128, row * 128), 22);
                     object_count++;
                     col++;
                 }
@@ -3023,15 +2968,18 @@ int main()
                 }
                 if (player.rb.pos.y >= grounds_Boss[ground_count - 1].rb.cb.max.y + 256)
                 {
-                    playing_second_level = 0;
+                    playing_boss_fight = 0;
                     death_on = 1;
                     break;
                 }
+
                 keyboard_input();
+
                 //USER INPUT
+
                 if (key_down(KEY_ESC))
                 {
-                    playing_second_level = 0;
+                    playing_boss_fight = 0;
                     menu_on = 1;
                     break;
                 }
@@ -3199,15 +3147,6 @@ int main()
                                 objects_Boss[i].sprite_frame += 12;
                             }
                         }
-                        else if (objects_Boss[i].sprite_frame >= 22 && objects_Boss[i].sprite_frame <= 27)
-                        {
-                            if (game_timer % 4 == 0)
-                            {
-                                objects_Boss[i].sprite_frame++;
-                                objects_Boss[i].sprite_frame %= 6;
-                                objects_Boss[i].sprite_frame += 22;
-                            }
-                        }
                     }
 
                     // Kill enemy
@@ -3293,8 +3232,6 @@ int main()
                 //DRAWING
 
                 masked_blit(hell_background, buffer, camera.x, camera.y, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-                //masked_blit(montain_sprite, buffer, camera.x * 0.2f, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-                //masked_blit(ground_background_sprite, buffer, camera.x * 0.4f, camera.y - 128, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
                 for (int i = 0; i < ground_count; i++)
                 {
@@ -3432,8 +3369,6 @@ int main()
                 if ((arrow_attack.rb.pos.x - player.rb.pos.x > (SCREEN_WIDTH / 2) + 128 && arrow_attack.rb.velocity.x > 0) || ((arrow_attack.rb.pos.x - player.rb.pos.x) * -1 > SCREEN_WIDTH / 2 && arrow_attack.rb.velocity.x < 0))
                     arrow_attack.rb.cb.enabled = 0;
 
-                //draw_test(buffer, test_sprite, camera);
-
                 draw_lifebar(buffer, lifebar_sprite, player);
 
                 draw_sprite(screen, buffer, 0, 0);
@@ -3468,6 +3403,8 @@ int main()
         play_sample(sound_death, 255, 128, 1000, 1);
 
         animation_frame = 0;
+
+        remove_int(increment_invulnerability);
 
         while (death_on && !close_game)
         {

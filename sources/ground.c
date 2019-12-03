@@ -160,9 +160,18 @@ void init_bridge(Ground *bridge, Vector pos, int animation_frame)
     bridge->rb.acceleration = create_vector(0, 0);
     bridge->rb.pos = pos;
 
-    bridge->rb.cb.width = 128;
-    bridge->rb.cb.height = 116;
-    bridge->rb.cb.offset = create_vector(0, 28);
+    if (animation_frame >= 0 && animation_frame <= 2)
+    {
+        bridge->rb.cb.width = 128;
+        bridge->rb.cb.height = 116;
+        bridge->rb.cb.offset = create_vector(0, 28);
+    }
+    else
+    {
+        bridge->rb.cb.width = 32;
+        bridge->rb.cb.height = 128;
+        bridge->rb.cb.offset = create_vector(0, 0);
+    }
 
     bridge->rb.cb.min = create_vector(bridge->rb.pos.x, bridge->rb.pos.y);
     bridge->rb.cb.max = create_vector(bridge->rb.cb.min.x + bridge->rb.cb.width, bridge->rb.cb.min.y + bridge->rb.cb.height);
