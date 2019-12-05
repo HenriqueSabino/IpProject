@@ -1,0 +1,53 @@
+9
+69
+
+
+
+
+
+
+
+********************************************************************
+********************************************************************
+bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+x*******************************************************************
+x****G***********p*********I******************p*********pIIIp*****G*
+x***B*B**********g********edf***B*****B*******g********pedddf*orrrrr
+xPp**B**I******B*6*******g****g**II*****B***G*g********g******q*****
+02I102*edf*102*6*7*6*1002*******eddf*1002***g***g***102*******q*****
+*809*3LLLLL4*3L7L7L7L4**3LLLLLLLLLLLL4**802LLLLLLL109*3LLLLLLLq****0
+
+Captions:
+
+* => nothing
+P => player
+B => bat
+F => fox
+H => harpy
+G => ghost
+I => spike
+L => fluid lava 
+0 => ground sprite 0
+1 => ground sprite 1
+2 => ground sprite 2
+3 => ground sprite 3
+4 => ground sprite 4
+5 => ground sprite 5
+6 => ground sprite 6
+7 => ground sprite 7
+8 => ground sprite 8
+9 => ground sprite 9
+a => ground sprite 10
+b => ground sprite 11
+d => platform sprite 0
+e => platform sprite 1
+f => platform sprite 2
+g => platform sprite 3
+h => bridge sprite 0
+i => bridge sprite 1
+j => bridge sprite 2
+k => platform sprite 4
+l => platform sprite 5
+m => platform sprite 6
+n => platform sprite 7
+p => potion

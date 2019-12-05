@@ -12,13 +12,13 @@ void init_ground(Ground *ground, Vector pos, int animation_frame)
     ground->rb.acceleration = create_vector(0, 0);
     ground->rb.pos = pos;
 
-    if (animation_frame == 0 || animation_frame == 8 || animation_frame == 9)
+    if (animation_frame == 0 || animation_frame == 8 || animation_frame == 9 || animation_frame == 92)
     {
         ground->rb.cb.width = 128;
         ground->rb.cb.height = 100;
         ground->rb.cb.offset = create_vector(0, 28);
     }
-    else if (animation_frame == 1)
+    else if (animation_frame == 1 || animation_frame == 90)
     {
         ground->rb.cb.width = 116;
         ground->rb.cb.height = 100;
@@ -36,7 +36,7 @@ void init_ground(Ground *ground, Vector pos, int animation_frame)
         ground->rb.cb.height = 128;
         ground->rb.cb.offset = create_vector(0, 0);
     }
-    else if (animation_frame == 4)
+    else if (animation_frame == 4 || animation_frame == 91)
     {
         ground->rb.cb.width = 116;
         ground->rb.cb.height = 128;
