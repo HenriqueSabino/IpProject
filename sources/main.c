@@ -21,7 +21,6 @@ void close_program()
 }
 END_OF_FUNCTION(close_program)
 
-int sleepy = 1, sketchy = 0, angry = 0;
 int menu_on = 1;
 int death_on = 0;
 int cutscene_one_on = 0;
@@ -75,8 +74,8 @@ void draw_test(BITMAP *bmp, BITMAP *sprite, Vector camera);
 
 int main()
 {
-    srand(time(NULL));
 #pragma region allegro initialization
+    srand(time(NULL));
     allegro_init();
     install_keyboard();
     install_sound(DIGI_AUTODETECT, MIDI_AUTODETECT, NULL);
@@ -107,6 +106,10 @@ int main()
     int playing_second_level_2 = 0;
 
     int playing_boss_fight = 0;
+
+    int end_level = 0;
+
+    int pause_game = 0;
 
     BITMAP *buffer = create_bitmap(SCREEN_W, SCREEN_H);
 
@@ -394,9 +397,9 @@ int main()
         fading_progress = 1;
         int scene_show = 1;
         int aux = 1;
+
         while (cutscene_one_on && !close_game)
         {
-
             if (fading_type == 0)
             {
                 keyboard_input();
@@ -435,8 +438,7 @@ int main()
                     }
                     if (scene_show == 6)
                     {
-                        stop_sample(intro);
-                        // menu_on = 0;
+                        stop_sample(introo);
                         playing_first_level = 1;
                         fading_type = 2;
                         fading_progress = 0;
@@ -555,8 +557,6 @@ int main()
                     {
                         fading_progress = 0;
                         fading_type = 0;
-
-                        menu_on = 0;
                         cutscene_one_on = TRUE;
                         // playing_first_level = 1;
                     }
@@ -568,8 +568,14 @@ int main()
             }
         }
 
-        destroy_bitmap(menu);
-        destroy_sample(intro);
+        destroy_bitmap(cena_one);
+        destroy_bitmap(cena_two);
+        destroy_bitmap(cena_three);
+        destroy_bitmap(cena_four);
+        destroy_bitmap(cena_five);
+        destroy_bitmap(cena_six);
+        destroy_bitmap(cena_seven);
+        destroy_sample(introo);
 
 #pragma endregion
 
@@ -928,92 +934,113 @@ int main()
 
         fading_type = 1;
         fading_progress = 1;
+        end_level = 0;
+        counter = 0;
 
         while (playing_first_level && !close_game)
         {
-            if (fading_type == 0)
+            //UPDATE
+            while (counter > 0)
             {
-                if (player.rb.pos.y >= grounds_lvl1[ground_count - 1].rb.cb.max.y ||
-                    player.rb.pos.x <= -256 || player.life <= 0)
+                if (fading_type == 0)
                 {
-                    player.life = 0;
-                    player.rb.cb.enabled = 0;
-                    player.sword_rb.cb.enabled = 0;
-                }
-                if (player.rb.pos.y >= grounds_lvl1[ground_count - 1].rb.cb.max.y + 256)
-                {
-                    // playing_first_level = 0;
-                    death_on = 1;
-                    // break;
-                    fading_type = 2;
-                    fading_progress = 0;
-                }
-                if (player.rb.cb.min.x > grounds_lvl1[ground_count - 1].rb.cb.max.x)
-                {
-                    // playing_first_level = 0;
-                    playing_first_level_2 = 1;
-                    // break;
-                    fading_type = 2;
-                    fading_progress = 0;
-                }
-
-                keyboard_input();
-                //USER INPUT
-                if (key_down(KEY_ESC))
-                {
-                    // playing_first_level = 0;
-                    menu_on = 1;
-                    // break;
-                    fading_type = 2;
-                    fading_progress = 0;
-                }
-                if (key_down(KEY_W) || key_down(KEY_SPACE))
-                {
-                    if (player.can_jump)
+                    if (player.rb.pos.y >= grounds_lvl1[ground_count - 1].rb.cb.max.y ||
+                        player.rb.pos.x <= -256 || player.life <= 0)
                     {
-                        set_velocity_axis(&player, "vertical", -20);
+                        player.life = 0;
+                        player.rb.cb.enabled = 0;
+                        player.sword_rb.cb.enabled = 0;
                     }
-                }
-                if ((key_holding(KEY_A) || key_holding(KEY_D)) && !player.attacking && !player.bow_attack)
-                {
-                    if (key_holding(KEY_A))
+                    if (player.rb.pos.y >= grounds_lvl1[ground_count - 1].rb.cb.max.y + 256)
                     {
-                        set_velocity_axis(&player, "horizontal", -5);
-                        player.facing_right = 0;
+                        // playing_first_level = 0;
+                        death_on = 1;
+                        // break;
+                        fading_type = 2;
+                        fading_progress = 0;
+                    }
+                    if (player.rb.cb.min.x > grounds_lvl1[ground_count - 1].rb.cb.max.x)
+                    {
+                        // playing_first_level = 0;
+                        playing_first_level_2 = 1;
+                        end_level = 1;
+                        // break;
+                        fading_type = 2;
+                        fading_progress = 0;
+                    }
+
+                    keyboard_input();
+                    //USER INPUT
+                    if (key_down(KEY_ESC))
+                    {
+                        // playing_first_level = 0;
+                        menu_on = 1;
+                        // break;
+                        fading_type = 2;
+                        fading_progress = 0;
+                    }
+                    if (key_down(KEY_P))
+                    {
+                        if (pause_game == 0)
+                        {
+                            pause_game = 1;
+                            counter = 0;
+                            player_animation_counter = 0;
+                            game_timer = 0;
+                        }
+                        else
+                        {
+                            pause_game = 0;
+                            counter = 0;
+                            player_animation_counter = 0;
+                            game_timer = 0;
+                        }
+                    }
+                    if (key_down(KEY_W) || key_down(KEY_SPACE) || key_down(KEY_UP))
+                    {
+                        if (player.can_jump && !pause_game)
+                        {
+                            set_velocity_axis(&player, "vertical", -20);
+                        }
+                    }
+                    if ((key_holding(KEY_A) || key_holding(KEY_D) || (key_holding(KEY_LEFT) || key_holding(KEY_RIGHT))) && !player.attacking && !player.bow_attack && !pause_game)
+                    {
+                        if (key_holding(KEY_A) || key_holding(KEY_LEFT))
+                        {
+                            set_velocity_axis(&player, "horizontal", -5);
+                            player.facing_right = 0;
+                        }
+                        else
+                        {
+                            set_velocity_axis(&player, "horizontal", 5);
+                            player.facing_right = 1;
+                        }
                     }
                     else
                     {
-                        set_velocity_axis(&player, "horizontal", 5);
-                        player.facing_right = 1;
+                        set_velocity_axis(&player, "horizontal", 0);
                     }
-                }
-                else
-                {
-                    set_velocity_axis(&player, "horizontal", 0);
+
+                    if (key_down(KEY_Q))
+                    {
+                        if (!player.taking_damage && !pause_game)
+                        {
+                            player.attacking = 1;
+                            player_animation_counter = 0;
+                        }
+                    }
+                    if (key_down(KEY_E))
+                    {
+                        if (!player.taking_damage && !arrow_attack.rb.cb.enabled && player.arrows_amount > 0 && !pause_game)
+                        {
+                            player.bow_attack = 1;
+                            player_animation_counter = 0;
+                        }
+                    }
                 }
 
-                if (key_down(KEY_Q))
-                {
-                    if (!player.taking_damage)
-                    {
-                        player.attacking = 1;
-                        player_animation_counter = 0;
-                    }
-                }
-                if (key_down(KEY_E))
-                {
-                    if (!player.taking_damage && !arrow_attack.rb.cb.enabled && player.arrows_amount > 0)
-                    {
-                        player.bow_attack = 1;
-                        player_animation_counter = 0;
-                    }
-                }
-            }
-            //UPDATE
-
-            while (counter > 0)
-            {
-                update_all(rbs_lvl1, rbs_size, camera);
+                if (!end_level && !pause_game)
+                    update_all(rbs_lvl1, rbs_size, camera);
 
                 //linear interpolation between camera and player's position
                 Vector offset_camera = create_vector(-SCREEN_WIDTH / 2 + 64, -200);
@@ -1051,7 +1078,7 @@ int main()
                         }
                     }
 
-                    if (!enemies_lvl1[i].taking_damage && enemies_lvl1[i].alive)
+                    if (!enemies_lvl1[i].taking_damage && enemies_lvl1[i].alive && end_level == 0 && !pause_game)
                     {
                         if (strcmp(enemies_lvl1[i].rb.cb.tag, "bat") == 0 || strcmp(enemies_lvl1[i].rb.cb.tag, "fox") == 0)
                         {
@@ -1115,20 +1142,7 @@ int main()
                     }
                 }
 
-                // Kill enemy
-                for (int i = 0; i < enemy_count; i++)
-                {
-                    if (enemies_lvl1[i].life <= 0)
-                    {
-                        enemies_lvl1[i].alive = 0;
-                        enemies_lvl1[i].attack = 0;
-                        if (strcmp(enemies_lvl1[i].rb.cb.tag, "jumperboss") != 0)
-                            enemies_lvl1[i].rb.gravity_scale = 0.2f;
-                        enemies_lvl1[i].rb.cb.enabled = 0;
-                    }
-                }
-
-                if (player.animation_frame >= 0 && player.animation_frame <= 7)
+                if (player.animation_frame >= 0 && player.animation_frame <= 7 && end_level == 0)
                 {
                     if (player_animation_counter % 3 == 0)
                     {
@@ -1190,6 +1204,18 @@ int main()
                                 grounds_lvl1[i].animation_frame %= 4;
                             }
                         }
+                    }
+                }
+
+                // KILL ENEMIES
+                for (int i = 0; i < enemy_count; i++)
+                {
+                    if (enemies_lvl1[i].life <= 0)
+                    {
+                        enemies_lvl1[i].alive = 0;
+                        enemies_lvl1[i].attack = 0;
+                        enemies_lvl1[i].rb.gravity_scale = 0.2f;
+                        enemies_lvl1[i].rb.cb.enabled = 0;
                     }
                 }
 
@@ -1743,93 +1769,96 @@ int main()
 
             fading_type = 1;
             fading_progress = 1;
+            end_level = 0;
+            counter = 0;
 
             while (playing_first_level_2 && !close_game)
             {
-                if (fading_type == 0)
+                //UPDATE
+                while (counter > 0)
                 {
-                    if (player.rb.pos.y >= grounds_lvl1_2[ground_count - 1].rb.cb.max.y ||
-                        player.rb.pos.x <= -256 || player.life <= 0)
+                    if (fading_type == 0)
                     {
-                        player.life = 0;
-                        player.rb.cb.enabled = 0;
-                        player.sword_rb.cb.enabled = 0;
-                    }
-                    if (player.rb.pos.y >= grounds_lvl1_2[ground_count - 1].rb.cb.max.y + 256)
-                    {
-                        // playing_first_level_2 = 0;
-                        death_on = 1;
-                        // break;
-                        fading_type = 2;
-                        fading_progress = 0;
-                    }
-                    if (player.rb.cb.min.x > grounds_lvl1_2[ground_count - 1].rb.cb.max.x - 96)
-                    {
-                        // playing_first_level_2 = 0;
-                        playing_second_level = 1;
-                        // break;
-                        fading_type = 2;
-                        fading_progress = 0;
-                    }
-
-                    keyboard_input();
-                    //USER INPUT
-                    if (key_down(KEY_ESC))
-                    {
-                        // playing_first_level_2 = 0;
-                        menu_on = 1;
-                        // break;
-                        fading_type = 2;
-                        fading_progress = 0;
-                    }
-                    if (key_down(KEY_W) || key_down(KEY_SPACE))
-                    {
-                        if (player.can_jump)
+                        if (player.rb.pos.y >= grounds_lvl1_2[ground_count - 1].rb.cb.max.y ||
+                            player.rb.pos.x <= -256 || player.life <= 0)
                         {
-                            set_velocity_axis(&player, "vertical", -20);
+                            player.life = 0;
+                            player.rb.cb.enabled = 0;
+                            player.sword_rb.cb.enabled = 0;
                         }
-                    }
-                    if ((key_holding(KEY_A) || key_holding(KEY_D)) && !player.attacking && !player.bow_attack)
-                    {
-                        if (key_holding(KEY_A))
+                        if (player.rb.pos.y >= grounds_lvl1_2[ground_count - 1].rb.cb.max.y + 256)
                         {
-                            set_velocity_axis(&player, "horizontal", -5);
-                            player.facing_right = 0;
+                            // playing_first_level_2 = 0;
+                            death_on = 1;
+                            // break;
+                            fading_type = 2;
+                            fading_progress = 0;
+                        }
+                        if (player.rb.cb.min.x > grounds_lvl1_2[ground_count - 1].rb.cb.max.x - 96)
+                        {
+                            // playing_first_level_2 = 0;
+                            playing_second_level = 1;
+                            end_level = 1;
+                            // break;
+                            fading_type = 2;
+                            fading_progress = 0;
+                        }
+
+                        keyboard_input();
+                        //USER INPUT
+                        if (key_down(KEY_ESC))
+                        {
+                            // playing_first_level_2 = 0;
+                            menu_on = 1;
+                            // break;
+                            fading_type = 2;
+                            fading_progress = 0;
+                        }
+                        if (key_down(KEY_W) || key_down(KEY_SPACE) || key_down(KEY_UP))
+                        {
+                            if (player.can_jump)
+                            {
+                                set_velocity_axis(&player, "vertical", -20);
+                            }
+                        }
+                        if ((key_holding(KEY_A) || key_holding(KEY_D) || (key_holding(KEY_LEFT) || key_holding(KEY_RIGHT))) && !player.attacking && !player.bow_attack)
+                        {
+                            if (key_holding(KEY_A) || key_holding(KEY_LEFT))
+                            {
+                                set_velocity_axis(&player, "horizontal", -5);
+                                player.facing_right = 0;
+                            }
+                            else
+                            {
+                                set_velocity_axis(&player, "horizontal", 5);
+                                player.facing_right = 1;
+                            }
                         }
                         else
                         {
-                            set_velocity_axis(&player, "horizontal", 5);
-                            player.facing_right = 1;
+                            set_velocity_axis(&player, "horizontal", 0);
                         }
-                    }
-                    else
-                    {
-                        set_velocity_axis(&player, "horizontal", 0);
-                    }
 
-                    if (key_down(KEY_Q))
-                    {
-                        if (!player.taking_damage)
+                        if (key_down(KEY_Q))
                         {
-                            player.attacking = 1;
-                            player_animation_counter = 0;
+                            if (!player.taking_damage)
+                            {
+                                player.attacking = 1;
+                                player_animation_counter = 0;
+                            }
                         }
-                    }
-                    if (key_down(KEY_E))
-                    {
-                        if (!player.taking_damage && !arrow_attack.rb.cb.enabled && player.arrows_amount > 0)
+                        if (key_down(KEY_E))
                         {
-                            player.bow_attack = 1;
-                            player_animation_counter = 0;
+                            if (!player.taking_damage && !arrow_attack.rb.cb.enabled && player.arrows_amount > 0)
+                            {
+                                player.bow_attack = 1;
+                                player_animation_counter = 0;
+                            }
                         }
                     }
-                }
 
-                //UPDATE
-
-                while (counter > 0)
-                {
-                    update_all(rbs_lvl1_2, rbs_size, camera);
+                    if (!end_level)
+                        update_all(rbs_lvl1_2, rbs_size, camera);
 
                     //linear interpolation between camera and player's position
                     Vector offset_camera = create_vector(-SCREEN_WIDTH / 2 + 64, -200);
@@ -1867,7 +1896,7 @@ int main()
                             }
                         }
 
-                        if (!enemies_lvl1_2[i].taking_damage && enemies_lvl1_2[i].alive)
+                        if (!enemies_lvl1_2[i].taking_damage && enemies_lvl1_2[i].alive && end_level == 0)
                         {
                             if (strcmp(enemies_lvl1_2[i].rb.cb.tag, "bat") == 0 || strcmp(enemies_lvl1_2[i].rb.cb.tag, "fox") == 0)
                             {
@@ -1943,7 +1972,7 @@ int main()
                         }
                     }
 
-                    if (player.animation_frame >= 0 && player.animation_frame <= 7)
+                    if (player.animation_frame >= 0 && player.animation_frame <= 7 && end_level == 0)
                     {
                         if (player_animation_counter % 3 == 0)
                         {
@@ -2557,92 +2586,95 @@ int main()
 
             fading_type = 1;
             fading_progress = 1;
+            end_level = 0;
+            counter = 0;
 
             while (playing_second_level && !close_game)
             {
-                if (fading_type == 0)
+                //UPDATE
+                while (counter > 0)
                 {
-                    if (player.rb.pos.y >= grounds_lvl2[ground_count - 1].rb.cb.max.y ||
-                        player.rb.pos.x <= -256 || player.life <= 0)
+                    if (fading_type == 0)
                     {
-                        player.life = 0;
-                        player.rb.cb.enabled = 0;
-                        player.sword_rb.cb.enabled = 0;
-                    }
-                    if (player.rb.pos.y >= grounds_lvl2[ground_count - 1].rb.cb.max.y + 256)
-                    {
-                        // playing_second_level = 0;
-                        death_on = 1;
-                        // break;
-                        fading_type = 2;
-                        fading_progress = 0;
-                    }
-                    if (player.rb.cb.min.x > grounds_lvl2[ground_count - 1].rb.cb.max.x)
-                    {
-                        // playing_second_level = 0;
-                        playing_second_level_2 = 1;
-                        // break;
-                        fading_type = 2;
-                        fading_progress = 0;
-                    }
-                    keyboard_input();
-                    //USER INPUT
-                    if (key_down(KEY_ESC))
-                    {
-                        // playing_second_level = 0;
-                        menu_on = 1;
-                        // break;
-                        fading_type = 2;
-                        fading_progress = 0;
-                    }
-                    if (key_down(KEY_W) || key_down(KEY_SPACE))
-                    {
-                        if (player.can_jump)
+                        if (player.rb.pos.y >= grounds_lvl2[ground_count - 1].rb.cb.max.y ||
+                            player.rb.pos.x <= -256 || player.life <= 0)
                         {
-                            set_velocity_axis(&player, "vertical", -20);
+                            player.life = 0;
+                            player.rb.cb.enabled = 0;
+                            player.sword_rb.cb.enabled = 0;
                         }
-                    }
-                    if ((key_holding(KEY_A) || key_holding(KEY_D)) && !player.attacking && !player.bow_attack)
-                    {
-                        if (key_holding(KEY_A))
+                        if (player.rb.pos.y >= grounds_lvl2[ground_count - 1].rb.cb.max.y + 256)
                         {
-                            set_velocity_axis(&player, "horizontal", -5);
-                            player.facing_right = 0;
+                            // playing_second_level = 0;
+                            death_on = 1;
+                            // break;
+                            fading_type = 2;
+                            fading_progress = 0;
+                        }
+                        if (player.rb.cb.min.x > grounds_lvl2[ground_count - 1].rb.cb.max.x)
+                        {
+                            // playing_second_level = 0;
+                            playing_second_level_2 = 1;
+                            end_level = 1;
+                            // break;
+                            fading_type = 2;
+                            fading_progress = 0;
+                        }
+                        keyboard_input();
+                        //USER INPUT
+                        if (key_down(KEY_ESC))
+                        {
+                            // playing_second_level = 0;
+                            menu_on = 1;
+                            // break;
+                            fading_type = 2;
+                            fading_progress = 0;
+                        }
+                        if (key_down(KEY_W) || key_down(KEY_SPACE) || key_down(KEY_UP))
+                        {
+                            if (player.can_jump)
+                            {
+                                set_velocity_axis(&player, "vertical", -20);
+                            }
+                        }
+                        if ((key_holding(KEY_A) || key_holding(KEY_D) || (key_holding(KEY_LEFT) || key_holding(KEY_RIGHT))) && !player.attacking && !player.bow_attack)
+                        {
+                            if (key_holding(KEY_A) || key_holding(KEY_LEFT))
+                            {
+                                set_velocity_axis(&player, "horizontal", -5);
+                                player.facing_right = 0;
+                            }
+                            else
+                            {
+                                set_velocity_axis(&player, "horizontal", 5);
+                                player.facing_right = 1;
+                            }
                         }
                         else
                         {
-                            set_velocity_axis(&player, "horizontal", 5);
-                            player.facing_right = 1;
+                            set_velocity_axis(&player, "horizontal", 0);
                         }
-                    }
-                    else
-                    {
-                        set_velocity_axis(&player, "horizontal", 0);
-                    }
 
-                    if (key_down(KEY_Q))
-                    {
-                        if (!player.taking_damage)
+                        if (key_down(KEY_Q))
                         {
-                            player.attacking = 1;
-                            player_animation_counter = 0;
+                            if (!player.taking_damage)
+                            {
+                                player.attacking = 1;
+                                player_animation_counter = 0;
+                            }
                         }
-                    }
-                    if (key_down(KEY_E))
-                    {
-                        if (!player.taking_damage && !arrow_attack.rb.cb.enabled && player.arrows_amount > 0)
+                        if (key_down(KEY_E))
                         {
-                            player.bow_attack = 1;
-                            player_animation_counter = 0;
+                            if (!player.taking_damage && !arrow_attack.rb.cb.enabled && player.arrows_amount > 0)
+                            {
+                                player.bow_attack = 1;
+                                player_animation_counter = 0;
+                            }
                         }
                     }
-                }
 
-                //UPDATE
-
-                while (counter > 0)
-                {
-                    update_all(rbs_lvl2, rbs_size, camera);
+                    if (!end_level)
+                        update_all(rbs_lvl2, rbs_size, camera);
 
                     //linear interpolation between camera and player's position
                     Vector offset_camera = create_vector(-SCREEN_WIDTH / 2 + 64, -200);
@@ -2680,7 +2712,7 @@ int main()
                             }
                         }
 
-                        if (!enemies_lvl2[i].taking_damage && enemies_lvl2[i].alive)
+                        if (!enemies_lvl2[i].taking_damage && enemies_lvl2[i].alive && end_level == 0)
                         {
                             if (strcmp(enemies_lvl2[i].rb.cb.tag, "bat") == 0 || strcmp(enemies_lvl2[i].rb.cb.tag, "fox") == 0)
                             {
@@ -2783,7 +2815,7 @@ int main()
                         }
                     }
 
-                    if (player.animation_frame >= 0 && player.animation_frame <= 7)
+                    if (player.animation_frame >= 0 && player.animation_frame <= 7 && end_level == 0)
                     {
                         if (player_animation_counter % 3 == 0)
                         {
@@ -3042,7 +3074,6 @@ int main()
         if (playing_second_level_2)
         {
 #pragma region second level second part
-
 #pragma region generating second level second part
             map_size = readMap(&map, "../sources/level_2_2.txt");
 
@@ -3489,92 +3520,95 @@ int main()
 
             fading_type = 1;
             fading_progress = 1;
+            end_level = 0;
+            counter = 0;
 
             while (playing_second_level_2 && !close_game)
             {
-                if (fading_type == 0)
+                //UPDATE
+                while (counter > 0)
                 {
-                    if (player.rb.pos.y >= grounds_lvl2[ground_count - 1].rb.cb.max.y ||
-                        player.rb.pos.x <= -256 || player.life <= 0)
+                    if (fading_type == 0)
                     {
-                        player.life = 0;
-                        player.rb.cb.enabled = 0;
-                        player.sword_rb.cb.enabled = 0;
-                    }
-                    if (player.rb.pos.y >= grounds_lvl2[ground_count - 1].rb.cb.max.y + 256)
-                    {
-                        // playing_second_level_2 = 0;
-                        death_on = 1;
-                        // break;
-                        fading_type = 2;
-                        fading_progress = 0;
-                    }
-                    if (player.rb.cb.min.x > grounds_lvl2[ground_count - 1].rb.cb.max.x - 96)
-                    {
-                        // playing_second_level = 0;
-                        playing_boss_fight = 1;
-                        // break;
-                        fading_type = 2;
-                        fading_progress = 0;
-                    }
-                    keyboard_input();
-                    //USER INPUT
-                    if (key_down(KEY_ESC))
-                    {
-                        // playing_second_level_2 = 0;
-                        menu_on = 1;
-                        // break;
-                        fading_type = 2;
-                        fading_progress = 0;
-                    }
-                    if (key_down(KEY_W) || key_down(KEY_SPACE))
-                    {
-                        if (player.can_jump)
+                        if (player.rb.pos.y >= grounds_lvl2[ground_count - 1].rb.cb.max.y ||
+                            player.rb.pos.x <= -256 || player.life <= 0)
                         {
-                            set_velocity_axis(&player, "vertical", -20);
+                            player.life = 0;
+                            player.rb.cb.enabled = 0;
+                            player.sword_rb.cb.enabled = 0;
                         }
-                    }
-                    if ((key_holding(KEY_A) || key_holding(KEY_D)) && !player.attacking && !player.bow_attack)
-                    {
-                        if (key_holding(KEY_A))
+                        if (player.rb.pos.y >= grounds_lvl2[ground_count - 1].rb.cb.max.y + 256)
                         {
-                            set_velocity_axis(&player, "horizontal", -5);
-                            player.facing_right = 0;
+                            // playing_second_level_2 = 0;
+                            death_on = 1;
+                            // break;
+                            fading_type = 2;
+                            fading_progress = 0;
+                        }
+                        if (player.rb.cb.min.x > grounds_lvl2[ground_count - 1].rb.cb.max.x - 96)
+                        {
+                            // playing_second_level = 0;
+                            playing_boss_fight = 1;
+                            end_level = 1;
+                            // break;
+                            fading_type = 2;
+                            fading_progress = 0;
+                        }
+                        keyboard_input();
+                        //USER INPUT
+                        if (key_down(KEY_ESC))
+                        {
+                            // playing_second_level_2 = 0;
+                            menu_on = 1;
+                            // break;
+                            fading_type = 2;
+                            fading_progress = 0;
+                        }
+                        if (key_down(KEY_W) || key_down(KEY_SPACE) || key_down(KEY_UP))
+                        {
+                            if (player.can_jump)
+                            {
+                                set_velocity_axis(&player, "vertical", -20);
+                            }
+                        }
+                        if ((key_holding(KEY_A) || key_holding(KEY_D) || key_holding(KEY_LEFT) || key_holding(KEY_RIGHT)) && !player.attacking && !player.bow_attack)
+                        {
+                            if (key_holding(KEY_A) || key_holding(KEY_LEFT))
+                            {
+                                set_velocity_axis(&player, "horizontal", -5);
+                                player.facing_right = 0;
+                            }
+                            else
+                            {
+                                set_velocity_axis(&player, "horizontal", 5);
+                                player.facing_right = 1;
+                            }
                         }
                         else
                         {
-                            set_velocity_axis(&player, "horizontal", 5);
-                            player.facing_right = 1;
+                            set_velocity_axis(&player, "horizontal", 0);
                         }
-                    }
-                    else
-                    {
-                        set_velocity_axis(&player, "horizontal", 0);
-                    }
 
-                    if (key_down(KEY_Q))
-                    {
-                        if (!player.taking_damage)
+                        if (key_down(KEY_Q))
                         {
-                            player.attacking = 1;
-                            player_animation_counter = 0;
+                            if (!player.taking_damage)
+                            {
+                                player.attacking = 1;
+                                player_animation_counter = 0;
+                            }
                         }
-                    }
-                    if (key_down(KEY_E))
-                    {
-                        if (!player.taking_damage && !arrow_attack.rb.cb.enabled && player.arrows_amount > 0)
+                        if (key_down(KEY_E))
                         {
-                            player.bow_attack = 1;
-                            player_animation_counter = 0;
+                            if (!player.taking_damage && !arrow_attack.rb.cb.enabled && player.arrows_amount > 0)
+                            {
+                                player.bow_attack = 1;
+                                player_animation_counter = 0;
+                            }
                         }
                     }
-                }
 
-                //UPDATE
-
-                while (counter > 0)
-                {
-                    update_all(rbs_lvl2, rbs_size, camera);
+                    if (!end_level)
+                        update_all(rbs_lvl2, rbs_size, camera);
 
                     //linear interpolation between camera and player's position
                     Vector offset_camera = create_vector(-SCREEN_WIDTH / 2 + 64, -200);
@@ -3612,7 +3646,7 @@ int main()
                             }
                         }
 
-                        if (!enemies_lvl2[i].taking_damage && enemies_lvl2[i].alive)
+                        if (!enemies_lvl2[i].taking_damage && enemies_lvl2[i].alive && end_level == 0)
                         {
                             if (strcmp(enemies_lvl2[i].rb.cb.tag, "bat") == 0 || strcmp(enemies_lvl2[i].rb.cb.tag, "fox") == 0)
                             {
@@ -3715,7 +3749,7 @@ int main()
                         }
                     }
 
-                    if (player.animation_frame >= 0 && player.animation_frame <= 7)
+                    if (player.animation_frame >= 0 && player.animation_frame <= 7 && end_level == 0)
                     {
                         if (player_animation_counter % 3 == 0)
                         {
@@ -4265,84 +4299,85 @@ int main()
 
             fading_type = 1;
             fading_progress = 1;
+            end_level = 0;
+            counter = 0;
 
             while (playing_boss_fight && !close_game)
             {
-                if (fading_type == 0)
+                //UPDATE
+                while (counter > 0)
                 {
-                    if (player.rb.pos.y >= grounds_Boss[ground_count - 1].rb.cb.max.y ||
-                        player.rb.pos.x <= -256 || player.life <= 0)
+                    if (fading_type == 0)
                     {
-                        player.life = 0;
-                        player.rb.cb.enabled = 0;
-                        player.sword_rb.cb.enabled = 0;
-                    }
-                    if (player.rb.pos.y >= grounds_Boss[ground_count - 1].rb.cb.max.y + 256)
-                    {
-                        // playing_boss_fight = 0;
-                        death_on = 1;
-                        // break;
-                    }
-
-                    keyboard_input();
-
-                    //USER INPUT
-
-                    if (key_down(KEY_ESC))
-                    {
-                        // playing_boss_fight = 0;
-                        menu_on = 1;
-                        // break;
-                        fading_type = 2;
-                        fading_progress = 0;
-                    }
-                    if (key_down(KEY_W) || key_down(KEY_SPACE))
-                    {
-                        if (player.can_jump)
+                        if (player.rb.pos.y >= grounds_Boss[ground_count - 1].rb.cb.max.y ||
+                            player.rb.pos.x <= -256 || player.life <= 0)
                         {
-                            set_velocity_axis(&player, "vertical", -20);
+                            player.life = 0;
+                            player.rb.cb.enabled = 0;
+                            player.sword_rb.cb.enabled = 0;
                         }
-                    }
-                    if ((key_holding(KEY_A) || key_holding(KEY_D)) && !player.attacking && !player.bow_attack)
-                    {
-                        if (key_holding(KEY_A))
+                        if (player.rb.pos.y >= grounds_Boss[ground_count - 1].rb.cb.max.y + 256)
                         {
-                            set_velocity_axis(&player, "horizontal", -5);
-                            player.facing_right = 0;
+                            // playing_boss_fight = 0;
+                            death_on = 1;
+                            // break;
+                        }
+
+                        keyboard_input();
+
+                        //USER INPUT
+
+                        if (key_down(KEY_ESC))
+                        {
+                            // playing_boss_fight = 0;
+                            menu_on = 1;
+                            // break;
+                            fading_type = 2;
+                            fading_progress = 0;
+                        }
+                        if (key_down(KEY_W) || key_down(KEY_SPACE) || key_down(KEY_UP))
+                        {
+                            if (player.can_jump)
+                            {
+                                set_velocity_axis(&player, "vertical", -20);
+                            }
+                        }
+                        if ((key_holding(KEY_A) || key_holding(KEY_D) || key_holding(KEY_LEFT) || key_holding(KEY_RIGHT)) && !player.attacking && !player.bow_attack)
+                        {
+                            if (key_holding(KEY_A) || key_holding(KEY_LEFT))
+                            {
+                                set_velocity_axis(&player, "horizontal", -5);
+                                player.facing_right = 0;
+                            }
+                            else
+                            {
+                                set_velocity_axis(&player, "horizontal", 5);
+                                player.facing_right = 1;
+                            }
                         }
                         else
                         {
-                            set_velocity_axis(&player, "horizontal", 5);
-                            player.facing_right = 1;
+                            set_velocity_axis(&player, "horizontal", 0);
                         }
-                    }
-                    else
-                    {
-                        set_velocity_axis(&player, "horizontal", 0);
-                    }
 
-                    if (key_down(KEY_Q))
-                    {
-                        if (!player.taking_damage)
+                        if (key_down(KEY_Q))
                         {
-                            player.attacking = 1;
-                            player_animation_counter = 0;
+                            if (!player.taking_damage)
+                            {
+                                player.attacking = 1;
+                                player_animation_counter = 0;
+                            }
                         }
-                    }
-                    if (key_down(KEY_E))
-                    {
-                        if (!player.taking_damage && !arrow_attack.rb.cb.enabled && player.arrows_amount > 0)
+                        if (key_down(KEY_E))
                         {
-                            player.bow_attack = 1;
-                            player_animation_counter = 0;
+                            if (!player.taking_damage && !arrow_attack.rb.cb.enabled && player.arrows_amount > 0)
+                            {
+                                player.bow_attack = 1;
+                                player_animation_counter = 0;
+                            }
                         }
                     }
-                }
 
-                //UPDATE
-
-                while (counter > 0)
-                {
                     update_all(rbs_Boss, rbs_size, camera);
 
                     //linear interpolation between camera and player's position
@@ -5401,7 +5436,7 @@ void draw_lifebar(BITMAP *bmp, BITMAP *sprite, Player player)
     textout_ex(bmp, font, player_arrows_amount, 180, 64, makecol(255, 255, 0), -1);
 }
 
-void draw_jumperboss(BITMAP *bmp, BITMAP *sprite, Enemy *jumperboss, Vector camera)
+/*void draw_jumperboss(BITMAP *bmp, BITMAP *sprite, Enemy *jumperboss, Vector camera)
 {
     if (angry)
     {
@@ -5464,6 +5499,6 @@ void draw_jumperboss(BITMAP *bmp, BITMAP *sprite, Enemy *jumperboss, Vector came
     }
 
     destroy_bitmap(jumperboss_sprite);
-}
+}*/
 
 #pragma endregion
