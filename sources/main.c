@@ -238,6 +238,7 @@ int main()
         play_sample(intro, 255, 128, 1000, 1);
 
         int animation_frame = 0;
+        counter = 0;
 
         while (menu_on && !close_game)
         {
