@@ -24,6 +24,7 @@ END_OF_FUNCTION(close_program)
 int sleepy = 1, sketchy = 0, angry = 0;
 int menu_on = 1;
 int death_on = 0;
+int cutscene_one_on = 0;
 volatile int counter = 0;
 volatile int player_animation_counter = 0;
 volatile long game_timer = 0;
@@ -91,6 +92,7 @@ int main()
     LOCK_VARIABLE(game_timer);
     LOCK_VARIABLE(counter);
     LOCK_VARIABLE(menu_on);
+    LOCK_VARIABLE(cutscene_one_on);
     LOCK_VARIABLE(death_on);
     LOCK_FUNCTION(increment);
 
@@ -347,7 +349,216 @@ int main()
                         fading_type = 0;
 
                         menu_on = 0;
+                        cutscene_one_on = 1;
+                        // playing_first_level = 1;
+                    }
+                }
+
+                draw_sprite(screen, buffer, 0, 0);
+
+                counter--;
+            }
+        }
+
+        destroy_bitmap(menu);
+        destroy_sample(intro);
+
+#pragma endregion
+
+#pragma region cutscene one
+
+        //VARIABLES
+        int pschx = 355, pschy = 420;
+
+        //BITMAPS
+        BITMAP *cena_one = load_bitmap("../assets/Cutscenes/Cena1.bmp", NULL);
+        BITMAP *cena_two = load_bitmap("../assets/Cutscenes/Cena2.bmp", NULL);
+        BITMAP *cena_three = load_bitmap("../assets/Cutscenes/Cena3.bmp", NULL);
+        BITMAP *cena_four = load_bitmap("../assets/Cutscenes/Cena4.bmp", NULL);
+        BITMAP *cena_five = load_bitmap("../assets/Cutscenes/Cena5.bmp", NULL);
+        BITMAP *cena_six = load_bitmap("../assets/Cutscenes/Cena6.bmp", NULL);
+        BITMAP *cena_seven = load_bitmap("../assets/Cutscenes/Cena7.bmp", NULL);
+        BITMAP *arroww = load_bitmap(ARROW_PATH, NULL);
+
+        //SAMPLES
+        SAMPLE *selectt = load_sample(SELECT_SOUND);
+        SAMPLE *introo = load_sample(INTRO_SOUND);
+        SAMPLE *enterr = load_sample(ENTER_SOUND);
+
+        //INTRODUCTION SAMPLE
+        play_sample(introo, 255, 128, 1000, 1);
+
+        animation_frame = 0;
+        counter = 0;
+        fading_type = 1;
+        fading_progress = 1;
+        int scene_show = 1;
+        int aux = 1;
+        while (cutscene_one_on && !close_game)
+        {
+
+            if (fading_type == 0)
+            {
+                keyboard_input();
+
+                //INPUT
+                if (key_down(KEY_RIGHT))
+                {
+                    som = TRUE;
+                    if (scene_show == 2)
+                    {
+                        pschx = 623;
+                        pschy = 470;
+                    }
+                }
+                if (key_down(KEY_LEFT))
+                {
+                    som = TRUE;
+                    if (scene_show == 2)
+                    {
+                        pschx = 325;
+                        pschy = 473;
+                    }
+                }
+
+                if (key_down(KEY_DOWN) || key_down(KEY_UP))
+                {
+                    som = TRUE;
+                }
+
+                if (key_down(KEY_ENTER))
+                {
+                    aux++;
+                    if (aux == 2)
+                    {
+                        pschx = 325, pschy = 473;
+                    }
+                    if (scene_show == 6)
+                    {
+                        stop_sample(intro);
+                        // menu_on = 0;
                         playing_first_level = 1;
+                        fading_type = 2;
+                        fading_progress = 0;
+                        cutscene_one_on = 0;
+                    }
+                    if (scene_show == 2)
+                    {
+                        if (pschx == 325)
+                        {
+                            scene_show++;
+                        }
+                        else if (623)
+                        {
+                            scene_show = 7;
+                        }
+                    }
+                    else
+                    {
+                        scene_show++;
+                    }
+                    if (scene_show - 1 == 7)
+                    {
+                        scene_show = 3;
+                    }
+                }
+
+                if (key_down(KEY_ESC))
+                {
+                    close_program();
+                }
+            }
+            while (counter > 0)
+            {
+                if (animation_frame >= 0 && animation_frame <= 15)
+                {
+                    if (game_timer % 2 == 0)
+                    {
+                        animation_frame++;
+                        animation_frame %= 16;
+                    }
+                }
+
+                int r_img_pos = animation_frame % ARROW_SPRITE_COLS;
+                int c_img_pos = animation_frame / ARROW_SPRITE_COLS;
+
+                r_img_pos *= ARROW_TILE_SIZE;
+                c_img_pos *= ARROW_TILE_SIZE;
+
+                if (som)
+                {
+                    play_sample(select, 255, 128, 1000, 0);
+                    som = FALSE;
+                }
+
+                clear(buffer);
+
+                if (scene_show == 1)
+                {
+                    pschx = 665, pschy = 476;
+                    draw_sprite(buffer, cena_one, 0, 0);
+                }
+                else if (scene_show == 2)
+                {
+                    draw_sprite(buffer, cena_two, 0, 0);
+                }
+                else if (scene_show == 3)
+                {
+                    pschy = 476;
+                    pschx = 783;
+                    draw_sprite(buffer, cena_three, 0, 0);
+                }
+                else if (scene_show == 4)
+                {
+                    pschy = 476;
+                    pschx = 783;
+                    draw_sprite(buffer, cena_four, 0, 0);
+                }
+                else if (scene_show == 5)
+                {
+                    pschx = 782;
+                    pschy = 476;
+                    draw_sprite(buffer, cena_five, 0, 0);
+                }
+                else if (scene_show == 6)
+                {
+                    pschx = 783;
+                    pschy = 476;
+                    draw_sprite(buffer, cena_six, 0, 0);
+                }
+                else if (scene_show == 7)
+                {
+                    pschx = 783;
+                    pschy = 476;
+                    draw_sprite(buffer, cena_seven, 0, 0);
+                }
+                //draw the a part of the sprite sheet to the screen and scales it
+                masked_blit(arrow_sprite, buffer, r_img_pos, c_img_pos, pschx, pschy, 32, 32);
+
+                if (fading_type == 1)
+                {
+                    fading_progress -= 0.05f;
+                    set_trans_blender(255, 255, 255, fading_progress * 255);
+                    draw_sprite_ex(buffer, fade_black, 0, 0, DRAW_SPRITE_TRANS, DRAW_SPRITE_NO_FLIP);
+                    if (fading_progress <= 0)
+                    {
+                        fading_progress = 0;
+                        fading_type = 0;
+                    }
+                }
+                else if (fading_type == 2)
+                {
+                    fading_progress += 0.05f;
+                    set_trans_blender(255, 255, 255, fading_progress * 255);
+                    draw_sprite_ex(buffer, fade_black, 0, 0, DRAW_SPRITE_TRANS, DRAW_SPRITE_NO_FLIP);
+                    if (fading_progress >= 1)
+                    {
+                        fading_progress = 0;
+                        fading_type = 0;
+
+                        menu_on = 0;
+                        cutscene_one_on = TRUE;
+                        // playing_first_level = 1;
                     }
                 }
 
