@@ -8,6 +8,7 @@
 #define CAVE_GROUND "..\\assets\\Platforms\\CaveGround.bmp"
 #define HELL_GROUND "..\\assets\\Platforms\\HellGround.bmp"
 #define CAVE_GROUND_PLATFORM "..\\assets\\Platforms\\CaveGround2.bmp"
+#define HELL_GROUND_PLATFORM "..\\assets\\Platforms\\HellGround2.bmp"
 #define LAVA "..\\assets\\Platforms\\LavaGround.bmp"
 #define BRIDGE "..\\assets\\Platforms\\BridgePieces.bmp"
 

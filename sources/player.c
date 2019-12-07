@@ -111,7 +111,7 @@ void onCollisionEnter(RigidBody *self, RigidBody *other)
         }
         else if (strcmp(other->cb.tag, "jumper_boss") == 0)
         {
-            player_ref->life -= 20;
+            player_ref->life -= 10;
         }
 
         player_ref->taking_damage = 1;
@@ -240,7 +240,7 @@ void onCollisionStay(RigidBody *self, RigidBody *other)
         }
         else if (strcmp(other->cb.tag, "jumper_boss") == 0)
         {
-            player_ref->life -= 20;
+            player_ref->life -= 10;
         }
 
         player_ref->taking_damage = 1;

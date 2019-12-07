@@ -12,7 +12,7 @@ typedef struct boss
     RigidBody rb;
     Vector player_pos;
     Vector boss_pos_ini;
-    int animation_frame, facing_right, taking_damage, life, alive, sleepy, angry, alert;
+    int animation_frame, facing_right, taking_damage, life, alive, sleepy, angry, alert, behavior;
 } Boss;
 
 void init_jumper_boss(Boss *jumper_boss, Vector pos);

@@ -76,7 +76,7 @@ void init_arrow_attack(Item *arrow_attack, Vector pos)
 
 void onCollisionEnter_arrow(RigidBody *self, RigidBody *other)
 {
-    if (strcmp(other->cb.tag, "bat") == 0 || strcmp(other->cb.tag, "fox") == 0 || strcmp(other->cb.tag, "harpy") == 0 || strcmp(other->cb.tag, "jumperboss") == 0)
+    if (strcmp(other->cb.tag, "bat") == 0 || strcmp(other->cb.tag, "fox") == 0 || strcmp(other->cb.tag, "harpy") == 0 || strcmp(other->cb.tag, "jumper_boss") == 0)
     {
         self->cb.enabled = 0;
     }

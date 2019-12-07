@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include "../headers/boss.h"
 #include "../headers/player.h"
+#include "../headers/rigidbody.h"
 #include "../headers/collisionbox.h"
 #include "../headers/vector.h"
 #include "../headers/list.h"
@@ -16,6 +17,7 @@ void onCollisionEnter_jumper_boss(RigidBody *self, RigidBody *other)
     {
         if (self->cb.max.y < other->cb.min.y || self->cb.min.y > other->cb.max.y)
         {
+            jb_ref->behavior = 1;
             jb_ref->rb.velocity.y = 0;
             jb_ref->rb.acceleration = create_vector(0, 0);
             jb_ref->taking_damage = 0;
@@ -26,6 +28,7 @@ void onCollisionEnter_jumper_boss(RigidBody *self, RigidBody *other)
     {
         if (self->cb.max.y < other->cb.min.y)
         {
+            jb_ref->behavior = 1;
             jb_ref->rb.velocity.y = 0;
             jb_ref->rb.acceleration = create_vector(0, 0);
             jb_ref->taking_damage = 0;
@@ -68,7 +71,7 @@ void onCollisionEnter_jumper_boss(RigidBody *self, RigidBody *other)
         }
         else
         {
-            self->velocity = create_vector(0, 0);
+            self->velocity = create_vector(0, -2);
             self->acceleration = create_vector(0, 0);
         }
     }
@@ -90,16 +93,21 @@ void onCollisionStay_jumper_boss(RigidBody *self, RigidBody *other)
     {
         if (self->cb.max.y < other->cb.min.y)
         {
-            jb_ref->rb.velocity.y = 0;
-            jb_ref->rb.acceleration = create_vector(0, 0);
+            self->velocity.y = 0;
+            self->acceleration = create_vector(0, 0);
             jb_ref->taking_damage = 0;
         }
+    }
+
+    if (jb_ref->behavior == 3 && !jb_ref->taking_damage)
+    {
+        self->velocity = create_vector(0, -20);
     }
 }
 
 void atk_jumper_boss(Boss *jumper_boss, Player *player, int behavior)
 {
-    int attack_behavior = behavior;
+    jumper_boss->behavior = behavior;
 
     Vector player_pos = mult(sum(player->rb.cb.min, player->rb.cb.max), 0.5f);
     Vector jumper_boss_pos = mult(sum(jumper_boss->rb.cb.min, jumper_boss->rb.cb.max), 0.5f);
@@ -115,7 +123,7 @@ void atk_jumper_boss(Boss *jumper_boss, Player *player, int behavior)
         jumper_boss->rb.cb.offset = create_vector(14, 36);
     }
 
-    if (attack_behavior == 1)
+    if (jumper_boss->behavior == 1)
     {
         if (jumper_boss->taking_damage == 0 && jumper_boss->rb.velocity.y == 0 && jumper_boss->angry)
         {
@@ -137,19 +145,23 @@ void atk_jumper_boss(Boss *jumper_boss, Player *player, int behavior)
             jumper_boss->rb.velocity.y = 0;
         }
     }
-    else if (attack_behavior == 2)
+    else if (jumper_boss->behavior == 2)
     {
         if (dist(jumper_boss->rb.pos, player_pos) <= 400)
         {
-            jb_ref->alert = 1;
-            jb_ref->sleepy = 0;
+            jumper_boss->alert = 1;
+            jumper_boss->sleepy = 0;
         }
 
         if (dist(player_pos, jumper_boss->rb.pos) <= 200)
         {
-            jb_ref->alert = 0;
-            jb_ref->angry = 1;
+            jumper_boss->alert = 0;
+            jumper_boss->angry = 1;
+            jumper_boss->behavior = 1;
         }
+    }
+    else if (jumper_boss->behavior == 3)
+    {
     }
 }
 
@@ -165,6 +177,7 @@ void init_jumper_boss(Boss *jumper_boss, Vector pos)
     jumper_boss->sleepy = 1;
     jumper_boss->angry = 0;
     jumper_boss->alert = 0;
+    jumper_boss->behavior = 0;
 
     jumper_boss->rb.acceleration = create_vector(0, 0);
     jumper_boss->rb.gravity_scale = 0.1f;
