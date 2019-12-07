@@ -228,6 +228,10 @@ int main()
     if (hell_background == NULL)
         allegro_message("error");
 
+    BITMAP *pause_sprite = load_bitmap("../assets/Canvas/pause2.bmp", NULL);
+    if (pause_sprite == NULL)
+        allegro_message("error");
+
     //fading type will assume 3 values
     //0 - no fading at the moment
     //1 - fading in to a scene
@@ -393,7 +397,7 @@ int main()
         //SAMPLES
         SAMPLE *selectt = load_sample(SELECT_SOUND);
         SAMPLE *introo = load_sample(INTRO_SOUND);
-        
+
         //INTRODUCTION SAMPLE
         play_sample(introo, 255, 128, 1000, 1);
 
@@ -961,18 +965,14 @@ int main()
                     }
                     if (player.rb.pos.y >= grounds_lvl1[ground_count - 1].rb.cb.max.y + 256)
                     {
-                        // playing_first_level = 0;
                         death_on = 1;
-                        // break;
                         fading_type = 2;
                         fading_progress = 0;
                     }
                     if (player.rb.cb.min.x > grounds_lvl1[ground_count - 1].rb.cb.max.x)
                     {
-                        // playing_first_level = 0;
                         playing_first_level_2 = 1;
                         end_level = 1;
-                        // break;
                         fading_type = 2;
                         fading_progress = 0;
                     }
@@ -991,17 +991,37 @@ int main()
                     {
                         if (pause_game == 0)
                         {
-                            pause_game = 1;
-                            counter = 0;
-                            player_animation_counter = 0;
-                            game_timer = 0;
+                            if (fading_type == 0)
+                            {
+                                pause_game = 1;
+                                counter = 0;
+                                player_animation_counter = 0;
+                                game_timer = 0;
+                                som = TRUE;
+
+                                if (som)
+                                {
+                                    play_sample(select, 255, 128, 1000, 0);
+                                    som = FALSE;
+                                }
+                            }
                         }
                         else
                         {
-                            pause_game = 0;
-                            counter = 0;
-                            player_animation_counter = 0;
-                            game_timer = 0;
+                            if (fading_type == 0)
+                            {
+                                pause_game = 0;
+                                counter = 0;
+                                player_animation_counter = 0;
+                                game_timer = 0;
+                                som = TRUE;
+
+                                if (som)
+                                {
+                                    play_sample(select, 255, 128, 1000, 0);
+                                    som = FALSE;
+                                }
+                            }
                         }
                     }
                     if (key_down(KEY_W) || key_down(KEY_SPACE) || key_down(KEY_UP))
@@ -1139,7 +1159,7 @@ int main()
 
                 for (int i = 0; i < object_count; i++)
                 {
-                    if (objects_lvl1[i].sprite_frame >= 4 && objects_lvl1[i].sprite_frame <= 7)
+                    if (objects_lvl1[i].sprite_frame >= 4 && objects_lvl1[i].sprite_frame <= 7 && !pause_game)
                     {
                         if (game_timer % 4 == 0)
                         {
@@ -1196,21 +1216,6 @@ int main()
                             player.animation_frame = 8;
                             player.bow_attack = 0;
                             player.arrows_amount--;
-                        }
-                    }
-                }
-
-                for (int i = 0; i < ground_count; i++)
-                {
-                    if (strcmp(grounds_lvl1[i].rb.cb.tag, "lava") == 0)
-                    {
-                        if (grounds_lvl1[i].animation_frame >= 0 && grounds_lvl1[i].animation_frame <= 3)
-                        {
-                            if (game_timer % 4 == 0)
-                            {
-                                grounds_lvl1[i].animation_frame++;
-                                grounds_lvl1[i].animation_frame %= 4;
-                            }
                         }
                     }
                 }
@@ -1277,13 +1282,14 @@ int main()
                     }
                 }
 
-                draw_player(buffer, player_sprite, &player, camera);
+                if (!pause_game)
+                    draw_player(buffer, player_sprite, &player, camera);
 
                 for (int i = 0; i < enemy_count; i++)
                 {
                     if (strcmp(enemies_lvl1[i].rb.cb.tag, "bat") == 0 && enemies_lvl1[i].rb.pos.y <= 2000)
                     {
-                        if (enemies_lvl1[i].rb.pos.x + 128 >= camera.x && enemies_lvl1[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
+                        if (enemies_lvl1[i].rb.pos.x + 128 >= camera.x && enemies_lvl1[i].rb.pos.x <= camera.x + SCREEN_WIDTH && !pause_game)
                         {
                             if (enemies_lvl1[i].rb.pos.y + 128 >= camera.y && enemies_lvl1[i].rb.pos.y <= camera.y + SCREEN_HEIGHT)
                             {
@@ -1293,7 +1299,7 @@ int main()
                         if (enemies_lvl1[i].alive == 0 && enemies_lvl1[i].rb.pos.y >= 2000)
                             enemies_lvl1[i].rb.pos.y = 2001;
                     }
-                    else if (strcmp(enemies_lvl1[i].rb.cb.tag, "fox") == 0 && enemies_lvl1[i].rb.pos.y <= 2000)
+                    else if (strcmp(enemies_lvl1[i].rb.cb.tag, "fox") == 0 && enemies_lvl1[i].rb.pos.y <= 2000 && !pause_game)
                     {
                         if (enemies_lvl1[i].rb.pos.x + 128 >= camera.x && enemies_lvl1[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
                         {
@@ -1305,7 +1311,7 @@ int main()
                         if (enemies_lvl1[i].alive == 0 && enemies_lvl1[i].rb.pos.y >= 2000)
                             enemies_lvl1[i].rb.pos.y = 2001;
                     }
-                    else if (strcmp(enemies_lvl1[i].rb.cb.tag, "harpy") == 0 && enemies_lvl1[i].rb.pos.y <= 2000)
+                    else if (strcmp(enemies_lvl1[i].rb.cb.tag, "harpy") == 0 && enemies_lvl1[i].rb.pos.y <= 2000 && !pause_game)
                     {
                         if (enemies_lvl1[i].rb.pos.x + 128 >= camera.x && enemies_lvl1[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
                         {
@@ -1343,13 +1349,17 @@ int main()
                     }
                 }
 
-                if (arrow_attack.rb.cb.enabled)
+                if (arrow_attack.rb.cb.enabled && !pause_game)
                     draw_arrow_attack(buffer, arrow_attack_sprite, &arrow_attack, camera);
 
                 if ((arrow_attack.rb.pos.x - player.rb.pos.x > (SCREEN_WIDTH / 2) + 128 && arrow_attack.rb.velocity.x > 0) || ((arrow_attack.rb.pos.x - player.rb.pos.x) * -1 > SCREEN_WIDTH / 2 && arrow_attack.rb.velocity.x < 0))
                     arrow_attack.rb.cb.enabled = 0;
 
-                draw_lifebar(buffer, lifebar_sprite, player);
+                if (!pause_game)
+                    draw_lifebar(buffer, lifebar_sprite, player);
+
+                if (pause_game)
+                    draw_sprite_ex(buffer, pause_sprite, 0, 0, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
 
                 if (fading_type == 1)
                 {
@@ -1822,16 +1832,55 @@ int main()
                             fading_type = 2;
                             fading_progress = 0;
                         }
+
+                        if (key_down(KEY_P))
+                        {
+                            if (pause_game == 0)
+                            {
+                                if (fading_type == 0)
+                                {
+                                    pause_game = 1;
+                                    counter = 0;
+                                    player_animation_counter = 0;
+                                    game_timer = 0;
+                                    som = TRUE;
+
+                                    if (som)
+                                    {
+                                        play_sample(select, 255, 128, 1000, 0);
+                                        som = FALSE;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if (fading_type == 0)
+                                {
+                                    pause_game = 0;
+                                    counter = 0;
+                                    player_animation_counter = 0;
+                                    game_timer = 0;
+                                    som = TRUE;
+
+                                    if (som)
+                                    {
+                                        play_sample(select, 255, 128, 1000, 0);
+                                        som = FALSE;
+                                    }
+                                }
+                            }
+                        }
+
                         if (key_down(KEY_W) || key_down(KEY_SPACE) || key_down(KEY_UP))
                         {
-                            if (player.can_jump)
+                            if (player.can_jump && !pause_game)
                             {
                                 set_velocity_axis(&player, "vertical", -20);
                             }
                         }
                         if ((key_holding(KEY_A) || key_holding(KEY_D) || (key_holding(KEY_LEFT) || key_holding(KEY_RIGHT))) && !player.attacking && !player.bow_attack)
                         {
-                            if (key_holding(KEY_A) || key_holding(KEY_LEFT))
+                            if ((key_holding(KEY_A) || key_holding(KEY_LEFT)) && !pause_game)
                             {
                                 set_velocity_axis(&player, "horizontal", -5);
                                 player.facing_right = 0;
@@ -1849,7 +1898,7 @@ int main()
 
                         if (key_down(KEY_Q))
                         {
-                            if (!player.taking_damage)
+                            if (!player.taking_damage && !pause_game)
                             {
                                 player.attacking = 1;
                                 player_animation_counter = 0;
@@ -1857,7 +1906,7 @@ int main()
                         }
                         if (key_down(KEY_E))
                         {
-                            if (!player.taking_damage && !arrow_attack.rb.cb.enabled && player.arrows_amount > 0)
+                            if (!player.taking_damage && !arrow_attack.rb.cb.enabled && player.arrows_amount > 0 && !pause_game)
                             {
                                 player.bow_attack = 1;
                                 player_animation_counter = 0;
@@ -1865,7 +1914,7 @@ int main()
                         }
                     }
 
-                    if (!end_level)
+                    if (!end_level && !pause_game)
                         update_all(rbs_lvl1_2, rbs_size, camera);
 
                     //linear interpolation between camera and player's position
@@ -1904,7 +1953,7 @@ int main()
                             }
                         }
 
-                        if (!enemies_lvl1_2[i].taking_damage && enemies_lvl1_2[i].alive && end_level == 0)
+                        if (!enemies_lvl1_2[i].taking_damage && enemies_lvl1_2[i].alive && end_level == 0 && !pause_game)
                         {
                             if (strcmp(enemies_lvl1_2[i].rb.cb.tag, "bat") == 0 || strcmp(enemies_lvl1_2[i].rb.cb.tag, "fox") == 0)
                             {
@@ -1957,7 +2006,7 @@ int main()
 
                     for (int i = 0; i < object_count; i++)
                     {
-                        if (objects_lvl1_2[i].sprite_frame >= 4 && objects_lvl1_2[i].sprite_frame <= 7)
+                        if (objects_lvl1_2[i].sprite_frame >= 4 && objects_lvl1_2[i].sprite_frame <= 7 && !pause_game)
                         {
                             if (game_timer % 4 == 0)
                             {
@@ -2030,21 +2079,6 @@ int main()
                         }
                     }
 
-                    for (int i = 0; i < ground_count; i++)
-                    {
-                        if (strcmp(grounds_lvl1_2[i].rb.cb.tag, "lava") == 0)
-                        {
-                            if (grounds_lvl1_2[i].animation_frame >= 0 && grounds_lvl1_2[i].animation_frame <= 3)
-                            {
-                                if (game_timer % 4 == 0)
-                                {
-                                    grounds_lvl1_2[i].animation_frame++;
-                                    grounds_lvl1_2[i].animation_frame %= 4;
-                                }
-                            }
-                        }
-                    }
-
                     //DRAWING
 
                     masked_blit(cloud_sprite, buffer, camera.x * 0.1f, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -2095,13 +2129,14 @@ int main()
                         }
                     }
 
-                    draw_player(buffer, player_sprite, &player, camera);
+                    if (!pause_game)
+                        draw_player(buffer, player_sprite, &player, camera);
 
                     for (int i = 0; i < enemy_count; i++)
                     {
                         if (strcmp(enemies_lvl1_2[i].rb.cb.tag, "bat") == 0 && enemies_lvl1_2[i].rb.pos.y <= 2000)
                         {
-                            if (enemies_lvl1_2[i].rb.pos.x + 128 >= camera.x && enemies_lvl1_2[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
+                            if (enemies_lvl1_2[i].rb.pos.x + 128 >= camera.x && enemies_lvl1_2[i].rb.pos.x <= camera.x + SCREEN_WIDTH && !pause_game)
                             {
                                 if (enemies_lvl1_2[i].rb.pos.y + 128 >= camera.y && enemies_lvl1_2[i].rb.pos.y <= camera.y + SCREEN_HEIGHT)
                                 {
@@ -2113,7 +2148,7 @@ int main()
                         }
                         else if (strcmp(enemies_lvl1_2[i].rb.cb.tag, "fox") == 0 && enemies_lvl1_2[i].rb.pos.y <= 2000)
                         {
-                            if (enemies_lvl1_2[i].rb.pos.x + 128 >= camera.x && enemies_lvl1_2[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
+                            if (enemies_lvl1_2[i].rb.pos.x + 128 >= camera.x && enemies_lvl1_2[i].rb.pos.x <= camera.x + SCREEN_WIDTH && !pause_game)
                             {
                                 if (enemies_lvl1_2[i].rb.pos.y + 128 >= camera.y && enemies_lvl1_2[i].rb.pos.y <= camera.y + SCREEN_HEIGHT)
                                 {
@@ -2125,7 +2160,7 @@ int main()
                         }
                         else if (strcmp(enemies_lvl1_2[i].rb.cb.tag, "harpy") == 0 && enemies_lvl1_2[i].rb.pos.y <= 2000)
                         {
-                            if (enemies_lvl1_2[i].rb.pos.x + 128 >= camera.x && enemies_lvl1_2[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
+                            if (enemies_lvl1_2[i].rb.pos.x + 128 >= camera.x && enemies_lvl1_2[i].rb.pos.x <= camera.x + SCREEN_WIDTH && !pause_game)
                             {
                                 if (enemies_lvl1_2[i].rb.pos.y + 128 >= camera.y && enemies_lvl1_2[i].rb.pos.y <= camera.y + SCREEN_HEIGHT)
                                 {
@@ -2161,13 +2196,17 @@ int main()
                         }
                     }
 
-                    if (arrow_attack.rb.cb.enabled)
+                    if (arrow_attack.rb.cb.enabled && !pause_game)
                         draw_arrow_attack(buffer, arrow_attack_sprite, &arrow_attack, camera);
 
                     if ((arrow_attack.rb.pos.x - player.rb.pos.x > (SCREEN_WIDTH / 2) + 128 && arrow_attack.rb.velocity.x > 0) || ((arrow_attack.rb.pos.x - player.rb.pos.x) * -1 > SCREEN_WIDTH / 2 && arrow_attack.rb.velocity.x < 0))
                         arrow_attack.rb.cb.enabled = 0;
 
-                    draw_lifebar(buffer, lifebar_sprite, player);
+                    if (!pause_game)
+                        draw_lifebar(buffer, lifebar_sprite, player);
+
+                    if (pause_game)
+                        draw_sprite_ex(buffer, pause_sprite, 0, 0, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
 
                     if (fading_type == 1)
                     {
@@ -2638,16 +2677,55 @@ int main()
                             fading_type = 2;
                             fading_progress = 0;
                         }
+
+                        if (key_down(KEY_P))
+                        {
+                            if (pause_game == 0)
+                            {
+                                if (fading_type == 0)
+                                {
+                                    pause_game = 1;
+                                    counter = 0;
+                                    player_animation_counter = 0;
+                                    game_timer = 0;
+                                    som = TRUE;
+
+                                    if (som)
+                                    {
+                                        play_sample(select, 255, 128, 1000, 0);
+                                        som = FALSE;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if (fading_type == 0)
+                                {
+                                    pause_game = 0;
+                                    counter = 0;
+                                    player_animation_counter = 0;
+                                    game_timer = 0;
+                                    som = TRUE;
+
+                                    if (som)
+                                    {
+                                        play_sample(select, 255, 128, 1000, 0);
+                                        som = FALSE;
+                                    }
+                                }
+                            }
+                        }
+
                         if (key_down(KEY_W) || key_down(KEY_SPACE) || key_down(KEY_UP))
                         {
-                            if (player.can_jump)
+                            if (player.can_jump && !pause_game)
                             {
                                 set_velocity_axis(&player, "vertical", -20);
                             }
                         }
                         if ((key_holding(KEY_A) || key_holding(KEY_D) || (key_holding(KEY_LEFT) || key_holding(KEY_RIGHT))) && !player.attacking && !player.bow_attack)
                         {
-                            if (key_holding(KEY_A) || key_holding(KEY_LEFT))
+                            if ((key_holding(KEY_A) || key_holding(KEY_LEFT)) && !pause_game)
                             {
                                 set_velocity_axis(&player, "horizontal", -5);
                                 player.facing_right = 0;
@@ -2665,7 +2743,7 @@ int main()
 
                         if (key_down(KEY_Q))
                         {
-                            if (!player.taking_damage)
+                            if (!player.taking_damage && !pause_game)
                             {
                                 player.attacking = 1;
                                 player_animation_counter = 0;
@@ -2673,7 +2751,7 @@ int main()
                         }
                         if (key_down(KEY_E))
                         {
-                            if (!player.taking_damage && !arrow_attack.rb.cb.enabled && player.arrows_amount > 0)
+                            if (!player.taking_damage && !arrow_attack.rb.cb.enabled && player.arrows_amount > 0 && !pause_game)
                             {
                                 player.bow_attack = 1;
                                 player_animation_counter = 0;
@@ -2681,7 +2759,7 @@ int main()
                         }
                     }
 
-                    if (!end_level)
+                    if (!end_level && !pause_game)
                         update_all(rbs_lvl2, rbs_size, camera);
 
                     //linear interpolation between camera and player's position
@@ -2720,7 +2798,7 @@ int main()
                             }
                         }
 
-                        if (!enemies_lvl2[i].taking_damage && enemies_lvl2[i].alive && end_level == 0)
+                        if (!enemies_lvl2[i].taking_damage && enemies_lvl2[i].alive && end_level == 0 && !pause_game)
                         {
                             if (strcmp(enemies_lvl2[i].rb.cb.tag, "bat") == 0 || strcmp(enemies_lvl2[i].rb.cb.tag, "fox") == 0)
                             {
@@ -2791,7 +2869,7 @@ int main()
 
                     for (int i = 0; i < object_count; i++)
                     {
-                        if (objects_lvl2[i].sprite_frame >= 12 && objects_lvl2[i].sprite_frame <= 15)
+                        if (objects_lvl2[i].sprite_frame >= 12 && objects_lvl2[i].sprite_frame <= 15 && !pause_game)
                         {
                             if (game_timer % 4 == 0)
                             {
@@ -2800,7 +2878,7 @@ int main()
                                 objects_lvl2[i].sprite_frame += 12;
                             }
                         }
-                        else if (objects_lvl2[i].sprite_frame >= 22 && objects_lvl2[i].sprite_frame <= 27)
+                        else if (objects_lvl2[i].sprite_frame >= 22 && objects_lvl2[i].sprite_frame <= 27 && !pause_game)
                         {
                             if (game_timer % 4 == 0)
                             {
@@ -2877,7 +2955,7 @@ int main()
                     {
                         if (strcmp(grounds_lvl2[i].rb.cb.tag, "lava") == 0)
                         {
-                            if (grounds_lvl2[i].animation_frame >= 0 && grounds_lvl2[i].animation_frame <= 3)
+                            if (grounds_lvl2[i].animation_frame >= 0 && grounds_lvl2[i].animation_frame <= 3 && !pause_game)
                             {
                                 if (game_timer % 4 == 0)
                                 {
@@ -2959,14 +3037,14 @@ int main()
                             }
                         }
                     }
-
-                    draw_player(buffer, player_sprite, &player, camera);
+                    if (!pause_game)
+                        draw_player(buffer, player_sprite, &player, camera);
 
                     for (int i = 0; i < enemy_count; i++)
                     {
                         if (strcmp(enemies_lvl2[i].rb.cb.tag, "bat") == 0 && enemies_lvl2[i].rb.pos.y <= 2000)
                         {
-                            if (enemies_lvl2[i].rb.pos.x + 128 >= camera.x && enemies_lvl2[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
+                            if (enemies_lvl2[i].rb.pos.x + 128 >= camera.x && enemies_lvl2[i].rb.pos.x <= camera.x + SCREEN_WIDTH && !pause_game)
                             {
                                 if (enemies_lvl2[i].rb.pos.y + 128 >= camera.y && enemies_lvl2[i].rb.pos.y <= camera.y + SCREEN_HEIGHT)
                                 {
@@ -2976,7 +3054,7 @@ int main()
                             if (enemies_lvl2[i].alive == 0 && enemies_lvl2[i].rb.pos.y >= 2000)
                                 enemies_lvl2[i].rb.pos.y = 2001;
                         }
-                        else if (strcmp(enemies_lvl2[i].rb.cb.tag, "fox") == 0 && enemies_lvl2[i].rb.pos.y <= 2000)
+                        else if (strcmp(enemies_lvl2[i].rb.cb.tag, "fox") == 0 && enemies_lvl2[i].rb.pos.y <= 2000 && !pause_game)
                         {
                             if (enemies_lvl2[i].rb.pos.x + 128 >= camera.x && enemies_lvl2[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
                             {
@@ -2988,7 +3066,7 @@ int main()
                             if (enemies_lvl2[i].alive == 0 && enemies_lvl2[i].rb.pos.y >= 2000)
                                 enemies_lvl2[i].rb.pos.y = 2001;
                         }
-                        else if (strcmp(enemies_lvl2[i].rb.cb.tag, "harpy") == 0 && enemies_lvl2[i].rb.pos.y <= 2000)
+                        else if (strcmp(enemies_lvl2[i].rb.cb.tag, "harpy") == 0 && enemies_lvl2[i].rb.pos.y <= 2000 && !pause_game)
                         {
                             if (enemies_lvl2[i].rb.pos.x + 128 >= camera.x && enemies_lvl2[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
                             {
@@ -3010,7 +3088,7 @@ int main()
                                 }
                             }
                         }
-                        else if (strcmp(enemies_lvl2[i].rb.cb.tag, "ghost") == 0)
+                        else if (strcmp(enemies_lvl2[i].rb.cb.tag, "ghost") == 0 && !pause_game)
                         {
                             if (enemies_lvl2[i].rb.pos.x + 128 >= camera.x && enemies_lvl2[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
                             {
@@ -3022,15 +3100,17 @@ int main()
                         }
                     }
 
-                    if (arrow_attack.rb.cb.enabled)
+                    if (arrow_attack.rb.cb.enabled && !pause_game)
                         draw_arrow_attack(buffer, arrow_attack_sprite, &arrow_attack, camera);
 
                     if ((arrow_attack.rb.pos.x - player.rb.pos.x > (SCREEN_WIDTH / 2) + 128 && arrow_attack.rb.velocity.x > 0) || ((arrow_attack.rb.pos.x - player.rb.pos.x) * -1 > SCREEN_WIDTH / 2 && arrow_attack.rb.velocity.x < 0))
                         arrow_attack.rb.cb.enabled = 0;
 
-                    //draw_test(buffer, test_sprite, camera);
+                    if (!pause_game)
+                        draw_lifebar(buffer, lifebar_sprite, player);
 
-                    draw_lifebar(buffer, lifebar_sprite, player);
+                    if (pause_game)
+                        draw_sprite_ex(buffer, pause_sprite, 0, 0, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
 
                     if (fading_type == 1)
                     {
@@ -3572,16 +3652,54 @@ int main()
                             fading_type = 2;
                             fading_progress = 0;
                         }
+                        if (key_down(KEY_P))
+                        {
+                            if (pause_game == 0)
+                            {
+                                if (fading_type == 0)
+                                {
+                                    pause_game = 1;
+                                    counter = 0;
+                                    player_animation_counter = 0;
+                                    game_timer = 0;
+                                    som = TRUE;
+
+                                    if (som)
+                                    {
+                                        play_sample(select, 255, 128, 1000, 0);
+                                        som = FALSE;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if (fading_type == 0)
+                                {
+                                    pause_game = 0;
+                                    counter = 0;
+                                    player_animation_counter = 0;
+                                    game_timer = 0;
+                                    som = TRUE;
+
+                                    if (som)
+                                    {
+                                        play_sample(select, 255, 128, 1000, 0);
+                                        som = FALSE;
+                                    }
+                                }
+                            }
+                        }
+
                         if (key_down(KEY_W) || key_down(KEY_SPACE) || key_down(KEY_UP))
                         {
-                            if (player.can_jump)
+                            if (player.can_jump && !pause_game)
                             {
                                 set_velocity_axis(&player, "vertical", -20);
                             }
                         }
                         if ((key_holding(KEY_A) || key_holding(KEY_D) || key_holding(KEY_LEFT) || key_holding(KEY_RIGHT)) && !player.attacking && !player.bow_attack)
                         {
-                            if (key_holding(KEY_A) || key_holding(KEY_LEFT))
+                            if ((key_holding(KEY_A) || key_holding(KEY_LEFT)) && !pause_game)
                             {
                                 set_velocity_axis(&player, "horizontal", -5);
                                 player.facing_right = 0;
@@ -3599,7 +3717,7 @@ int main()
 
                         if (key_down(KEY_Q))
                         {
-                            if (!player.taking_damage)
+                            if (!player.taking_damage && !pause_game)
                             {
                                 player.attacking = 1;
                                 player_animation_counter = 0;
@@ -3607,7 +3725,7 @@ int main()
                         }
                         if (key_down(KEY_E))
                         {
-                            if (!player.taking_damage && !arrow_attack.rb.cb.enabled && player.arrows_amount > 0)
+                            if (!player.taking_damage && !arrow_attack.rb.cb.enabled && player.arrows_amount > 0 && !pause_game)
                             {
                                 player.bow_attack = 1;
                                 player_animation_counter = 0;
@@ -3615,7 +3733,7 @@ int main()
                         }
                     }
 
-                    if (!end_level)
+                    if (!end_level && !pause_game)
                         update_all(rbs_lvl2, rbs_size, camera);
 
                     //linear interpolation between camera and player's position
@@ -3654,7 +3772,7 @@ int main()
                             }
                         }
 
-                        if (!enemies_lvl2[i].taking_damage && enemies_lvl2[i].alive && end_level == 0)
+                        if (!enemies_lvl2[i].taking_damage && enemies_lvl2[i].alive && end_level == 0 && !pause_game)
                         {
                             if (strcmp(enemies_lvl2[i].rb.cb.tag, "bat") == 0 || strcmp(enemies_lvl2[i].rb.cb.tag, "fox") == 0)
                             {
@@ -3725,7 +3843,7 @@ int main()
 
                     for (int i = 0; i < object_count; i++)
                     {
-                        if (objects_lvl2[i].sprite_frame >= 12 && objects_lvl2[i].sprite_frame <= 15)
+                        if (objects_lvl2[i].sprite_frame >= 12 && objects_lvl2[i].sprite_frame <= 15 && !pause_game)
                         {
                             if (game_timer % 4 == 0)
                             {
@@ -3734,7 +3852,7 @@ int main()
                                 objects_lvl2[i].sprite_frame += 12;
                             }
                         }
-                        else if (objects_lvl2[i].sprite_frame >= 22 && objects_lvl2[i].sprite_frame <= 27)
+                        else if (objects_lvl2[i].sprite_frame >= 22 && objects_lvl2[i].sprite_frame <= 27 && !pause_game)
                         {
                             if (game_timer % 4 == 0)
                             {
@@ -3811,7 +3929,7 @@ int main()
                     {
                         if (strcmp(grounds_lvl2[i].rb.cb.tag, "lava") == 0)
                         {
-                            if (grounds_lvl2[i].animation_frame >= 0 && grounds_lvl2[i].animation_frame <= 3)
+                            if (grounds_lvl2[i].animation_frame >= 0 && grounds_lvl2[i].animation_frame <= 3 && !pause_game)
                             {
                                 if (game_timer % 4 == 0)
                                 {
@@ -3893,12 +4011,12 @@ int main()
                             }
                         }
                     }
-
-                    draw_player(buffer, player_sprite, &player, camera);
+                    if (!pause_game)
+                        draw_player(buffer, player_sprite, &player, camera);
 
                     for (int i = 0; i < enemy_count; i++)
                     {
-                        if (strcmp(enemies_lvl2[i].rb.cb.tag, "bat") == 0 && enemies_lvl2[i].rb.pos.y <= 2000)
+                        if (strcmp(enemies_lvl2[i].rb.cb.tag, "bat") == 0 && enemies_lvl2[i].rb.pos.y <= 2000 && !pause_game)
                         {
                             if (enemies_lvl2[i].rb.pos.x + 128 >= camera.x && enemies_lvl2[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
                             {
@@ -3910,7 +4028,7 @@ int main()
                             if (enemies_lvl2[i].alive == 0 && enemies_lvl2[i].rb.pos.y >= 2000)
                                 enemies_lvl2[i].rb.pos.y = 2001;
                         }
-                        else if (strcmp(enemies_lvl2[i].rb.cb.tag, "fox") == 0 && enemies_lvl2[i].rb.pos.y <= 2000)
+                        else if (strcmp(enemies_lvl2[i].rb.cb.tag, "fox") == 0 && enemies_lvl2[i].rb.pos.y <= 2000 && !pause_game)
                         {
                             if (enemies_lvl2[i].rb.pos.x + 128 >= camera.x && enemies_lvl2[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
                             {
@@ -3922,7 +4040,7 @@ int main()
                             if (enemies_lvl2[i].alive == 0 && enemies_lvl2[i].rb.pos.y >= 2000)
                                 enemies_lvl2[i].rb.pos.y = 2001;
                         }
-                        else if (strcmp(enemies_lvl2[i].rb.cb.tag, "harpy") == 0 && enemies_lvl2[i].rb.pos.y <= 2000)
+                        else if (strcmp(enemies_lvl2[i].rb.cb.tag, "harpy") == 0 && enemies_lvl2[i].rb.pos.y <= 2000 && !pause_game)
                         {
                             if (enemies_lvl2[i].rb.pos.x + 128 >= camera.x && enemies_lvl2[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
                             {
@@ -3944,7 +4062,7 @@ int main()
                                 }
                             }
                         }
-                        else if (strcmp(enemies_lvl2[i].rb.cb.tag, "ghost") == 0)
+                        else if (strcmp(enemies_lvl2[i].rb.cb.tag, "ghost") == 0 && !pause_game)
                         {
                             if (enemies_lvl2[i].rb.pos.x + 128 >= camera.x && enemies_lvl2[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
                             {
@@ -3956,15 +4074,18 @@ int main()
                         }
                     }
 
-                    if (arrow_attack.rb.cb.enabled)
+                    if (arrow_attack.rb.cb.enabled && !pause_game)
                         draw_arrow_attack(buffer, arrow_attack_sprite, &arrow_attack, camera);
 
                     if ((arrow_attack.rb.pos.x - player.rb.pos.x > (SCREEN_WIDTH / 2) + 128 && arrow_attack.rb.velocity.x > 0) || ((arrow_attack.rb.pos.x - player.rb.pos.x) * -1 > SCREEN_WIDTH / 2 && arrow_attack.rb.velocity.x < 0))
                         arrow_attack.rb.cb.enabled = 0;
 
                     //draw_test(buffer, test_sprite, camera);
+                    if (!pause_game)
+                        draw_lifebar(buffer, lifebar_sprite, player);
 
-                    draw_lifebar(buffer, lifebar_sprite, player);
+                    if (pause_game)
+                        draw_sprite_ex(buffer, pause_sprite, 0, 0, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
 
                     if (fading_type == 1)
                     {
@@ -4353,16 +4474,53 @@ int main()
                             fading_type = 2;
                             fading_progress = 0;
                         }
+                        if (key_down(KEY_P))
+                        {
+                            if (pause_game == 0)
+                            {
+                                if (fading_type == 0)
+                                {
+                                    pause_game = 1;
+                                    counter = 0;
+                                    player_animation_counter = 0;
+                                    game_timer = 0;
+                                    som = TRUE;
+
+                                    if (som)
+                                    {
+                                        play_sample(select, 255, 128, 1000, 0);
+                                        som = FALSE;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if (fading_type == 0)
+                                {
+                                    pause_game = 0;
+                                    counter = 0;
+                                    player_animation_counter = 0;
+                                    game_timer = 0;
+                                    som = TRUE;
+
+                                    if (som)
+                                    {
+                                        play_sample(select, 255, 128, 1000, 0);
+                                        som = FALSE;
+                                    }
+                                }
+                            }
+                        }
                         if (key_down(KEY_W) || key_down(KEY_SPACE) || key_down(KEY_UP))
                         {
-                            if (player.can_jump)
+                            if (player.can_jump && !pause_game)
                             {
                                 set_velocity_axis(&player, "vertical", -20);
                             }
                         }
                         if ((key_holding(KEY_A) || key_holding(KEY_D) || key_holding(KEY_LEFT) || key_holding(KEY_RIGHT)) && !player.attacking && !player.bow_attack)
                         {
-                            if (key_holding(KEY_A) || key_holding(KEY_LEFT))
+                            if ((key_holding(KEY_A) || key_holding(KEY_LEFT)) && !pause_game)
                             {
                                 set_velocity_axis(&player, "horizontal", -5);
                                 player.facing_right = 0;
@@ -4380,7 +4538,7 @@ int main()
 
                         if (key_down(KEY_Q))
                         {
-                            if (!player.taking_damage)
+                            if (!player.taking_damage && !pause_game)
                             {
                                 player.attacking = 1;
                                 player_animation_counter = 0;
@@ -4388,7 +4546,7 @@ int main()
                         }
                         if (key_down(KEY_E))
                         {
-                            if (!player.taking_damage && !arrow_attack.rb.cb.enabled && player.arrows_amount > 0)
+                            if (!player.taking_damage && !arrow_attack.rb.cb.enabled && player.arrows_amount > 0 && !pause_game)
                             {
                                 player.bow_attack = 1;
                                 player_animation_counter = 0;
@@ -4396,7 +4554,8 @@ int main()
                         }
                     }
 
-                    update_all(rbs_Boss, rbs_size, camera);
+                    if (!pause_game)
+                        update_all(rbs_Boss, rbs_size, camera);
 
                     //linear interpolation between camera and player's position
                     Vector offset_camera = create_vector(-SCREEN_WIDTH / 2 + 64, -200);
@@ -4438,7 +4597,7 @@ int main()
                             }
                         }
 
-                        if (!enemies_Boss[i].taking_damage && enemies_Boss[i].alive)
+                        if (!enemies_Boss[i].taking_damage && enemies_Boss[i].alive && !pause_game)
                         {
                             if (strcmp(enemies_Boss[i].rb.cb.tag, "bat") == 0 || strcmp(enemies_Boss[i].rb.cb.tag, "fox") == 0)
                             {
@@ -4504,19 +4663,6 @@ int main()
                                 enemies_Boss[i].animation_frame = 3;
                             else if (strcmp(enemies_Boss[i].rb.cb.tag, "spike") != 0)
                                 enemies_Boss[i].animation_frame = 0;
-                        }
-                    }
-
-                    for (int i = 0; i < object_count; i++)
-                    {
-                        if (objects_Boss[i].sprite_frame >= 12 && objects_Boss[i].sprite_frame <= 15)
-                        {
-                            if (game_timer % 4 == 0)
-                            {
-                                objects_Boss[i].sprite_frame++;
-                                objects_Boss[i].sprite_frame %= 4;
-                                objects_Boss[i].sprite_frame += 12;
-                            }
                         }
                     }
 
@@ -4671,21 +4817,6 @@ int main()
                         }
                     }
 
-                    for (int i = 0; i < ground_count; i++)
-                    {
-                        if (strcmp(grounds_Boss[i].rb.cb.tag, "lava") == 0)
-                        {
-                            if (grounds_Boss[i].animation_frame >= 0 && grounds_Boss[i].animation_frame <= 3)
-                            {
-                                if (game_timer % 4 == 0)
-                                {
-                                    grounds_Boss[i].animation_frame++;
-                                    grounds_Boss[i].animation_frame %= 4;
-                                }
-                            }
-                        }
-                    }
-
                     //DRAWING
 
                     masked_blit(hell_background, buffer, camera.x, camera.y, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -4699,30 +4830,6 @@ int main()
                                 if (grounds_Boss[i].rb.pos.y + 128 >= camera.y && grounds_Boss[i].rb.pos.y <= camera.y + SCREEN_HEIGHT)
                                 {
                                     draw_platform(buffer, hell_platform_sprite, &grounds_Boss[i], camera);
-                                }
-                            }
-                        }
-                    }
-
-                    for (int i = 0; i < object_count; i++)
-                    {
-                        if (objects_Boss[i].sprite_frame >= 12 && objects_Boss[i].sprite_frame <= 15)
-                        {
-                            if (objects_Boss[i].position.x + 128 >= camera.x && objects_Boss[i].position.x <= camera.x + SCREEN_WIDTH)
-                            {
-                                if (objects_Boss[i].position.y + 128 >= camera.y && objects_Boss[i].position.y <= camera.y + SCREEN_HEIGHT)
-                                {
-                                    draw_object(buffer, scenario_sprite, &objects_Boss[i], camera);
-                                }
-                            }
-                        }
-                        if (objects_Boss[i].sprite_frame >= 22 && objects_Boss[i].sprite_frame <= 27)
-                        {
-                            if (objects_Boss[i].position.x + 128 >= camera.x && objects_Boss[i].position.x <= camera.x + SCREEN_WIDTH)
-                            {
-                                if (objects_Boss[i].position.y + 128 >= camera.y && objects_Boss[i].position.y <= camera.y + SCREEN_HEIGHT)
-                                {
-                                    draw_object(buffer, scenario_sprite, &objects_Boss[i], camera);
                                 }
                             }
                         }
@@ -4744,29 +4851,17 @@ int main()
                         }
                     }
 
-                    for (int i = 0; i < ground_count; i++)
-                    {
-                        if (strcmp(grounds_Boss[i].rb.cb.tag, "lava") == 0)
-                        {
-                            if (grounds_Boss[i].rb.pos.x + 128 >= camera.x && grounds_Boss[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
-                            {
-                                if (grounds_Boss[i].rb.pos.y + 128 >= camera.y && grounds_Boss[i].rb.pos.y <= camera.y + SCREEN_HEIGHT)
-                                {
-                                    draw_lava(buffer, lava_sprite, &grounds_Boss[i], camera);
-                                }
-                            }
-                        }
-                    }
+                    if (!pause_game)
+                        draw_player(buffer, player_sprite, &player, camera);
 
-                    draw_player(buffer, player_sprite, &player, camera);
-
-                    draw_jumper_boss(buffer, jumper_boss_sprite, &jumper_boss, camera);
+                    if (!pause_game)
+                        draw_jumper_boss(buffer, jumper_boss_sprite, &jumper_boss, camera);
 
                     for (int i = 0; i < enemy_count; i++)
                     {
                         if (strcmp(enemies_Boss[i].rb.cb.tag, "bat") == 0 && enemies_Boss[i].rb.pos.y <= 2000)
                         {
-                            if (enemies_Boss[i].rb.pos.x + 128 >= camera.x && enemies_Boss[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
+                            if (enemies_Boss[i].rb.pos.x + 128 >= camera.x && enemies_Boss[i].rb.pos.x <= camera.x + SCREEN_WIDTH && !pause_game)
                             {
                                 if (enemies_Boss[i].rb.pos.y + 128 >= camera.y && enemies_Boss[i].rb.pos.y <= camera.y + SCREEN_HEIGHT)
                                 {
@@ -4778,7 +4873,7 @@ int main()
                         }
                         else if (strcmp(enemies_Boss[i].rb.cb.tag, "fox") == 0 && enemies_Boss[i].rb.pos.y <= 2000)
                         {
-                            if (enemies_Boss[i].rb.pos.x + 128 >= camera.x && enemies_Boss[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
+                            if (enemies_Boss[i].rb.pos.x + 128 >= camera.x && enemies_Boss[i].rb.pos.x <= camera.x + SCREEN_WIDTH && !pause_game)
                             {
                                 if (enemies_Boss[i].rb.pos.y + 128 >= camera.y && enemies_Boss[i].rb.pos.y <= camera.y + SCREEN_HEIGHT)
                                 {
@@ -4790,7 +4885,7 @@ int main()
                         }
                         else if (strcmp(enemies_Boss[i].rb.cb.tag, "harpy") == 0 && enemies_Boss[i].rb.pos.y <= 2000)
                         {
-                            if (enemies_Boss[i].rb.pos.x + 128 >= camera.x && enemies_Boss[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
+                            if (enemies_Boss[i].rb.pos.x + 128 >= camera.x && enemies_Boss[i].rb.pos.x <= camera.x + SCREEN_WIDTH && !pause_game)
                             {
                                 if (enemies_Boss[i].rb.pos.y + 128 >= camera.y && enemies_Boss[i].rb.pos.y <= camera.y + SCREEN_HEIGHT)
                                 {
@@ -4812,7 +4907,7 @@ int main()
                         }
                         else if (strcmp(enemies_Boss[i].rb.cb.tag, "ghost") == 0)
                         {
-                            if (enemies_Boss[i].rb.pos.x + 128 >= camera.x && enemies_Boss[i].rb.pos.x <= camera.x + SCREEN_WIDTH)
+                            if (enemies_Boss[i].rb.pos.x + 128 >= camera.x && enemies_Boss[i].rb.pos.x <= camera.x + SCREEN_WIDTH && !pause_game)
                             {
                                 if (enemies_Boss[i].rb.pos.y + 128 >= camera.y && enemies_Boss[i].rb.pos.y <= camera.y + SCREEN_HEIGHT)
                                 {
@@ -4822,13 +4917,17 @@ int main()
                         }
                     }
 
-                    if (arrow_attack.rb.cb.enabled)
+                    if (arrow_attack.rb.cb.enabled && !pause_game)
                         draw_arrow_attack(buffer, arrow_attack_sprite, &arrow_attack, camera);
 
                     if ((arrow_attack.rb.pos.x - player.rb.pos.x > (SCREEN_WIDTH / 2) + 128 && arrow_attack.rb.velocity.x > 0) || ((arrow_attack.rb.pos.x - player.rb.pos.x) * -1 > SCREEN_WIDTH / 2 && arrow_attack.rb.velocity.x < 0))
                         arrow_attack.rb.cb.enabled = 0;
 
-                    draw_lifebar(buffer, lifebar_sprite, player);
+                    if (!pause_game)
+                        draw_lifebar(buffer, lifebar_sprite, player);
+
+                    if (pause_game)
+                        draw_sprite_ex(buffer, pause_sprite, 0, 0, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
 
                     if (fading_type == 1)
                     {
@@ -4898,6 +4997,7 @@ int main()
 
         fading_type = 1;
         fading_progress = 1;
+        counter = 0;
 
         while (death_on && !close_game)
         {
@@ -5021,6 +5121,7 @@ int main()
     destroy_bitmap(hell_platform_sprite);
     destroy_bitmap(hell_background);
     destroy_bitmap(fade_black);
+    destroy_bitmap(pause_sprite);
 
 #pragma endregion
     return 0;
