@@ -12,6 +12,7 @@
 #include "../headers/scenegeneration.h"
 #include "../headers/menu.h"
 #include "../headers/item.h"
+#include "../headers/boss.h"
 
 #pragma region functions
 volatile int close_game = 0;
@@ -66,7 +67,7 @@ void draw_potion(BITMAP *bmp, BITMAP *sprite, Item *potion, Vector camera);
 
 void draw_arrow_attack(BITMAP *bmp, BITMAP *sprite, Item *arrow_attack, Vector camera);
 
-void draw_jumperboss(BITMAP *bmp, BITMAP *sprite, Enemy *jumperboss, Vector camera);
+void draw_jumper_boss(BITMAP *bmp, BITMAP *sprite, Boss *jumper_boss, Vector camera);
 
 void draw_test(BITMAP *bmp, BITMAP *sprite, Vector camera);
 
@@ -213,8 +214,8 @@ int main()
     if (arrow_attack_sprite == NULL)
         allegro_message("error");
 
-    BITMAP *jumperboss_sprite = load_bitmap(JUMPER_BOSS, NULL);
-    if (jumperboss_sprite == NULL)
+    BITMAP *jumper_boss_sprite = load_bitmap(JUMPER_BOSS, NULL);
+    if (jumper_boss_sprite == NULL)
         allegro_message("error");
 
     BITMAP *hell_background = load_bitmap("../assets/Scenario/HellBackGround.bmp", NULL);
@@ -287,7 +288,7 @@ int main()
                     {
                         stop_sample(intro);
                         // menu_on = 0;
-                        playing_first_level = 1;
+                        //playing_first_level = 1;
                         fading_type = 2;
                         fading_progress = 0;
                     }
@@ -439,7 +440,8 @@ int main()
                     if (scene_show == 6)
                     {
                         stop_sample(introo);
-                        playing_first_level = 1;
+                        // playing_first_level = 1;
+                        playing_boss_fight = 1;
                         fading_type = 2;
                         fading_progress = 0;
                         cutscene_one_on = 0;
@@ -4065,6 +4067,8 @@ int main()
             Item items_Boss[item_count];
             item_count = 0;
 
+            Boss jumper_boss;
+
             temp_col = 0;
 
             for (int i = 0; i < map_size; i++)
@@ -4074,6 +4078,11 @@ int main()
                     init_player(&player, create_vector(col * 128, row * 128), player.life);
                     init_arrow_attack(&arrow_attack, player.rb.pos);
                     camera = sum(player.rb.pos, create_vector(-100, -200));
+                    col++;
+                }
+                else if (map[i] == 'J')
+                {
+                    init_jumper_boss(&jumper_boss, create_vector(col * 128, row * 128));
                     col++;
                 }
                 else if (map[i] == 'B')
@@ -4293,6 +4302,7 @@ int main()
 
             set_enemies_ref(enemies_Boss, enemy_count);
 
+            rbs_Boss[rbs_size - 3] = &jumper_boss.rb;
             rbs_Boss[rbs_size - 2] = &player.sword_rb;
             rbs_Boss[rbs_size - 1] = &arrow_attack.rb;
 #pragma endregion
@@ -4510,6 +4520,81 @@ int main()
                         }
                     }
 
+                    // Boss behavior
+                    if (jumper_boss.sleepy && !jumper_boss.taking_damage)
+                    {
+                        atk_jumper_boss(&jumper_boss, &player, 2);
+
+                        if (jumper_boss.animation_frame >= 0 && jumper_boss.animation_frame <= 1)
+                        {
+                            if (game_timer % 32 == 0)
+                            {
+                                jumper_boss.animation_frame++;
+                                jumper_boss.animation_frame %= 2;
+                            }
+                        }
+                    }
+                    else if (jumper_boss.sleepy && jumper_boss.taking_damage)
+                    {
+                        jumper_boss.angry = 1;
+                        jumper_boss.sleepy = 0;
+                    }
+
+                    if (jumper_boss.angry)
+                    {
+                        atk_jumper_boss(&jumper_boss, &player, 1);
+
+                        if (jumper_boss.animation_frame >= 4 && jumper_boss.animation_frame <= 9)
+                        {
+                            if (game_timer % 8 == 0)
+                            {
+                                jumper_boss.animation_frame++;
+                                jumper_boss.animation_frame %= 6;
+                            }
+                        }
+
+                        if (jumper_boss.life < 0)
+                        {
+                            jumper_boss.alive = 0;
+                            jumper_boss.angry = 0;
+                        }
+                    }
+
+                    if (!jumper_boss.alive)
+                    {
+                        if (jumper_boss.animation_frame >= 10 && jumper_boss.animation_frame <= 15)
+                        {
+                            if (game_timer % 16 == 0)
+                            {
+                                jumper_boss.animation_frame++;
+
+                                if (jumper_boss.animation_frame > 15)
+                                {
+                                    jumper_boss.animation_frame = 15;
+                                    jumper_boss.rb.cb.enabled = 0;
+                                }
+                            }
+                        }
+                    }
+
+                    if (jumper_boss.alert)
+                    {
+                        atk_jumper_boss(&jumper_boss, &player, 2);
+
+                        if (jumper_boss.animation_frame >= 2 && jumper_boss.animation_frame <= 3)
+                        {
+                            if (game_timer % 32 == 0)
+                            {
+                                jumper_boss.animation_frame++;
+
+                                if (jumper_boss.animation_frame > 3)
+                                {
+                                    jumper_boss.animation_frame = 2;
+                                }
+                            }
+                        }
+                    }
+
                     if (player.animation_frame >= 0 && player.animation_frame <= 7)
                     {
                         if (player_animation_counter % 3 == 0)
@@ -4648,6 +4733,8 @@ int main()
                     }
 
                     draw_player(buffer, player_sprite, &player, camera);
+
+                    draw_jumper_boss(buffer, jumper_boss_sprite, &jumper_boss, camera);
 
                     for (int i = 0; i < enemy_count; i++)
                     {
@@ -4898,7 +4985,7 @@ int main()
     destroy_bitmap(scenario_sprite);
     destroy_bitmap(potion_sprite);
     destroy_bitmap(montain_sprite);
-    destroy_bitmap(jumperboss_sprite);
+    destroy_bitmap(jumper_boss_sprite);
     destroy_bitmap(cloud_sprite);
     destroy_bitmap(arrow_attack_sprite);
     destroy_bitmap(ground_background_sprite);
@@ -5436,69 +5523,87 @@ void draw_lifebar(BITMAP *bmp, BITMAP *sprite, Player player)
     textout_ex(bmp, font, player_arrows_amount, 180, 64, makecol(255, 255, 0), -1);
 }
 
-/*void draw_jumperboss(BITMAP *bmp, BITMAP *sprite, Enemy *jumperboss, Vector camera)
+void draw_jumper_boss(BITMAP *bmp, BITMAP *sprite, Boss *jumper_boss, Vector camera)
 {
-    if (angry)
+    if (jumper_boss->rb.cb.enabled)
     {
-        if (jumperboss->animation_frame < 4)
+        if (jumper_boss->angry)
         {
-            jumperboss->animation_frame = 4;
-        }
-    }
-    BITMAP *jumperboss_sprite = create_bitmap(128, 128);
-    clear_to_color(jumperboss_sprite, makecol(255, 0, 255));
-
-    //rect(bmp, jumperboss->rb.cb.min.x - floor(camera.x), jumperboss->rb.cb.min.y - floor(camera.y), jumperboss->rb.cb.max.x - floor(camera.x), jumperboss->rb.cb.max.y - floor(camera.y), makecol(255, 0, 0));
-
-    int r_img_pos = jumperboss->animation_frame % JUMPERBOSS_SPRITE_COLS;
-    int c_img_pos = jumperboss->animation_frame / JUMPERBOSS_SPRITE_COLS;
-
-    r_img_pos *= JUMPERBOSS_TILE_SIZE;
-    c_img_pos *= JUMPERBOSS_TILE_SIZE;
-
-    //draw the a part of the sprite sheet to the screen and scales it
-    masked_stretch_blit(sprite, jumperboss_sprite, r_img_pos, c_img_pos, 32, 32, 0, 0, 128, 128);
-
-    set_trans_blender(255, 255, 255, 64);
-
-    if (!jumperboss->facing_right)
-    {
-        if (jumperboss->taking_damage == 0 || jumperboss->alive == 0)
-        {
-            draw_sprite_ex(bmp, jumperboss_sprite, jumperboss->rb.pos.x - floor(camera.x), jumperboss->rb.pos.y - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
-        }
-        else
-        {
-            if (game_timer % 2 == 0)
+            if (jumper_boss->animation_frame < 4)
             {
-                draw_sprite_ex(bmp, jumperboss_sprite, jumperboss->rb.pos.x - floor(camera.x), jumperboss->rb.pos.y - floor(camera.y), DRAW_SPRITE_TRANS, DRAW_SPRITE_NO_FLIP);
+                jumper_boss->animation_frame = 4;
+            }
+        }
+        else if (jumper_boss->alert)
+        {
+            if (jumper_boss->animation_frame < 2)
+            {
+                jumper_boss->animation_frame = 2;
+            }
+        }
+        else if (!jumper_boss->alive)
+        {
+            if (jumper_boss->animation_frame < 10)
+            {
+                jumper_boss->animation_frame = 10;
+            }
+        }
+
+        BITMAP *jumper_boss_sprite = create_bitmap(128, 128);
+        clear_to_color(jumper_boss_sprite, makecol(255, 0, 255));
+
+        //rect(bmp, jumper_boss->rb.cb.min.x - floor(camera.x), jumper_boss->rb.cb.min.y - floor(camera.y), jumper_boss->rb.cb.max.x - floor(camera.x), jumper_boss->rb.cb.max.y - floor(camera.y), makecol(255, 0, 0));
+
+        int r_img_pos = jumper_boss->animation_frame % JUMPER_BOSS_SPRITE_COLS;
+        int c_img_pos = jumper_boss->animation_frame / JUMPER_BOSS_SPRITE_COLS;
+
+        r_img_pos *= JUMPER_BOSS_TILE_SIZE;
+        c_img_pos *= JUMPER_BOSS_TILE_SIZE;
+
+        //draw the a part of the sprite sheet to the screen and scales it
+        masked_stretch_blit(sprite, jumper_boss_sprite, r_img_pos, c_img_pos, 32, 32, 0, 0, 128, 128);
+
+        set_trans_blender(255, 255, 255, 64);
+
+        if (jumper_boss->facing_right)
+        {
+            if (jumper_boss->taking_damage == 0 || jumper_boss->alive == 0)
+            {
+                draw_sprite_ex(bmp, jumper_boss_sprite, jumper_boss->rb.pos.x - floor(camera.x), jumper_boss->rb.pos.y - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
             }
             else
             {
-                draw_sprite_ex(bmp, jumperboss_sprite, jumperboss->rb.pos.x - floor(camera.x), jumperboss->rb.pos.y - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+                if (game_timer % 2 == 0)
+                {
+                    draw_sprite_ex(bmp, jumper_boss_sprite, jumper_boss->rb.pos.x - floor(camera.x), jumper_boss->rb.pos.y - floor(camera.y), DRAW_SPRITE_TRANS, DRAW_SPRITE_NO_FLIP);
+                }
+                else
+                {
+                    draw_sprite_ex(bmp, jumper_boss_sprite, jumper_boss->rb.pos.x - floor(camera.x), jumper_boss->rb.pos.y - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+                }
             }
-        }
-    }
-    else
-    {
-        if (jumperboss->taking_damage == 0 || jumperboss->alive == 0)
-        {
-            draw_sprite_ex(bmp, jumperboss_sprite, jumperboss->rb.pos.x - floor(camera.x), jumperboss->rb.pos.y - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
         }
         else
         {
-            if (game_timer % 2 == 0)
+            if (jumper_boss->taking_damage == 0 || jumper_boss->alive == 0)
             {
-                draw_sprite_ex(bmp, jumperboss_sprite, jumperboss->rb.pos.x - floor(camera.x), jumperboss->rb.pos.y - floor(camera.y), DRAW_SPRITE_TRANS, DRAW_SPRITE_H_FLIP);
+                draw_sprite_ex(bmp, jumper_boss_sprite, jumper_boss->rb.pos.x - floor(camera.x), jumper_boss->rb.pos.y - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
             }
             else
             {
-                draw_sprite_ex(bmp, jumperboss_sprite, jumperboss->rb.pos.x - floor(camera.x), jumperboss->rb.pos.y - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
+                if (game_timer % 2 == 0)
+                {
+                    draw_sprite_ex(bmp, jumper_boss_sprite, jumper_boss->rb.pos.x - floor(camera.x), jumper_boss->rb.pos.y - floor(camera.y), DRAW_SPRITE_TRANS, DRAW_SPRITE_H_FLIP);
+                }
+                else
+                {
+                    draw_sprite_ex(bmp, jumper_boss_sprite, jumper_boss->rb.pos.x - floor(camera.x), jumper_boss->rb.pos.y - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
+                }
             }
         }
-    }
 
-    destroy_bitmap(jumperboss_sprite);
-}*/
+        destroy_bitmap(jumper_boss_sprite);
+    }
+}
 
 #pragma endregion
