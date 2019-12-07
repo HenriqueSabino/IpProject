@@ -11,6 +11,139 @@
 Enemy *enemies_ref;
 int enemies_ref_count;
 
+void atk(Enemy *enemy, RigidBody player)
+{
+    Vector player_pos = mult(sum(player.cb.min, player.cb.max), 0.5f);
+    Vector enemy_pos = mult(sum(enemy->rb.cb.min, enemy->rb.cb.max), 0.5f);
+
+    if (player_pos.x >= enemy_pos.x)
+    {
+        enemy->facing_right = 0;
+    }
+    else
+    {
+        enemy->facing_right = 1;
+    }
+
+    if ((strcmp(enemy->rb.cb.tag, "bat") == 0 || strcmp(enemy->rb.cb.tag, "harpy") == 0) && enemy->attack)
+    {
+        if (enemy->taking_damage == 1)
+        {
+            if (player_pos.x > enemy_pos.x)
+            {
+                enemy->rb.velocity = create_vector(-10, 0);
+                enemy->rb.acceleration = create_vector(0, 0);
+            }
+            else
+            {
+                enemy->rb.velocity = create_vector(10, 0);
+                enemy->rb.acceleration = create_vector(0, 0);
+            }
+
+            if (dist(create_vector(enemy->rb.pos.x, 0), create_vector(enemy->enemy_pos_ini.x, 0)) >= 100)
+            {
+                enemy->taking_damage = 0;
+            }
+        }
+
+        if (dist(create_vector(enemy_pos.x, 0), create_vector(player_pos.x, 0)) <= 100 && !enemy->taking_damage)
+        {
+            enemy->rb.acceleration = create_vector(0, 0);
+        }
+        else if (dist(enemy->rb.pos, player_pos) <= SCREEN_WIDTH && !enemy->taking_damage)
+        {
+            if (dist(enemy_pos, sum(player_pos, enemy->player_pos)) <= 10)
+            {
+                enemy->player_pos.x *= -1;
+                enemy->rb.acceleration = mult(normalized(diff(player_pos, enemy_pos)), 8);
+            }
+            enemy->rb.velocity = mult(normalized(diff(sum(player_pos, enemy->player_pos), enemy_pos)), 6);
+        }
+
+        if (enemy->taking_damage == 0)
+            enemy->enemy_pos_ini = enemy->rb.pos;
+    }
+    else if (strcmp(enemy->rb.cb.tag, "fox") == 0 && enemy->rb.velocity.y == 0 && enemy->attack)
+    {
+        if (enemy->taking_damage == 1)
+        {
+            if (player_pos.x > enemy_pos.x)
+            {
+                enemy->rb.acceleration = create_vector(0, 0);
+                enemy->rb.velocity = create_vector(-10, -5);
+                enemy->taking_damage = -1;
+            }
+            else
+            {
+                enemy->rb.acceleration = create_vector(0, 0);
+                enemy->rb.velocity = create_vector(10, -5);
+                enemy->taking_damage = -1;
+            }
+        }
+
+        if (dist(enemy->rb.pos, player_pos) <= SCREEN_WIDTH)
+        {
+            if (dist(create_vector(enemy_pos.x, 0), create_vector(player_pos.x, 0)) <= 100)
+            {
+                enemy->rb.acceleration = create_vector(0, 0);
+            }
+            else if (dist(enemy->rb.pos, player_pos) <= SCREEN_WIDTH && !enemy->taking_damage)
+            {
+                if (dist(enemy_pos, sum(player_pos, enemy->player_pos)) <= 10)
+                {
+                    enemy->player_pos.x *= -1;
+                    enemy->rb.acceleration = mult(normalized(diff(create_vector(player_pos.x, 0), create_vector(enemy_pos.x, 0))), 8);
+                }
+                enemy->rb.velocity = mult(normalized(diff(create_vector(player_pos.x, 0), create_vector(enemy_pos.x, 0))), 5);
+            }
+
+            enemy->rb.acceleration.y = 0;
+        }
+        else
+        {
+            enemy->rb.velocity = create_vector(0, 0);
+        }
+    }
+    else if (strcmp(enemy->rb.cb.tag, "spike") == 0 && enemy->rb.cb.solid == 0)
+    {
+        if (enemy->animation_frame == 0)
+        {
+            enemy->rb.cb.width = 120;
+            enemy->rb.cb.height = 76;
+            enemy->rb.cb.offset = create_vector(4, 48);
+            enemy->rb.cb.enabled = 1;
+        }
+        else if (enemy->animation_frame == 1 || enemy->animation_frame == 7)
+        {
+            enemy->rb.cb.width = 120;
+            enemy->rb.cb.height = 56;
+            enemy->rb.cb.offset = create_vector(4, 68);
+            enemy->rb.cb.enabled = 1;
+        }
+        else if (enemy->animation_frame == 2 || enemy->animation_frame == 6)
+        {
+            enemy->rb.cb.width = 120;
+            enemy->rb.cb.height = 44;
+            enemy->rb.cb.offset = create_vector(4, 80);
+            enemy->rb.cb.enabled = 1;
+        }
+        else if (enemy->animation_frame == 3 || enemy->animation_frame == 5)
+        {
+            enemy->rb.cb.width = 120;
+            enemy->rb.cb.height = 28;
+            enemy->rb.cb.offset = create_vector(4, 96);
+            enemy->rb.cb.enabled = 1;
+        }
+        else
+        {
+            enemy->rb.cb.width = 120;
+            enemy->rb.cb.height = 8;
+            enemy->rb.cb.offset = create_vector(4, 118);
+            enemy->rb.cb.enabled = 0;
+        }
+    }
+}
+
 void onCollisionEnter_bat(RigidBody *self, RigidBody *other)
 {
     if (strcmp(other->cb.tag, "sword") == 0 || strcmp(other->cb.tag, "arrow") == 0)
@@ -121,39 +254,23 @@ void onCollisionEnter_fox(RigidBody *self, RigidBody *other)
                 enemies_ref[i].taking_damage = 1;
 
                 if (strcmp(other->cb.tag, "sword") == 0)
+                {
                     enemies_ref[i].life -= 2;
+                }
                 else if (strcmp(other->cb.tag, "arrow") == 0)
+                {
                     enemies_ref[i].life--;
+                }
 
                 if (enemies_ref[i].life > 0)
                 {
-                    if (strcmp(other->cb.tag, "sword") == 0)
-                    {
-                        if (other->pos.x > self->pos.x)
-                        {
-                            self->velocity = create_vector(-10, -5);
-                        }
-                        else
-                        {
-                            self->velocity = create_vector(10, -5);
-                        }
-                    }
-                    else if (strcmp(other->cb.tag, "arrow") == 0)
-                    {
-                        if (other->velocity.x < 0)
-                        {
-                            self->velocity = create_vector(-5, -5);
-                        }
-                        else
-                        {
-                            self->velocity = create_vector(5, -5);
-                        }
-                    }
+                    continue;
                 }
                 else
                 {
                     self->velocity = create_vector(0, -15);
                     self->acceleration = create_vector(0, 0);
+                    enemies_ref[i].alive = 0;
                 }
             }
         }
@@ -330,125 +447,6 @@ void init_spike(Enemy *spike, Vector pos)
     spike->rb.onCollisionExit = NULL;
     spike->rb.onCollisionStay = onCollision_spike;
     strcpy(spike->rb.cb.tag, "spike");
-}
-
-void atk(Enemy *enemy, RigidBody player)
-{
-    Vector player_pos = mult(sum(player.cb.min, player.cb.max), 0.5f);
-    Vector enemy_pos = mult(sum(enemy->rb.cb.min, enemy->rb.cb.max), 0.5f);
-
-    if (player_pos.x >= enemy_pos.x)
-    {
-        enemy->facing_right = 0;
-    }
-    else
-    {
-        enemy->facing_right = 1;
-    }
-
-    if ((strcmp(enemy->rb.cb.tag, "bat") == 0 || strcmp(enemy->rb.cb.tag, "harpy") == 0) && enemy->attack)
-    {
-        if (enemy->taking_damage == 1)
-        {
-            if (player_pos.x > enemy_pos.x)
-            {
-                enemy->rb.velocity = create_vector(-10, 0);
-                enemy->rb.acceleration = create_vector(0, 0);
-            }
-            else
-            {
-                enemy->rb.velocity = create_vector(10, 0);
-                enemy->rb.acceleration = create_vector(0, 0);
-            }
-
-            if (dist(create_vector(enemy->rb.pos.x, 0), create_vector(enemy->enemy_pos_ini.x, 0)) >= 100)
-            {
-                enemy->taking_damage = 0;
-            }
-        }
-
-        if (dist(create_vector(enemy_pos.x, 0), create_vector(player_pos.x, 0)) <= 100 && !enemy->taking_damage)
-        {
-            enemy->rb.acceleration = create_vector(0, 0);
-        }
-        else if (dist(enemy->rb.pos, player_pos) <= SCREEN_WIDTH && !enemy->taking_damage)
-        {
-            if (dist(enemy_pos, sum(player_pos, enemy->player_pos)) <= 10)
-            {
-                enemy->player_pos.x *= -1;
-                enemy->rb.acceleration = mult(normalized(diff(player_pos, enemy_pos)), 8);
-            }
-            enemy->rb.velocity = mult(normalized(diff(sum(player_pos, enemy->player_pos), enemy_pos)), 6);
-        }
-
-        if (enemy->taking_damage == 0)
-            enemy->enemy_pos_ini = enemy->rb.pos;
-    }
-    else if (strcmp(enemy->rb.cb.tag, "fox") == 0 && enemy->rb.velocity.y == 0 && enemy->attack)
-    {
-
-        if (dist(enemy->rb.pos, player_pos) <= SCREEN_WIDTH)
-        {
-            if (dist(create_vector(enemy_pos.x, 0), create_vector(player_pos.x, 0)) <= 100)
-            {
-                enemy->rb.acceleration = create_vector(0, 0);
-            }
-            else if (dist(enemy->rb.pos, player_pos) <= SCREEN_WIDTH && !enemy->taking_damage)
-            {
-                if (dist(enemy_pos, sum(player_pos, enemy->player_pos)) <= 10)
-                {
-                    enemy->player_pos.x *= -1;
-                    enemy->rb.acceleration = mult(normalized(diff(create_vector(player_pos.x, 0), create_vector(enemy_pos.x, 0))), 8);
-                }
-                enemy->rb.velocity = mult(normalized(diff(create_vector(player_pos.x, 0), create_vector(enemy_pos.x, 0))), 5);
-            }
-
-            enemy->rb.acceleration.y = 0;
-            enemy->rb.velocity.y = 0;
-        }
-        else
-        {
-            enemy->rb.velocity = create_vector(0, 0);
-        }
-    }
-    else if (strcmp(enemy->rb.cb.tag, "spike") == 0 && enemy->rb.cb.solid == 0)
-    {
-        if (enemy->animation_frame == 0)
-        {
-            enemy->rb.cb.width = 120;
-            enemy->rb.cb.height = 76;
-            enemy->rb.cb.offset = create_vector(4, 48);
-            enemy->rb.cb.enabled = 1;
-        }
-        else if (enemy->animation_frame == 1 || enemy->animation_frame == 7)
-        {
-            enemy->rb.cb.width = 120;
-            enemy->rb.cb.height = 56;
-            enemy->rb.cb.offset = create_vector(4, 68);
-            enemy->rb.cb.enabled = 1;
-        }
-        else if (enemy->animation_frame == 2 || enemy->animation_frame == 6)
-        {
-            enemy->rb.cb.width = 120;
-            enemy->rb.cb.height = 44;
-            enemy->rb.cb.offset = create_vector(4, 80);
-            enemy->rb.cb.enabled = 1;
-        }
-        else if (enemy->animation_frame == 3 || enemy->animation_frame == 5)
-        {
-            enemy->rb.cb.width = 120;
-            enemy->rb.cb.height = 28;
-            enemy->rb.cb.offset = create_vector(4, 96);
-            enemy->rb.cb.enabled = 1;
-        }
-        else
-        {
-            enemy->rb.cb.width = 120;
-            enemy->rb.cb.height = 8;
-            enemy->rb.cb.offset = create_vector(4, 118);
-            enemy->rb.cb.enabled = 0;
-        }
-    }
 }
 
 void atk_ghost(Enemy *enemy, Player *player)

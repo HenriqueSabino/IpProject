@@ -9,7 +9,8 @@
         "stdio.h": "c",
         "string.h": "c",
         "random": "c",
-        "type_traits": "c"
+        "type_traits": "c",
+        "rigidbody.h": "c"
     },
     "editor.fontSize": 16,
     "editor.formatOnSave": true,
