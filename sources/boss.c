@@ -66,7 +66,6 @@ void atk_jumper_boss(Boss *jumper_boss, Player *player, int behavior)
             }
 
             jumper_boss->rb.acceleration.y = 0;
-            jumper_boss->rb.velocity.y = 0;
         }
     }
     else if (jumper_boss->behavior == 2)
@@ -86,18 +85,33 @@ void atk_jumper_boss(Boss *jumper_boss, Player *player, int behavior)
     }
     else if (jumper_boss->behavior == 3 && !jumper_boss->taking_damage)
     {
-        jumper_boss->rb.velocity = create_vector(0, -20);
+        jumper_boss->rb.velocity = create_vector(0, -30);
+        check_damage = 1;
     }
 
-    /*if (check_damage == 1)
+    if (check_damage == 1)
     {
-        if (player->can_jump)
+        if (jumper_boss->rb.velocity.x != 0)
         {
-            player->life -= 10;
+            if (player->can_jump)
+            {
+                player->life -= 5;
+                player->taking_damage = 1;
+                if (player->taking_damage)
+                {
+                    if (player_pos.x > jumper_boss_pos.x)
+                    {
+                        player->rb.velocity = create_vector(10, -10);
+                    }
+                    else
+                    {
+                        player->rb.velocity = create_vector(-10, -10);
+                    }
+                }
+            }
+            check_damage = 0;
         }
-        check_damage = 0;
-        jumper_boss->behavior = 1;
-    }*/
+    }
 }
 
 void onCollisionEnter_jumper_boss(RigidBody *self, RigidBody *other)

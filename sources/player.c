@@ -186,6 +186,12 @@ void onCollisionEnter(RigidBody *self, RigidBody *other)
 
         other->cb.enabled = 0;
     }
+
+    if (player_ref->taking_damage == 1)
+    {
+        timer_invulnerability = 0;
+        increment_invulnerability();
+    }
 }
 
 void onCollisionStay(RigidBody *self, RigidBody *other)
@@ -315,6 +321,12 @@ void onCollisionStay(RigidBody *self, RigidBody *other)
 
         other->cb.enabled = 0;
     }
+
+    if (player_ref->taking_damage == 1)
+    {
+        timer_invulnerability = 0;
+        increment_invulnerability();
+    }
 }
 
 void onCollisionExit(RigidBody *self, RigidBody *other)
@@ -322,6 +334,12 @@ void onCollisionExit(RigidBody *self, RigidBody *other)
     if (strcmp(other->cb.tag, "ground") == 0 || strcmp(other->cb.tag, "platform") == 0 || strcmp(other->cb.tag, "bridge") == 0)
     {
         player_ref->can_jump = 0;
+    }
+
+    if (player_ref->taking_damage == 1)
+    {
+        timer_invulnerability = 0;
+        increment_invulnerability();
     }
 }
 

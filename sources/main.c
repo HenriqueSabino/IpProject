@@ -4697,6 +4697,7 @@ int main()
                         jumper_boss.angry = 1;
                         jumper_boss.sleepy = 0;
                         jumper_boss.alert = 0;
+                        atk_jumper_boss(&jumper_boss, &player, 1);
                     }
 
                     if (jumper_boss.angry)
