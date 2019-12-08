@@ -392,6 +392,10 @@ int main()
         BITMAP *cena_five = load_bitmap("../assets/Cutscenes/Cena5.bmp", NULL);
         BITMAP *cena_six = load_bitmap("../assets/Cutscenes/Cena6.bmp", NULL);
         BITMAP *cena_seven = load_bitmap("../assets/Cutscenes/Cena7.bmp", NULL);
+        BITMAP *cena_eight = load_bitmap("../assets/Cutscenes/Cena8.bmp", NULL);
+        BITMAP *cena_nine = load_bitmap("../assets/Cutscenes/Cena9.bmp", NULL);
+        BITMAP *cena_ten = load_bitmap("../assets/Cutscenes/Cena10.bmp", NULL);
+        BITMAP *cena_eleven = load_bitmap("../assets/Cutscenes/Cena11.bmp", NULL);
         BITMAP *arroww = load_bitmap(ARROW_PATH, NULL);
 
         //SAMPLES
@@ -445,9 +449,10 @@ int main()
                     aux++;
                     if (aux == 2)
                     {
-                        pschx = 325, pschy = 473;
+                        pschx = 325;
+                        pschy = 473;
                     }
-                    if (scene_show == 6)
+                    if (scene_show == 10)
                     {
                         stop_sample(introo);
                         // playing_first_level = 1;
@@ -464,14 +469,14 @@ int main()
                         }
                         else if (623)
                         {
-                            scene_show = 7;
+                            scene_show = 11;
                         }
                     }
                     else
                     {
                         scene_show++;
                     }
-                    if (scene_show - 1 == 7)
+                    if (scene_show - 1 == 11)
                     {
                         scene_show = 3;
                     }
@@ -546,6 +551,30 @@ int main()
                     pschy = 476;
                     draw_sprite(buffer, cena_seven, 0, 0);
                 }
+                else if (scene_show == 8)
+                {
+                    pschx = 783;
+                    pschy = 476;
+                    draw_sprite(buffer, cena_eight, 0, 0);
+                }
+                else if (scene_show == 9)
+                {
+                    pschx = 783;
+                    pschy = 476;
+                    draw_sprite(buffer, cena_nine, 0, 0);
+                }
+                else if (scene_show == 10)
+                {
+                    pschx = 783;
+                    pschy = 476;
+                    draw_sprite(buffer, cena_ten, 0, 0);
+                }
+                else if (scene_show == 11)
+                {
+                    pschx = 783;
+                    pschy = 476;
+                    draw_sprite(buffer, cena_eleven, 0, 0);
+                }
                 //draw the a part of the sprite sheet to the screen and scales it
                 masked_blit(arrow_sprite, buffer, r_img_pos, c_img_pos, pschx, pschy, 32, 32);
 
@@ -587,6 +616,10 @@ int main()
         destroy_bitmap(cena_five);
         destroy_bitmap(cena_six);
         destroy_bitmap(cena_seven);
+        destroy_bitmap(cena_eight);
+        destroy_bitmap(cena_nine);
+        destroy_bitmap(cena_ten);
+        destroy_bitmap(cena_eleven);
         destroy_sample(introo);
 
 #pragma endregion
