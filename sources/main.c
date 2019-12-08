@@ -393,8 +393,7 @@ int main()
         //SAMPLES
         SAMPLE *selectt = load_sample(SELECT_SOUND);
         SAMPLE *introo = load_sample(INTRO_SOUND);
-        SAMPLE *enterr = load_sample(ENTER_SOUND);
-
+        
         //INTRODUCTION SAMPLE
         play_sample(introo, 255, 128, 1000, 1);
 
@@ -438,6 +437,7 @@ int main()
 
                 if (key_down(KEY_ENTER))
                 {
+                    som = TRUE;
                     aux++;
                     if (aux == 2)
                     {
