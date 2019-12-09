@@ -28,6 +28,7 @@ int cutscene_one_on = 0;
 volatile int counter = 0;
 volatile int player_animation_counter = 0;
 volatile int boss_timer_behavior = 0;
+volatile int enemies_spawn = 0;
 volatile long game_timer = 0;
 
 void increment()
@@ -4471,6 +4472,7 @@ int main()
             fading_progress = 1;
             end_level = 0;
             counter = 0;
+            int enemies_on = 0;
 
             while (playing_boss_fight && !close_game)
             {
@@ -4622,11 +4624,28 @@ int main()
                         {
                             if (strcmp(enemies_Boss[i].rb.cb.tag, "ghost") == 0)
                             {
-                                atk_ghost(&enemies_Boss[i], &player);
+                                if (jumper_boss.life < 10)
+                                {
+                                    atk_ghost(&enemies_Boss[i], &player);
+                                    enemies_Boss[i].rb.cb.enabled = 1;
+                                }
+                                else
+                                {
+                                    enemies_Boss[i].rb.cb.enabled = 0;
+                                }
                             }
                             else
                             {
-                                atk(&enemies_Boss[i], player.rb);
+                                if (jumper_boss.life < 20)
+                                {
+                                    atk(&enemies_Boss[i], player.rb);
+                                    enemies_Boss[i].rb.cb.enabled = 1;
+                                    enemies_on = 1;
+                                }
+                                else
+                                {
+                                    enemies_Boss[i].rb.cb.enabled = 0;
+                                }
                             }
                         }
 
@@ -4895,7 +4914,7 @@ int main()
                     {
                         if (strcmp(enemies_Boss[i].rb.cb.tag, "bat") == 0 && enemies_Boss[i].rb.pos.y <= 2000)
                         {
-                            if (enemies_Boss[i].rb.pos.x + 128 >= camera.x && enemies_Boss[i].rb.pos.x <= camera.x + SCREEN_WIDTH && !pause_game)
+                            if (enemies_Boss[i].rb.pos.x + 128 >= camera.x && enemies_Boss[i].rb.pos.x <= camera.x + SCREEN_WIDTH && !pause_game && enemies_on)
                             {
                                 if (enemies_Boss[i].rb.pos.y + 128 >= camera.y && enemies_Boss[i].rb.pos.y <= camera.y + SCREEN_HEIGHT)
                                 {
@@ -4941,7 +4960,7 @@ int main()
                         }
                         else if (strcmp(enemies_Boss[i].rb.cb.tag, "ghost") == 0)
                         {
-                            if (enemies_Boss[i].rb.pos.x + 128 >= camera.x && enemies_Boss[i].rb.pos.x <= camera.x + SCREEN_WIDTH && !pause_game)
+                            if (enemies_Boss[i].rb.pos.x + 128 >= camera.x && enemies_Boss[i].rb.pos.x <= camera.x + SCREEN_WIDTH && !pause_game && enemies_Boss[i].rb.cb.enabled)
                             {
                                 if (enemies_Boss[i].rb.pos.y + 128 >= camera.y && enemies_Boss[i].rb.pos.y <= camera.y + SCREEN_HEIGHT)
                                 {
