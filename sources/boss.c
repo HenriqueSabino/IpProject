@@ -57,14 +57,14 @@ void atk_jumper_boss(Boss *jumper_boss, Player *player, int behavior)
             }
             else if (dist(jumper_boss->rb.pos, player_pos) <= SCREEN_WIDTH && !jumper_boss->taking_damage)
             {
-                if (dist(jumper_boss_pos, sum(player_pos, jumper_boss->player_pos)) <= 10)
+                if (dist(jumper_boss_pos, player_pos) <= 10)
                 {
                     jumper_boss->player_pos.x *= -1;
                     jumper_boss->rb.acceleration = mult(normalized(diff(create_vector(player_pos.x, 0), create_vector(jumper_boss_pos.x, 0))), 8);
                 }
-                jumper_boss->rb.velocity = mult(normalized(diff(create_vector(player_pos.x, 0), create_vector(jumper_boss_pos.x, 0))), 5);
             }
 
+            jumper_boss->rb.velocity = mult(normalized(diff(create_vector(player_pos.x, 0), create_vector(jumper_boss_pos.x, 0))), 5);
             jumper_boss->rb.acceleration.y = 0;
         }
     }
@@ -116,7 +116,7 @@ void atk_jumper_boss(Boss *jumper_boss, Player *player, int behavior)
 
 void onCollisionEnter_jumper_boss(RigidBody *self, RigidBody *other)
 {
-    if (strcmp(other->cb.tag, "ground") == 0 || strcmp(other->cb.tag, "bridge") == 0)
+    if (strcmp(other->cb.tag, "ground") == 0)
     {
         if (self->cb.max.y < other->cb.min.y || self->cb.min.y > other->cb.max.y)
         {
@@ -161,7 +161,7 @@ void onCollisionEnter_jumper_boss(RigidBody *self, RigidBody *other)
 
 void onCollisionStay_jumper_boss(RigidBody *self, RigidBody *other)
 {
-    if (strcmp(other->cb.tag, "ground") == 0 || strcmp(other->cb.tag, "bridge") == 0)
+    if (strcmp(other->cb.tag, "ground") == 0)
     {
         if (self->cb.max.y < other->cb.min.y || self->cb.min.y > other->cb.max.y)
         {
