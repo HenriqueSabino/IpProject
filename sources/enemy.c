@@ -92,7 +92,6 @@ void atk(Enemy *enemy, RigidBody player)
                 if (dist(enemy_pos, sum(player_pos, enemy->player_pos)) <= 10)
                 {
                     enemy->player_pos.x *= -1;
-                    enemy->rb.acceleration = mult(normalized(diff(create_vector(player_pos.x, 0), create_vector(enemy_pos.x, 0))), 8);
                 }
                 enemy->rb.velocity = mult(normalized(diff(create_vector(player_pos.x, 0), create_vector(enemy_pos.x, 0))), 5);
             }

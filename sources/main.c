@@ -455,7 +455,7 @@ int main()
                     if (scene_show == 10)
                     {
                         stop_sample(introo);
-                        // playing_first_level = 1;
+                        //playing_first_level = 1;
                         playing_boss_fight = 1;
                         fading_type = 2;
                         fading_progress = 0;
