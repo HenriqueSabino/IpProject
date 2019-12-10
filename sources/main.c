@@ -4785,7 +4785,7 @@ int main()
             end_level = 0;
             counter = 0;
             int enemies_on = 0;
-            int fire_on = 0;
+            int behavior_trasition = 0;
 
             while (playing_boss_fight && !close_game)
             {
@@ -5066,7 +5066,7 @@ int main()
                                 }
                             }
                         }
-                        else if (jumper_boss.taking_damage && !fire_on)
+                        else if (jumper_boss.taking_damage && !jumper_boss.fire_on)
                         {
                             jumper_boss.angry = 1;
                             jumper_boss.sleepy = 0;
@@ -5079,26 +5079,31 @@ int main()
                         {
                             if (jumper_boss.life > 30)
                             {
-                                if (boss_timer_behavior % 120 == 0)
+                                if (boss_timer_behavior > 120 && !jumper_boss.taking_damage && !jumper_boss.stomp_on)
                                 {
+                                    jumper_boss.stomp_on = 1;
                                     jumper_boss.behavior = 3;
                                     atk_jumper_boss(&jumper_boss, &player, 3);
                                     boss_timer_behavior = 0;
                                 }
+                                jumper_boss.stomp_on = 0;
                             }
                             else if (jumper_boss.life > 0)
                             {
-                                if (boss_timer_behavior % 120 == 0 && !fire_on)
+                                if (boss_timer_behavior > 120 && !jumper_boss.taking_damage && !behavior_trasition)
                                 {
+                                    jumper_boss.stomp_on = 1;
                                     jumper_boss.behavior = 3;
                                     atk_jumper_boss(&jumper_boss, &player, 3);
+                                    behavior_trasition = 1;
                                 }
-                                if (boss_timer_behavior > 200 && !jumper_boss.taking_damage && fire_on == 0)
+                                if (boss_timer_behavior > 200 && !jumper_boss.taking_damage && jumper_boss.fire_on == 0)
                                 {
-                                    fire_on = 1;
+                                    jumper_boss.fire_on = 1;
                                     jumper_boss.rb.velocity.x = 0;
                                     jumper_boss.animation_frame = 20;
                                 }
+                                jumper_boss.stomp_on = 0;
                             }
 
                             if (jumper_boss.behavior == 1)
@@ -5144,7 +5149,8 @@ int main()
                                         boss_timer_behavior = 0;
                                         jumper_boss.behavior = 1;
                                         atk_jumper_boss(&jumper_boss, &player, 1);
-                                        fire_on = 0;
+                                        jumper_boss.fire_on = 0;
+                                        behavior_trasition = 0;
                                     }
                                 }
                             }
@@ -5188,6 +5194,8 @@ int main()
                             jumper_boss.rb.gravity_scale = 0;
                             jumper_boss.angry = 0;
                             jumper_boss.animation_frame = 10;
+                            jumper_boss.stomp_on = 0;
+                            jumper_boss.fire_on = 0;
                         }
                     }
                     else

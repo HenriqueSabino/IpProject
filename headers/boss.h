@@ -14,7 +14,7 @@ typedef struct boss
     RigidBody rb;
     Vector player_pos;
     Vector boss_pos_ini;
-    int animation_frame, facing_right, taking_damage, life, alive, sleepy, angry, alert, behavior;
+    int animation_frame, facing_right, taking_damage, life, alive, sleepy, angry, alert, behavior, stomp_on, fire_on;
 } Boss;
 
 typedef struct fireball

@@ -157,22 +157,25 @@ void onCollisionEnter_jumper_boss(RigidBody *self, RigidBody *other)
 
     if (strcmp(other->cb.tag, "sword") == 0 || strcmp(other->cb.tag, "arrow") == 0)
     {
-        jb_ref->taking_damage = 1;
-
-        if (strcmp(other->cb.tag, "sword") == 0)
-            jb_ref->life -= 2;
-        else if (strcmp(other->cb.tag, "arrow") == 0)
-            jb_ref->life--;
-
-        if (jb_ref->life > 0)
+        if (!jb_ref->stomp_on && !jb_ref->fire_on)
         {
-            return;
-        }
-        else
-        {
-            jb_ref->animation_frame = 10;
-            self->velocity = create_vector(0, -2);
-            self->acceleration = create_vector(0, 0);
+            jb_ref->taking_damage = 1;
+
+            if (strcmp(other->cb.tag, "sword") == 0)
+                jb_ref->life -= 2;
+            else if (strcmp(other->cb.tag, "arrow") == 0)
+                jb_ref->life--;
+
+            if (jb_ref->life > 0)
+            {
+                return;
+            }
+            else
+            {
+                jb_ref->animation_frame = 10;
+                self->velocity = create_vector(0, -2);
+                self->acceleration = create_vector(0, 0);
+            }
         }
     }
 }
@@ -213,6 +216,8 @@ void init_jumper_boss(Boss *jumper_boss, Vector pos)
     jumper_boss->angry = 0;
     jumper_boss->alert = 0;
     jumper_boss->behavior = 0;
+    jumper_boss->stomp_on = 0;
+    jumper_boss->fire_on = 0;
 
     jumper_boss->rb.acceleration = create_vector(0, 0);
     jumper_boss->rb.gravity_scale = 0.1f;
