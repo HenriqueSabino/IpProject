@@ -5086,7 +5086,6 @@ int main()
                                     atk_jumper_boss(&jumper_boss, &player, 3);
                                     boss_timer_behavior = 0;
                                 }
-                                jumper_boss.stomp_on = 0;
                             }
                             else if (jumper_boss.life > 0)
                             {
@@ -5103,7 +5102,6 @@ int main()
                                     jumper_boss.rb.velocity.x = 0;
                                     jumper_boss.animation_frame = 20;
                                 }
-                                jumper_boss.stomp_on = 0;
                             }
 
                             if (jumper_boss.behavior == 1)

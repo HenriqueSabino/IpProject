@@ -132,6 +132,7 @@ void onCollisionEnter_jumper_boss(RigidBody *self, RigidBody *other)
             if (jb_ref->behavior == 3)
             {
                 check_damage = 1;
+                jb_ref->stomp_on = 0;
             }
             jb_ref->behavior = 1;
             jb_ref->rb.velocity.y = 0;
@@ -147,6 +148,7 @@ void onCollisionEnter_jumper_boss(RigidBody *self, RigidBody *other)
             if (jb_ref->behavior == 3)
             {
                 check_damage = 1;
+                jb_ref->stomp_on = 0;
             }
             jb_ref->behavior = 1;
             jb_ref->rb.velocity.y = 0;
