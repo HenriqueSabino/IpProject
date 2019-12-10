@@ -36,7 +36,7 @@ void atk_jumper_boss(Boss *jumper_boss, Player *player, int behavior)
         if (player_pos.x > jumper_boss_pos.x)
         {
             jumper_boss->rb.acceleration = create_vector(0, 0);
-            jumper_boss->rb.velocity = create_vector(5, -5);
+            jumper_boss->rb.velocity = create_vector(-5, -5);
             jumper_boss->taking_damage = -1;
         }
         else

@@ -4909,7 +4909,7 @@ int main()
                         }
                     }
 
-                    if (!pause_game)
+                    if (!pause_game && !end_level)
                         update_all(rbs_Boss, rbs_size, camera);
 
                     //linear interpolation between camera and player's position
