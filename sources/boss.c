@@ -92,7 +92,7 @@ void atk_jumper_boss(Boss *jumper_boss, Player *player, int behavior)
         {
             player->life -= 5;
             player->taking_damage = 1;
-            /*if (player->life > 0)
+            if (player->life > 0)
             {
                 if (player_pos.x > jumper_boss_pos.x)
                 {
@@ -107,7 +107,7 @@ void atk_jumper_boss(Boss *jumper_boss, Player *player, int behavior)
             {
                 player->rb.velocity = create_vector(0, -15);
                 player->rb.acceleration = create_vector(0, 0);
-            }*/
+            }
         }
         if (jumper_boss->rb.pos.x > player_pos.x)
             jumper_boss->rb.velocity = mult(normalized(diff(create_vector(player_pos.x, 0), create_vector(jumper_boss_pos.x, 0))), 5);
@@ -200,7 +200,7 @@ void init_jumper_boss(Boss *jumper_boss, Vector pos)
     jumper_boss->facing_right = 0;
     jumper_boss->player_pos = create_vector(0, 0);
     jumper_boss->boss_pos_ini = create_vector(0, 0);
-    jumper_boss->life = 50;
+    jumper_boss->life = 60;
     jumper_boss->alive = 1;
     jumper_boss->taking_damage = 0;
     jumper_boss->sleepy = 1;
@@ -227,4 +227,36 @@ void init_jumper_boss(Boss *jumper_boss, Vector pos)
     strcpy(jumper_boss->rb.cb.tag, "jumper_boss");
 
     jb_ref = jumper_boss;
+}
+
+void onCollisionEnter_FB(RigidBody *self, RigidBody *other)
+{
+    if (strcmp(other->cb.tag, "player") == 0)
+    {
+        self->cb.enabled = 0;
+    }
+}
+
+void init_fireball(Fireball *fireball, Vector pos)
+{
+    fireball->animation_frame = 0;
+
+    fireball->rb.gravity_scale = 0;
+    fireball->rb.velocity = create_vector(0, 0);
+    fireball->rb.acceleration = create_vector(0, 0);
+    fireball->rb.pos = pos;
+
+    fireball->rb.cb.width = 64;
+    fireball->rb.cb.height = 18;
+    fireball->rb.cb.offset = create_vector(0, 22);
+
+    fireball->rb.cb.min = create_vector(fireball->rb.pos.x, fireball->rb.pos.y);
+    fireball->rb.cb.max = create_vector(fireball->rb.cb.min.x + fireball->rb.cb.width, fireball->rb.cb.min.y + fireball->rb.cb.height);
+    strcpy(fireball->rb.cb.tag, "fireball");
+    fireball->rb.cb.solid = 0;
+    fireball->rb.cb.enabled = 0;
+    fireball->rb.collidingWith = createList();
+    fireball->rb.onCollisionEnter = onCollisionEnter_FB;
+    fireball->rb.onCollisionExit = NULL;
+    fireball->rb.onCollisionStay = NULL;
 }

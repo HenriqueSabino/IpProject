@@ -73,6 +73,8 @@ void draw_jumper_boss(BITMAP *bmp, BITMAP *sprite, Boss *jumper_boss, Vector cam
 
 void draw_test(BITMAP *bmp, BITMAP *sprite, Vector camera);
 
+void draw_fireball(BITMAP *bmp, BITMAP *sprite, Fireball *fireball, Vector camera);
+
 #pragma endregion
 
 int main()
@@ -225,6 +227,10 @@ int main()
 
     BITMAP *jumper_boss_sprite = load_bitmap(JUMPER_BOSS, NULL);
     if (jumper_boss_sprite == NULL)
+        allegro_message("error");
+
+    BITMAP *fireball_sprite = load_bitmap(FIREBALL, NULL);
+    if (fireball_sprite == NULL)
         allegro_message("error");
 
     BITMAP *hell_background = load_bitmap("../assets/Scenario/HellBackGround.bmp", NULL);
@@ -458,8 +464,8 @@ int main()
                     if (scene_show == 10)
                     {
                         stop_sample(introo);
-                        playing_first_level_2 = 1;
-                        //playing_boss_fight = 1;
+                        //playing_first_level_2 = 1;
+                        playing_boss_fight = 1;
                         fading_type = 2;
                         fading_progress = 0;
                         cutscene_one_on = 0;
@@ -4366,6 +4372,8 @@ int main()
 
             Boss jumper_boss;
 
+            Fireball fireball;
+
             temp_col = 0;
 
             for (int i = 0; i < map_size; i++)
@@ -4380,6 +4388,7 @@ int main()
                 else if (map[i] == 'J')
                 {
                     init_jumper_boss(&jumper_boss, create_vector(col * 128, row * 128));
+                    init_fireball(&fireball, jumper_boss.rb.pos);
                     col++;
                 }
                 else if (map[i] == 'B')
@@ -4570,7 +4579,7 @@ int main()
                 }
             }
 
-            int rbs_size = map_size - not_objs + 2;
+            int rbs_size = map_size - not_objs + 3;
             RigidBody *rbs_Boss[rbs_size];
             rbs_Boss[0] = &player.rb;
 
@@ -4599,7 +4608,8 @@ int main()
 
             set_enemies_ref(enemies_Boss, enemy_count);
 
-            rbs_Boss[rbs_size - 3] = &jumper_boss.rb;
+            rbs_Boss[rbs_size - 4] = &jumper_boss.rb;
+            rbs_Boss[rbs_size - 3] = &fireball.rb;
             rbs_Boss[rbs_size - 2] = &player.sword_rb;
             rbs_Boss[rbs_size - 1] = &arrow_attack.rb;
 #pragma endregion
@@ -4609,6 +4619,7 @@ int main()
             end_level = 0;
             counter = 0;
             int enemies_on = 0;
+            int fire_on = 0;
 
             while (playing_boss_fight && !close_game)
             {
@@ -4880,7 +4891,7 @@ int main()
                             }
                         }
                     }
-                    else if (jumper_boss.taking_damage)
+                    else if (jumper_boss.taking_damage && !fire_on)
                     {
                         jumper_boss.angry = 1;
                         jumper_boss.sleepy = 0;
@@ -4890,11 +4901,28 @@ int main()
 
                     if (jumper_boss.angry)
                     {
-                        if (boss_timer_behavior % 120 == 0)
+                        if (jumper_boss.life > 30)
                         {
-                            jumper_boss.behavior = 3;
-                            atk_jumper_boss(&jumper_boss, &player, 3);
-                            boss_timer_behavior = 0;
+                            if (boss_timer_behavior % 120 == 0)
+                            {
+                                jumper_boss.behavior = 3;
+                                atk_jumper_boss(&jumper_boss, &player, 3);
+                                boss_timer_behavior = 0;
+                            }
+                        }
+                        else if (jumper_boss.life > 0)
+                        {
+                            if (boss_timer_behavior % 120 == 0 && !fire_on)
+                            {
+                                jumper_boss.behavior = 3;
+                                atk_jumper_boss(&jumper_boss, &player, 3);
+                            }
+                            if (boss_timer_behavior > 200 && !jumper_boss.taking_damage && fire_on == 0)
+                            {
+                                fire_on = 1;
+                                jumper_boss.rb.velocity.x = 0;
+                                jumper_boss.animation_frame = 20;
+                            }
                         }
 
                         if (jumper_boss.behavior == 1)
@@ -4908,6 +4936,48 @@ int main()
                             {
                                 jumper_boss.animation_frame++;
                                 jumper_boss.animation_frame %= 6;
+                            }
+                        }
+                        if (jumper_boss.animation_frame > 19 && jumper_boss.animation_frame <= 23)
+                        {
+                            if (game_timer % 3 == 0)
+                            {
+                                jumper_boss.animation_frame++;
+
+                                if (jumper_boss.animation_frame > 23)
+                                {
+                                    fireball.animation_frame = 0;
+
+                                    if (jumper_boss.facing_right)
+                                    {
+                                        fireball.rb.pos = sum(jumper_boss.rb.pos, create_vector(53, 44));
+                                        fireball.rb.velocity.x = 20;
+                                    }
+                                    else
+                                    {
+                                        fireball.rb.pos = sum(jumper_boss.rb.pos, create_vector(-9, 44));
+                                        fireball.rb.velocity.x = -20;
+                                    }
+
+                                    fireball.rb.cb.enabled = 1;
+                                    jumper_boss.animation_frame = 4;
+                                    boss_timer_behavior = 0;
+                                    jumper_boss.behavior = 1;
+                                    atk_jumper_boss(&jumper_boss, &player, 1);
+                                    fire_on = 0;
+                                }
+                            }
+                        }
+                    }
+
+                    if (fireball.animation_frame >= 0 && fireball.animation_frame <= 3)
+                    {
+                        if (game_timer % 4 == 0)
+                        {
+                            fireball.animation_frame++;
+                            if (fireball.animation_frame >= 3)
+                            {
+                                fireball.animation_frame = 3;
                             }
                         }
                     }
@@ -5108,6 +5178,9 @@ int main()
 
                     if (arrow_attack.rb.cb.enabled && !pause_game)
                         draw_arrow_attack(buffer, arrow_attack_sprite, &arrow_attack, camera);
+
+                    if (fireball.rb.cb.enabled && !pause_game)
+                        draw_fireball(buffer, fireball_sprite, &fireball, camera);
 
                     if ((arrow_attack.rb.pos.x - player.rb.pos.x > (SCREEN_WIDTH / 2) + 128 && arrow_attack.rb.velocity.x > 0) || ((arrow_attack.rb.pos.x - player.rb.pos.x) * -1 > SCREEN_WIDTH / 2 && arrow_attack.rb.velocity.x < 0))
                         arrow_attack.rb.cb.enabled = 0;
@@ -5311,6 +5384,7 @@ int main()
     destroy_bitmap(hell_background);
     destroy_bitmap(fade_black);
     destroy_bitmap(pause_sprite);
+    destroy_bitmap(fireball_sprite);
 
 #pragma endregion
     return 0;
@@ -5820,6 +5894,28 @@ void draw_arrow_attack(BITMAP *bmp, BITMAP *sprite, Item *arrow_attack, Vector c
         draw_sprite_ex(bmp, arrow_attack_sprite, arrow_attack->rb.pos.x - floor(camera.x), arrow_attack->rb.pos.y - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
 
     destroy_bitmap(arrow_attack_sprite);
+}
+
+void draw_fireball(BITMAP *bmp, BITMAP *sprite, Fireball *fireball, Vector camera)
+{
+    BITMAP *fireball_sprite = create_bitmap(64, 64);
+    clear_to_color(fireball_sprite, makecol(255, 0, 255));
+
+    int r_img_pos = fireball->animation_frame % FIREBALL_SPRITE_COLS;
+    int c_img_pos = fireball->animation_frame / FIREBALL_SPRITE_COLS;
+
+    r_img_pos *= FIREBALL_TILE_SIZE;
+    c_img_pos *= FIREBALL_TILE_SIZE;
+
+    //draw the a part of the sprite sheet to the screen and scales it
+    masked_stretch_blit(sprite, fireball_sprite, r_img_pos, c_img_pos, 64, 64, 0, 0, 64, 64);
+
+    if (fireball->rb.velocity.x > 0)
+        draw_sprite_ex(bmp, fireball_sprite, fireball->rb.pos.x - floor(camera.x), fireball->rb.pos.y - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
+    else if (fireball->rb.velocity.x < 0)
+        draw_sprite_ex(bmp, fireball_sprite, fireball->rb.pos.x - floor(camera.x), fireball->rb.pos.y - floor(camera.y), DRAW_SPRITE_NORMAL, DRAW_SPRITE_H_FLIP);
+
+    destroy_bitmap(fireball_sprite);
 }
 
 void draw_lifebar(BITMAP *bmp, BITMAP *sprite, Player player)
