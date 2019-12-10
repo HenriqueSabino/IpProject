@@ -4809,7 +4809,7 @@ int main()
                             fading_progress = 0;
                             // break;
                         }
-                        if (jumper_boss.life <= 0)
+                        if (jumper_boss.animation_frame == 18)
                         {
                             cutscene_final = 1;
                             end_level = 1;
@@ -5051,111 +5051,146 @@ int main()
                     }
 
                     // Boss behavior
-                    if (jumper_boss.sleepy && !jumper_boss.taking_damage)
+                    if (jumper_boss.alive)
                     {
-                        atk_jumper_boss(&jumper_boss, &player, 2);
+                        if (jumper_boss.sleepy && !jumper_boss.taking_damage)
+                        {
+                            atk_jumper_boss(&jumper_boss, &player, 2);
 
-                        if (jumper_boss.animation_frame >= 0 && jumper_boss.animation_frame <= 1)
-                        {
-                            if (game_timer % 32 == 0)
+                            if (jumper_boss.animation_frame >= 0 && jumper_boss.animation_frame <= 1)
                             {
-                                jumper_boss.animation_frame++;
-                                jumper_boss.animation_frame %= 2;
-                            }
-                        }
-                    }
-                    else if (jumper_boss.taking_damage && !fire_on)
-                    {
-                        jumper_boss.angry = 1;
-                        jumper_boss.sleepy = 0;
-                        jumper_boss.alert = 0;
-                        atk_jumper_boss(&jumper_boss, &player, 1);
-                    }
-
-                    if (jumper_boss.angry)
-                    {
-                        if (jumper_boss.life > 30)
-                        {
-                            if (boss_timer_behavior % 120 == 0)
-                            {
-                                jumper_boss.behavior = 3;
-                                atk_jumper_boss(&jumper_boss, &player, 3);
-                                boss_timer_behavior = 0;
-                            }
-                        }
-                        else if (jumper_boss.life > 0)
-                        {
-                            if (boss_timer_behavior % 120 == 0 && !fire_on)
-                            {
-                                jumper_boss.behavior = 3;
-                                atk_jumper_boss(&jumper_boss, &player, 3);
-                            }
-                            if (boss_timer_behavior > 200 && !jumper_boss.taking_damage && fire_on == 0)
-                            {
-                                fire_on = 1;
-                                jumper_boss.rb.velocity.x = 0;
-                                jumper_boss.animation_frame = 20;
-                            }
-                        }
-
-                        if (jumper_boss.behavior == 1)
-                        {
-                            atk_jumper_boss(&jumper_boss, &player, 1);
-                        }
-
-                        if (jumper_boss.animation_frame >= 4 && jumper_boss.animation_frame <= 9)
-                        {
-                            if (game_timer % 8 == 0)
-                            {
-                                jumper_boss.animation_frame++;
-                                jumper_boss.animation_frame %= 6;
-                            }
-                        }
-                        if (jumper_boss.animation_frame > 19 && jumper_boss.animation_frame <= 23)
-                        {
-                            if (game_timer % 3 == 0)
-                            {
-                                jumper_boss.animation_frame++;
-
-                                if (jumper_boss.animation_frame > 23)
+                                if (game_timer % 32 == 0)
                                 {
-                                    fireball.animation_frame = 0;
-
-                                    if (jumper_boss.facing_right)
-                                    {
-                                        fireball.rb.pos = sum(jumper_boss.rb.pos, create_vector(53, 44));
-                                        fireball.rb.velocity.x = 20;
-                                    }
-                                    else
-                                    {
-                                        fireball.rb.pos = sum(jumper_boss.rb.pos, create_vector(-9, 44));
-                                        fireball.rb.velocity.x = -20;
-                                    }
-
-                                    fireball.rb.cb.enabled = 1;
-                                    jumper_boss.animation_frame = 4;
-                                    boss_timer_behavior = 0;
-                                    jumper_boss.behavior = 1;
-                                    atk_jumper_boss(&jumper_boss, &player, 1);
-                                    fire_on = 0;
+                                    jumper_boss.animation_frame++;
+                                    jumper_boss.animation_frame %= 2;
                                 }
                             }
                         }
-                    }
-
-                    if (fireball.animation_frame >= 0 && fireball.animation_frame <= 3)
-                    {
-                        if (game_timer % 4 == 0)
+                        else if (jumper_boss.taking_damage && !fire_on)
                         {
-                            fireball.animation_frame++;
-                            if (fireball.animation_frame >= 3)
+                            jumper_boss.angry = 1;
+                            jumper_boss.sleepy = 0;
+                            jumper_boss.alert = 0;
+                            jumper_boss.animation_frame = 4;
+                            atk_jumper_boss(&jumper_boss, &player, 1);
+                        }
+
+                        if (jumper_boss.angry)
+                        {
+                            if (jumper_boss.life > 30)
                             {
-                                fireball.animation_frame = 3;
+                                if (boss_timer_behavior % 120 == 0)
+                                {
+                                    jumper_boss.behavior = 3;
+                                    atk_jumper_boss(&jumper_boss, &player, 3);
+                                    boss_timer_behavior = 0;
+                                }
+                            }
+                            else if (jumper_boss.life > 0)
+                            {
+                                if (boss_timer_behavior % 120 == 0 && !fire_on)
+                                {
+                                    jumper_boss.behavior = 3;
+                                    atk_jumper_boss(&jumper_boss, &player, 3);
+                                }
+                                if (boss_timer_behavior > 200 && !jumper_boss.taking_damage && fire_on == 0)
+                                {
+                                    fire_on = 1;
+                                    jumper_boss.rb.velocity.x = 0;
+                                    jumper_boss.animation_frame = 20;
+                                }
+                            }
+
+                            if (jumper_boss.behavior == 1)
+                            {
+                                atk_jumper_boss(&jumper_boss, &player, 1);
+                            }
+
+                            if (jumper_boss.animation_frame >= 4 && jumper_boss.animation_frame <= 9)
+                            {
+                                if (game_timer % 3 == 0)
+                                {
+                                    jumper_boss.animation_frame++;
+                                    if (jumper_boss.animation_frame > 9)
+                                    {
+                                        jumper_boss.animation_frame = 4;
+                                    }
+                                }
+                            }
+                            if (jumper_boss.animation_frame > 19 && jumper_boss.animation_frame <= 26)
+                            {
+                                jumper_boss.rb.velocity.x = 0;
+                                if (game_timer % 3 == 0)
+                                {
+                                    jumper_boss.animation_frame++;
+
+                                    if (jumper_boss.animation_frame > 26)
+                                    {
+                                        fireball.animation_frame = 0;
+
+                                        if (jumper_boss.facing_right)
+                                        {
+                                            fireball.rb.pos = sum(jumper_boss.rb.pos, create_vector(53, 44));
+                                            fireball.rb.velocity.x = 20;
+                                        }
+                                        else
+                                        {
+                                            fireball.rb.pos = sum(jumper_boss.rb.pos, create_vector(-9, 44));
+                                            fireball.rb.velocity.x = -20;
+                                        }
+
+                                        fireball.rb.cb.enabled = 1;
+                                        jumper_boss.animation_frame = 4;
+                                        boss_timer_behavior = 0;
+                                        jumper_boss.behavior = 1;
+                                        atk_jumper_boss(&jumper_boss, &player, 1);
+                                        fire_on = 0;
+                                    }
+                                }
                             }
                         }
-                    }
 
-                    if (!jumper_boss.alive)
+                        if (fireball.animation_frame >= 0 && fireball.animation_frame <= 3)
+                        {
+                            if (game_timer % 4 == 0)
+                            {
+                                fireball.animation_frame++;
+                                if (fireball.animation_frame >= 3)
+                                {
+                                    fireball.animation_frame = 3;
+                                }
+                            }
+                        }
+
+                        if (jumper_boss.alert)
+                        {
+                            atk_jumper_boss(&jumper_boss, &player, 2);
+
+                            if (jumper_boss.animation_frame >= 2 && jumper_boss.animation_frame <= 3)
+                            {
+                                if (game_timer % 32 == 0)
+                                {
+                                    jumper_boss.animation_frame++;
+
+                                    if (jumper_boss.animation_frame > 3)
+                                    {
+                                        jumper_boss.animation_frame = 2;
+                                    }
+                                }
+                            }
+                            boss_timer_behavior = 0;
+                        }
+
+                        if (jumper_boss.life < 0)
+                        {
+                            jumper_boss.alive = 0;
+                            jumper_boss.rb.cb.enabled = 0;
+                            jumper_boss.rb.gravity_scale = 0;
+                            jumper_boss.angry = 0;
+                            jumper_boss.animation_frame = 10;
+                        }
+                    }
+                    else
                     {
                         if (jumper_boss.animation_frame >= 10 && jumper_boss.animation_frame <= 15)
                         {
@@ -5172,32 +5207,7 @@ int main()
                         }
                     }
 
-                    if (jumper_boss.alert)
-                    {
-                        atk_jumper_boss(&jumper_boss, &player, 2);
-
-                        if (jumper_boss.animation_frame >= 2 && jumper_boss.animation_frame <= 3)
-                        {
-                            if (game_timer % 32 == 0)
-                            {
-                                jumper_boss.animation_frame++;
-
-                                if (jumper_boss.animation_frame > 3)
-                                {
-                                    jumper_boss.animation_frame = 2;
-                                }
-                            }
-                        }
-                        boss_timer_behavior = 0;
-                    }
-
-                    if (jumper_boss.life < 0)
-                    {
-                        jumper_boss.alive = 0;
-                        jumper_boss.rb.cb.enabled = 0;
-                        jumper_boss.rb.gravity_scale = 0;
-                        jumper_boss.angry = 0;
-                    }
+                    //Player animation
 
                     if (player.animation_frame >= 0 && player.animation_frame <= 7)
                     {
@@ -6357,28 +6367,6 @@ void draw_lifebar(BITMAP *bmp, BITMAP *sprite, Player player)
 
 void draw_jumper_boss(BITMAP *bmp, BITMAP *sprite, Boss *jumper_boss, Vector camera)
 {
-    if (jumper_boss->angry)
-    {
-        if (jumper_boss->animation_frame < 4)
-        {
-            jumper_boss->animation_frame = 4;
-        }
-    }
-    else if (jumper_boss->alert)
-    {
-        if (jumper_boss->animation_frame < 2)
-        {
-            jumper_boss->animation_frame = 2;
-        }
-    }
-    else if (!jumper_boss->alive)
-    {
-        if (jumper_boss->animation_frame < 10)
-        {
-            jumper_boss->animation_frame = 10;
-        }
-    }
-
     BITMAP *jumper_boss_sprite = create_bitmap(128, 128);
     clear_to_color(jumper_boss_sprite, makecol(255, 0, 255));
 
