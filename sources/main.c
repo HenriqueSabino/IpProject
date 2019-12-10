@@ -24,7 +24,6 @@ END_OF_FUNCTION(close_program)
 
 int menu_on = 1;
 int death_on = 0;
-int cutscene_one_on = 0;
 volatile int counter = 0;
 volatile int player_animation_counter = 0;
 volatile int boss_timer_behavior = 0;
@@ -95,7 +94,6 @@ int main()
     LOCK_VARIABLE(game_timer);
     LOCK_VARIABLE(counter);
     LOCK_VARIABLE(menu_on);
-    LOCK_VARIABLE(cutscene_one_on);
     LOCK_VARIABLE(death_on);
     LOCK_FUNCTION(increment);
 
@@ -110,6 +108,10 @@ int main()
     int playing_second_level_2 = 0;
 
     int playing_boss_fight = 0;
+
+    int cutscene_one_on = 0;
+
+    int cutscene_two_on = 0;
 
     int end_level = 0;
 
@@ -456,7 +458,7 @@ int main()
                     if (scene_show == 10)
                     {
                         stop_sample(introo);
-                        playing_second_level = 1;
+                        playing_first_level_2 = 1;
                         //playing_boss_fight = 1;
                         fading_type = 2;
                         fading_progress = 0;
@@ -485,7 +487,8 @@ int main()
 
                 if (key_down(KEY_ESC))
                 {
-                    close_program();
+                    menu_on = 1;
+                    cutscene_one_on = 0;
                 }
             }
             while (counter > 0)
@@ -1849,7 +1852,8 @@ int main()
                         if (player.rb.cb.min.x > grounds_lvl1_2[ground_count - 1].rb.cb.max.x - 96)
                         {
                             // playing_first_level_2 = 0;
-                            playing_second_level = 1;
+                            //playing_second_level = 1;
+                            cutscene_two_on = 1;
                             end_level = 1;
                             // break;
                             fading_type = 2;
@@ -2288,6 +2292,138 @@ int main()
 
 #pragma endregion
         }
+#pragma region cutscene two
+
+        //BITMAPS
+        BITMAP *cena_two_one = load_bitmap("../assets/Cutscenes/Cutscene_two/Cena1.bmp", NULL);
+        BITMAP *cena_two_two = load_bitmap("../assets/Cutscenes/Cutscene_two/Cena2.bmp", NULL);
+        BITMAP *cena_two_three = load_bitmap("../assets/Cutscenes/Cutscene_two/Cena3.bmp", NULL);
+        //SAMPLES
+        SAMPLE *selec = load_sample(SELECT_SOUND);
+
+        animation_frame = 0;
+        counter = 0;
+        fading_type = 1;
+        fading_progress = 1;
+        scene_show = 1;
+
+        while (cutscene_two_on && !close_game)
+        {
+            if (fading_type == 0)
+            {
+                keyboard_input();
+
+                //INPUT
+
+                if (key_down(KEY_DOWN) || key_down(KEY_UP) || key_down(KEY_RIGHT) || key_down(KEY_LEFT))
+                {
+                    som = TRUE;
+                }
+
+                if (key_down(KEY_ENTER))
+                {
+                    som = TRUE;
+                    if (scene_show == 3)
+                    {
+
+                        playing_second_level = 1;
+                        fading_type = 2;
+                        fading_progress = 0;
+                        cutscene_one_on = 0;
+                    }
+
+                    scene_show++;
+                }
+
+                if (key_down(KEY_ESC))
+                {
+                    menu_on = 1;
+                    cutscene_two_on = 0;
+                }
+            }
+            while (counter > 0)
+            {
+                if (animation_frame >= 0 && animation_frame <= 15)
+                {
+                    if (game_timer % 2 == 0)
+                    {
+                        animation_frame++;
+                        animation_frame %= 16;
+                    }
+                }
+
+                int r_img_pos = animation_frame % ARROW_SPRITE_COLS;
+                int c_img_pos = animation_frame / ARROW_SPRITE_COLS;
+
+                r_img_pos *= ARROW_TILE_SIZE;
+                c_img_pos *= ARROW_TILE_SIZE;
+
+                if (som)
+                {
+                    play_sample(select, 255, 128, 1000, 0);
+                    som = FALSE;
+                }
+
+                clear(buffer);
+
+                if (scene_show == 1)
+                {
+                    pschx = 783;
+                    pschy = 476;
+                    draw_sprite(buffer, cena_two_one, 0, 0);
+                }
+                if (scene_show == 2)
+                {
+                    pschx = 783;
+                    pschy = 476;
+                    draw_sprite(buffer, cena_two_two, 0, 0);
+                }
+                if (scene_show == 3)
+                {
+                    pschx = 783;
+                    pschy = 476;
+                    draw_sprite(buffer, cena_two_three, 0, 0);
+                }
+
+                //draw the a part of the sprite sheet to the screen and scales it
+                masked_blit(arrow_sprite, buffer, r_img_pos, c_img_pos, pschx, pschy, 32, 32);
+
+                if (fading_type == 1)
+                {
+                    fading_progress -= 0.05f;
+                    set_trans_blender(255, 255, 255, fading_progress * 255);
+                    draw_sprite_ex(buffer, fade_black, 0, 0, DRAW_SPRITE_TRANS, DRAW_SPRITE_NO_FLIP);
+                    if (fading_progress <= 0)
+                    {
+                        fading_progress = 0;
+                        fading_type = 0;
+                    }
+                }
+                else if (fading_type == 2)
+                {
+                    fading_progress += 0.05f;
+                    set_trans_blender(255, 255, 255, fading_progress * 255);
+                    draw_sprite_ex(buffer, fade_black, 0, 0, DRAW_SPRITE_TRANS, DRAW_SPRITE_NO_FLIP);
+                    if (fading_progress >= 1)
+                    {
+                        fading_progress = 0;
+                        fading_type = 0;
+                        cutscene_two_on = FALSE;
+                        // playing_first_level = 1;
+                    }
+                }
+
+                draw_sprite(screen, buffer, 0, 0);
+
+                counter--;
+            }
+        }
+
+        destroy_bitmap(cena_two_one);
+        destroy_bitmap(cena_two_two);
+        destroy_bitmap(cena_two_three);
+
+#pragma endregion
 
         if (playing_second_level)
         {
