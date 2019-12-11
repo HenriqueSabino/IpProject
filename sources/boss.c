@@ -89,6 +89,11 @@ void atk_jumper_boss(Boss *jumper_boss, Player *player, int behavior)
     {
         if (jumper_boss->rb.velocity.y == 0)
             jumper_boss->rb.velocity = create_vector(0, -30);
+        else
+        {
+            jumper_boss->stomp_on = 0;
+            jumper_boss->behavior = 1;
+        }
     }
 
     if (check_damage == 1)
@@ -133,6 +138,7 @@ void onCollisionEnter_jumper_boss(RigidBody *self, RigidBody *other)
             {
                 check_damage = 1;
                 jb_ref->stomp_on = 0;
+                jb_ref->rb.gravity_scale = 0.1f;
             }
             jb_ref->behavior = 1;
             jb_ref->rb.velocity.y = 0;
@@ -149,6 +155,7 @@ void onCollisionEnter_jumper_boss(RigidBody *self, RigidBody *other)
             {
                 check_damage = 1;
                 jb_ref->stomp_on = 0;
+                jb_ref->rb.gravity_scale = 0.1f;
             }
             jb_ref->behavior = 1;
             jb_ref->rb.velocity.y = 0;

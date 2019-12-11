@@ -5108,15 +5108,37 @@ int main()
                             {
                                 atk_jumper_boss(&jumper_boss, &player, 1);
                             }
+                            else if (jumper_boss.behavior == 3)
+                            {
+                                //when it is going down
+                                if (jumper_boss.rb.velocity.y > 0)
+                                {
+                                    jumper_boss.rb.gravity_scale *= 1.2;
+                                }
+                            }
 
                             if (jumper_boss.animation_frame >= 4 && jumper_boss.animation_frame <= 9)
                             {
-                                if (game_timer % 3 == 0)
+                                if (!jumper_boss.stomp_on)
                                 {
-                                    jumper_boss.animation_frame++;
-                                    if (jumper_boss.animation_frame > 9)
+                                    if (game_timer % 3 == 0)
                                     {
-                                        jumper_boss.animation_frame = 4;
+                                        jumper_boss.animation_frame++;
+                                        if (jumper_boss.animation_frame > 9)
+                                        {
+                                            jumper_boss.animation_frame = 4;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    if (game_timer % 8 == 0)
+                                    {
+                                        jumper_boss.animation_frame++;
+                                        if (jumper_boss.animation_frame > 9)
+                                        {
+                                            jumper_boss.animation_frame = 4;
+                                        }
                                     }
                                 }
                             }
