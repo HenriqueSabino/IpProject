@@ -119,6 +119,8 @@ int main()
 
     int cutscene_final = 0;
 
+    int congratulations_on = 0;
+
     int end_level = 0;
 
     int pause_game = 0;
@@ -5446,7 +5448,7 @@ int main()
                     if (scene_show == 9)
                     {
                         //playing_first_level_2 = 1;
-                        menu_on = 1;
+                        congratulations_on = 1;
                         fading_type = 2;
                         fading_progress = 0;
                         cutscene_one_on = 0;
@@ -5575,6 +5577,83 @@ int main()
         destroy_bitmap(cena_final_seven);
         destroy_bitmap(cena_final_eight);
         destroy_bitmap(cena_final_nine);
+
+#pragma endregion
+
+#pragma region congratulation
+
+        //BITMAPS
+        BITMAP *congratulation = load_bitmap("../assets/congratulation.bmp", NULL);
+
+        while (congratulations_on && !close_game)
+        {
+            if (fading_type == 0)
+            {
+                keyboard_input();
+
+                //INPUT
+
+                if (key_down(KEY_DOWN) || key_down(KEY_UP) || key_down(KEY_RIGHT) || key_down(KEY_LEFT))
+                {
+                    som = TRUE;
+                }
+
+                if (key_down(KEY_ENTER))
+                {
+                    som = TRUE;
+                    menu_on = 1;
+                    fading_type = 2;
+                    fading_progress = 0;
+                    congratulations_on = 0;
+                }
+
+                if (key_down(KEY_ESC))
+                {
+                    menu_on = 1;
+                    congratulations_on = 0;
+                }
+            }
+
+            if (som)
+            {
+                play_sample(select, 255, 128, 1000, 0);
+                som = FALSE;
+            }
+
+            clear(buffer);
+            draw_sprite(buffer, congratulation, 0, 0);
+
+            if (fading_type == 1)
+            {
+                fading_progress -= 0.05f;
+                set_trans_blender(255, 255, 255, fading_progress * 255);
+                draw_sprite_ex(buffer, fade_black, 0, 0, DRAW_SPRITE_TRANS, DRAW_SPRITE_NO_FLIP);
+                if (fading_progress <= 0)
+                {
+                    fading_progress = 0;
+                    fading_type = 0;
+                }
+            }
+            else if (fading_type == 2)
+            {
+                fading_progress += 0.05f;
+                set_trans_blender(255, 255, 255, fading_progress * 255);
+                draw_sprite_ex(buffer, fade_black, 0, 0, DRAW_SPRITE_TRANS, DRAW_SPRITE_NO_FLIP);
+                if (fading_progress >= 1)
+                {
+                    fading_progress = 0;
+                    fading_type = 0;
+                    cutscene_final = 0;
+                    // playing_first_level = 1;
+                }
+            }
+
+            draw_sprite(screen, buffer, 0, 0);
+
+            counter--;
+        }
+
+        destroy_bitmap(congratulation);
 
 #pragma endregion
 
