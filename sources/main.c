@@ -61,7 +61,7 @@ void draw_bridge(BITMAP *bmp, BITMAP *sprite, Ground *bridge, Vector camera);
 
 void draw_object(BITMAP *bmp, BITMAP *sprite, Object *scenario, Vector camera);
 
-void draw_lifebar(BITMAP *bmp, BITMAP *sprite, Player player);
+void draw_lifebar(BITMAP *bmp, BITMAP *sprite, Player player, int attempts);
 
 void draw_arrow(BITMAP *bmp, BITMAP *sprite);
 
@@ -128,6 +128,8 @@ int main()
     int aux_music_boss = 0;
 
     int last_level_played = 0;
+
+    int attempts = 2;
 
     BITMAP *buffer = create_bitmap(SCREEN_W, SCREEN_H);
 
@@ -1449,7 +1451,7 @@ int main()
                     arrow_attack.rb.cb.enabled = 0;
 
                 if (!pause_game)
-                    draw_lifebar(buffer, lifebar_sprite, player);
+                    draw_lifebar(buffer, lifebar_sprite, player, attempts);
 
                 if (pause_game)
                     draw_sprite_ex(buffer, pause_sprite, 0, 0, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
@@ -2298,7 +2300,7 @@ int main()
                         arrow_attack.rb.cb.enabled = 0;
 
                     if (!pause_game)
-                        draw_lifebar(buffer, lifebar_sprite, player);
+                        draw_lifebar(buffer, lifebar_sprite, player, attempts);
 
                     if (pause_game)
                         draw_sprite_ex(buffer, pause_sprite, 0, 0, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
@@ -3346,7 +3348,7 @@ int main()
                         arrow_attack.rb.cb.enabled = 0;
 
                     if (!pause_game)
-                        draw_lifebar(buffer, lifebar_sprite, player);
+                        draw_lifebar(buffer, lifebar_sprite, player, attempts);
 
                     if (pause_game)
                         draw_sprite_ex(buffer, pause_sprite, 0, 0, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
@@ -4323,7 +4325,7 @@ int main()
 
                     //draw_test(buffer, test_sprite, camera);
                     if (!pause_game)
-                        draw_lifebar(buffer, lifebar_sprite, player);
+                        draw_lifebar(buffer, lifebar_sprite, player, attempts);
 
                     if (pause_game)
                         draw_sprite_ex(buffer, pause_sprite, 0, 0, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
@@ -5472,7 +5474,7 @@ int main()
                         arrow_attack.rb.cb.enabled = 0;
 
                     if (!pause_game)
-                        draw_lifebar(buffer, lifebar_sprite, player);
+                        draw_lifebar(buffer, lifebar_sprite, player, attempts);
 
                     if (pause_game)
                         draw_sprite_ex(buffer, pause_sprite, 0, 0, DRAW_SPRITE_NORMAL, DRAW_SPRITE_NO_FLIP);
@@ -5804,6 +5806,16 @@ int main()
         fading_type = 1;
         fading_progress = 1;
         counter = 0;
+
+        if (death_on && !close_game)
+        {
+            attempts--;
+            if (attempts < 0)
+            {
+                last_level_played = 0;
+                attempts = 2;
+            }
+        }
 
         while (death_on && !close_game)
         {
@@ -6463,7 +6475,7 @@ void draw_fireball(BITMAP *bmp, BITMAP *sprite, Fireball *fireball, Vector camer
     destroy_bitmap(fireball_sprite);
 }
 
-void draw_lifebar(BITMAP *bmp, BITMAP *sprite, Player player)
+void draw_lifebar(BITMAP *bmp, BITMAP *sprite, Player player, int attempts)
 {
     char player_life[4];
     itoa(player.life, player_life, 10);
@@ -6472,6 +6484,9 @@ void draw_lifebar(BITMAP *bmp, BITMAP *sprite, Player player)
     char player_arrows_amount[3];
     itoa(player.arrows_amount, player_arrows_amount, 10);
 
+    char attemptss[2];
+    itoa(attempts, attemptss, 10);
+
     char ex[2] = "x";
 
     rectfill(bmp, 73, 34, 73 + floor(122 * player.life / 100.0f), 49, makecol(255, 0, 0));
@@ -6479,6 +6494,8 @@ void draw_lifebar(BITMAP *bmp, BITMAP *sprite, Player player)
     textout_ex(bmp, font, player_life, 64 + 55, 38, makecol(255, 255, 0), -1);
     textout_ex(bmp, font, ex, 170, 64, makecol(255, 255, 0), -1);
     textout_ex(bmp, font, player_arrows_amount, 180, 64, makecol(255, 255, 0), -1);
+    textout_ex(bmp, font, ex, 70, 64, makecol(255, 255, 0), -1);
+    textout_ex(bmp, font, attemptss, 80, 64, makecol(255, 255, 0), -1);
 }
 
 void draw_jumper_boss(BITMAP *bmp, BITMAP *sprite, Boss *jumper_boss, Vector camera)
