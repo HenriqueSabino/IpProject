@@ -471,9 +471,7 @@ int main()
                     if (scene_show == 10)
                     {
                         stop_sample(intro);
-                        //playing_first_level = 1;
-                        playing_boss_fight = 1;
-                        // cutscene_final = 1;
+                        playing_first_level = 1;
                         fading_type = 2;
                         fading_progress = 0;
                         cutscene_one_on = 0;
@@ -5487,7 +5485,15 @@ int main()
 
 #pragma endregion
         }
+
+        SAMPLE *cutscene_sound_final = load_sample("../sounds/music_fase_2.wav");
+
 #pragma region cutscene Final
+
+        if (cutscene_final || congratulations_on)
+        {
+            play_sample(cutscene_sound_final, 255, 128, 1000, 1);
+        }
 
         //BITMAPS
         BITMAP *cena_final_one = load_bitmap("../assets/Cutscenes/cutscene_final/Cena1.bmp", NULL);
@@ -5731,6 +5737,8 @@ int main()
         }
 
         destroy_bitmap(congratulation);
+        stop_sample(cutscene_sound_final);
+        destroy_sample(cutscene_sound_final);
 
 #pragma endregion
 
@@ -5849,6 +5857,7 @@ int main()
         destroy_sample(sound_death);
 #pragma endregion
     }
+
 #pragma region destroy bitmaps
 
     destroy_bitmap(buffer);
