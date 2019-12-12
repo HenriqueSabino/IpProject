@@ -125,6 +125,8 @@ int main()
 
     int pause_game = 0;
 
+    int aux_music_boss = 0;
+
     BITMAP *buffer = create_bitmap(SCREEN_W, SCREEN_H);
 
 #pragma endregion
@@ -264,6 +266,8 @@ int main()
         //VARIABLES
         int chx = 355, chy = 420, som = FALSE;
         int py[2] = {420, 485};
+        pause_game = 0;
+        aux_music_boss = 0;
 
         //BITMAPS
         BITMAP *menu = load_bitmap(LOGO_PATH, NULL);
@@ -467,8 +471,8 @@ int main()
                     if (scene_show == 10)
                     {
                         stop_sample(intro);
-                        playing_first_level = 1;
-                        // playing_boss_fight = 1;
+                        //playing_first_level = 1;
+                        playing_boss_fight = 1;
                         // cutscene_final = 1;
                         fading_type = 2;
                         fading_progress = 0;
@@ -4501,10 +4505,7 @@ int main()
         SAMPLE *sound_boss = load_sample("../sounds/sound_boss.wav");
 
         //SAMPLE BOSS
-        if (playing_boss_fight)
-        {
-            play_sample(sound_boss, 255, 128, 1000, 1);
-        }
+
         if (playing_boss_fight)
         {
 #pragma region boss fight
@@ -4818,6 +4819,13 @@ int main()
 
             while (playing_boss_fight && !close_game)
             {
+
+                if (jumper_boss.angry && !aux_music_boss)
+                {
+                    play_sample(sound_boss, 255, 128, 1000, 1);
+                    aux_music_boss = 1;
+                }
+
                 //UPDATE
                 while (counter > 0)
                 {
