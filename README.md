@@ -1,2 +1,2 @@
 # IppProject
-A university project, develop a game in C language with graphics and souds
+A university project, develop a game in C language with graphics and sounds
