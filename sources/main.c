@@ -127,6 +127,8 @@ int main()
 
     int aux_music_boss = 0;
 
+    int last_level_played = 0;
+
     BITMAP *buffer = create_bitmap(SCREEN_W, SCREEN_H);
 
 #pragma endregion
@@ -430,6 +432,37 @@ int main()
 
         while (cutscene_one_on && !close_game)
         {
+            if (last_level_played != 0)
+            {
+                stop_sample(intro);
+                switch (last_level_played)
+                {
+                case 1:
+                    playing_first_level = 1;
+                    break;
+                case 2:
+                    playing_first_level_2 = 1;
+                    break;
+                case 3:
+                    playing_second_level = 1;
+                    break;
+                case 4:
+                    playing_second_level_2 = 1;
+                    break;
+                case 5:
+                    playing_second_level = 1;
+                    break;
+
+                default:
+                    playing_first_level = 1;
+                    break;
+                }
+
+                fading_type = 2;
+                fading_progress = 0;
+                cutscene_one_on = 0;
+            }
+
             if (fading_type == 0)
             {
                 keyboard_input();
@@ -471,7 +504,9 @@ int main()
                     if (scene_show == 10)
                     {
                         stop_sample(intro);
+
                         playing_first_level = 1;
+
                         fading_type = 2;
                         fading_progress = 0;
                         cutscene_one_on = 0;
@@ -993,6 +1028,7 @@ int main()
 
 #pragma endregion
 
+        last_level_played = 1;
         fading_type = 1;
         fading_progress = 1;
         end_level = 0;
@@ -1842,6 +1878,7 @@ int main()
 
 #pragma endregion
 
+            last_level_played++;
             fading_type = 1;
             fading_progress = 1;
             end_level = 0;
@@ -2832,6 +2869,7 @@ int main()
             rbs_lvl2[rbs_size - 1] = &arrow_attack.rb;
 #pragma endregion
 
+            last_level_played++;
             fading_type = 1;
             fading_progress = 1;
             end_level = 0;
@@ -3807,6 +3845,7 @@ int main()
 
 #pragma endregion
 
+            last_level_played++;
             fading_type = 1;
             fading_progress = 1;
             end_level = 0;
@@ -4808,6 +4847,7 @@ int main()
             rbs_Boss[rbs_size - 1] = &arrow_attack.rb;
 #pragma endregion
 
+            last_level_played++;
             fading_type = 1;
             fading_progress = 1;
             end_level = 0;
