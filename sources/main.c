@@ -467,8 +467,9 @@ int main()
                     if (scene_show == 10)
                     {
                         stop_sample(intro);
-                        //playing_second_level_2 = 1;
-                        playing_boss_fight = 1;
+                        playing_first_level = 1;
+                        // playing_boss_fight = 1;
+                        // cutscene_final = 1;
                         fading_type = 2;
                         fading_progress = 0;
                         cutscene_one_on = 0;
@@ -994,6 +995,14 @@ int main()
         fading_progress = 1;
         end_level = 0;
         counter = 0;
+
+        SAMPLE *sound_fase_1 = load_sample("../sounds/music_fase_1.wav");
+
+        //SOUND SAMPLE FASE 1
+        if (playing_first_level || playing_first_level_2)
+        {
+            play_sample(sound_fase_1, 255, 128, 1000, 1);
+        }
 
         while (playing_first_level && !close_game)
         {
@@ -2301,7 +2310,18 @@ int main()
 
 #pragma endregion
         }
+        stop_sample(sound_fase_1);
+        destroy_sample(sound_fase_1);
+
 #pragma region cutscene two
+
+        SAMPLE *sound_fase_2 = load_sample("../sounds/music_fase_2.wav");
+
+        //SAMPLE FASE 2
+        if (playing_second_level || playing_second_level_2 || cutscene_two_on)
+        {
+            play_sample(sound_fase_2, 255, 128, 1000, 1);
+        }
 
         //BITMAPS
         BITMAP *cena_two_one = load_bitmap("../assets/Cutscenes/Cutscene_two/Cena1.bmp", NULL);
@@ -4305,7 +4325,6 @@ int main()
             free(map);
             free(scenario_map);
             destroy_bitmap(level_background);
-
             for (int i = 0; i < rbs_size; i++)
             {
                 destroy_list(rbs_lvl2[i]->collidingWith);
@@ -4313,6 +4332,7 @@ int main()
 
 #pragma endregion
         }
+
 #pragma region cutscene three
 
         aux = 0;
@@ -4473,9 +4493,18 @@ int main()
         destroy_bitmap(cena_three_two);
         destroy_bitmap(cena_three_three);
         destroy_bitmap(cena_three_four);
+        stop_sample(sound_fase_2);
+        destroy_sample(sound_fase_2);
 
 #pragma endregion
 
+        SAMPLE *sound_boss = load_sample("../sounds/sound_boss.wav");
+
+        //SAMPLE BOSS
+        if (playing_boss_fight)
+        {
+            play_sample(sound_boss, 255, 128, 1000, 1);
+        }
         if (playing_boss_fight)
         {
 #pragma region boss fight
@@ -5445,6 +5474,8 @@ int main()
             {
                 destroy_list(rbs_Boss[i]->collidingWith);
             }
+            stop_sample(sound_boss);
+            destroy_sample(sound_boss);
 
 #pragma endregion
         }
@@ -5527,7 +5558,7 @@ int main()
                 clear(buffer);
 
                 pschx = 783;
-                pschy = 326;
+                pschy = 323;
 
                 if (scene_show == 1)
                 {
