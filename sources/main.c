@@ -269,6 +269,10 @@ int main()
 #pragma region menu
         //VARIABLES
         int chx = 355, chy = 420, som = FALSE;
+        int pschx = 355, pschy = 420;
+        int scene_show = 0;
+        int aux = 0;
+        int animation_frame = 0;
         int py[2] = {420, 485};
         pause_game = 0;
         aux_music_boss = 0;
@@ -282,398 +286,393 @@ int main()
         SAMPLE *intro = load_sample(INTRO_SOUND);
         SAMPLE *enter = load_sample(ENTER_SOUND);
 
-        //INTRODUCTION SAMPLE
-        play_sample(intro, 255, 128, 1000, 1);
-
-        int animation_frame = 0;
-        counter = 0;
-        fading_type = 1;
-        fading_progress = 1;
-
-        while (menu_on && !close_game)
+        if (last_level_played == 0)
         {
-            if (fading_type == 0)
+            //INTRODUCTION SAMPLE
+            play_sample(intro, 255, 128, 1000, 1);
+
+            counter = 0;
+            fading_type = 1;
+            fading_progress = 1;
+
+            while (menu_on && !close_game)
             {
-                keyboard_input();
-
-                //INPUT
-                if (key_down(KEY_RIGHT) || key_down(KEY_LEFT))
+                if (fading_type == 0)
                 {
-                    som = TRUE;
-                }
+                    keyboard_input();
 
-                if (key_down(KEY_DOWN))
-                {
-                    chy = (chy == py[0]) ? py[1] : py[0];
-                    som = TRUE;
-                }
-
-                if (key_down(KEY_UP))
-                {
-
-                    chy = (chy == py[0]) ? py[1] : py[0];
-                    som = TRUE;
-                }
-
-                if (key_down(KEY_ENTER))
-                {
-                    if (chy == py[0])
+                    //INPUT
+                    if (key_down(KEY_RIGHT) || key_down(KEY_LEFT))
                     {
-                        //stop_sample(intro);
-                        // menu_on = 0;
-                        //playing_first_level = 1;
-                        fading_type = 2;
-                        fading_progress = 0;
+                        som = TRUE;
                     }
-                    else
+
+                    if (key_down(KEY_DOWN))
+                    {
+                        chy = (chy == py[0]) ? py[1] : py[0];
+                        som = TRUE;
+                    }
+
+                    if (key_down(KEY_UP))
+                    {
+
+                        chy = (chy == py[0]) ? py[1] : py[0];
+                        som = TRUE;
+                    }
+
+                    if (key_down(KEY_ENTER))
+                    {
+                        if (chy == py[0])
+                        {
+                            fading_type = 2;
+                            fading_progress = 0;
+                        }
+                        else
+                        {
+                            close_program();
+                        }
+                    }
+
+                    if (key_down(KEY_ESC))
                     {
                         close_program();
                     }
                 }
-
-                if (key_down(KEY_ESC))
+                while (counter > 0)
                 {
-                    close_program();
+                    if (animation_frame >= 0 && animation_frame <= 15)
+                    {
+                        if (game_timer % 2 == 0)
+                        {
+                            animation_frame++;
+                            animation_frame %= 16;
+                        }
+                    }
+
+                    int r_img_pos = animation_frame % ARROW_SPRITE_COLS;
+                    int c_img_pos = animation_frame / ARROW_SPRITE_COLS;
+
+                    r_img_pos *= ARROW_TILE_SIZE;
+                    c_img_pos *= ARROW_TILE_SIZE;
+
+                    if (som)
+                    {
+                        play_sample(select, 255, 128, 1000, 0);
+                        som = FALSE;
+                    }
+
+                    clear(buffer);
+                    draw_sprite(buffer, menu, 0, 0);
+
+                    //draw the a part of the sprite sheet to the screen and scales it
+                    masked_blit(arrow_sprite, buffer, r_img_pos, c_img_pos, chx, chy, 32, 32);
+
+                    if (fading_type == 1)
+                    {
+                        fading_progress -= 0.05f;
+                        set_trans_blender(255, 255, 255, fading_progress * 255);
+                        draw_sprite_ex(buffer, fade_black, 0, 0, DRAW_SPRITE_TRANS, DRAW_SPRITE_NO_FLIP);
+                        if (fading_progress <= 0)
+                        {
+                            fading_progress = 0;
+                            fading_type = 0;
+                        }
+                    }
+                    else if (fading_type == 2)
+                    {
+                        fading_progress += 0.05f;
+                        set_trans_blender(255, 255, 255, fading_progress * 255);
+                        draw_sprite_ex(buffer, fade_black, 0, 0, DRAW_SPRITE_TRANS, DRAW_SPRITE_NO_FLIP);
+                        if (fading_progress >= 1)
+                        {
+                            fading_progress = 0;
+                            fading_type = 0;
+
+                            menu_on = 0;
+                            cutscene_one_on = 1;
+                        }
+                    }
+
+                    draw_sprite(screen, buffer, 0, 0);
+
+                    counter--;
                 }
             }
-            while (counter > 0)
-            {
-                if (animation_frame >= 0 && animation_frame <= 15)
-                {
-                    if (game_timer % 2 == 0)
-                    {
-                        animation_frame++;
-                        animation_frame %= 16;
-                    }
-                }
 
-                int r_img_pos = animation_frame % ARROW_SPRITE_COLS;
-                int c_img_pos = animation_frame / ARROW_SPRITE_COLS;
-
-                r_img_pos *= ARROW_TILE_SIZE;
-                c_img_pos *= ARROW_TILE_SIZE;
-
-                if (som)
-                {
-                    play_sample(select, 255, 128, 1000, 0);
-                    som = FALSE;
-                }
-
-                clear(buffer);
-                draw_sprite(buffer, menu, 0, 0);
-                //draw the a part of the sprite sheet to the screen and scales it
-                masked_blit(arrow_sprite, buffer, r_img_pos, c_img_pos, chx, chy, 32, 32);
-
-                if (fading_type == 1)
-                {
-                    fading_progress -= 0.05f;
-                    set_trans_blender(255, 255, 255, fading_progress * 255);
-                    draw_sprite_ex(buffer, fade_black, 0, 0, DRAW_SPRITE_TRANS, DRAW_SPRITE_NO_FLIP);
-                    if (fading_progress <= 0)
-                    {
-                        fading_progress = 0;
-                        fading_type = 0;
-                    }
-                }
-                else if (fading_type == 2)
-                {
-                    fading_progress += 0.05f;
-                    set_trans_blender(255, 255, 255, fading_progress * 255);
-                    draw_sprite_ex(buffer, fade_black, 0, 0, DRAW_SPRITE_TRANS, DRAW_SPRITE_NO_FLIP);
-                    if (fading_progress >= 1)
-                    {
-                        fading_progress = 0;
-                        fading_type = 0;
-
-                        menu_on = 0;
-                        cutscene_one_on = 1;
-                        // playing_first_level = 1;
-                    }
-                }
-
-                draw_sprite(screen, buffer, 0, 0);
-
-                counter--;
-            }
-        }
-
-        destroy_bitmap(menu);
+            destroy_bitmap(menu);
 
 #pragma endregion
 
 #pragma region cutscene one
 
-        //VARIABLES
-        int pschx = 355, pschy = 420;
+            //VARIABLES
+            pschx = 355, pschy = 420;
 
-        //BITMAPS
-        BITMAP *cena_one = load_bitmap("../assets/Cutscenes/Cena1.bmp", NULL);
-        BITMAP *cena_two = load_bitmap("../assets/Cutscenes/Cena2.bmp", NULL);
-        BITMAP *cena_three = load_bitmap("../assets/Cutscenes/Cena3.bmp", NULL);
-        BITMAP *cena_four = load_bitmap("../assets/Cutscenes/Cena4.bmp", NULL);
-        BITMAP *cena_five = load_bitmap("../assets/Cutscenes/Cena5.bmp", NULL);
-        BITMAP *cena_six = load_bitmap("../assets/Cutscenes/Cena6.bmp", NULL);
-        BITMAP *cena_seven = load_bitmap("../assets/Cutscenes/Cena7.bmp", NULL);
-        BITMAP *cena_eight = load_bitmap("../assets/Cutscenes/Cena8.bmp", NULL);
-        BITMAP *cena_nine = load_bitmap("../assets/Cutscenes/Cena9.bmp", NULL);
-        BITMAP *cena_ten = load_bitmap("../assets/Cutscenes/Cena10.bmp", NULL);
-        BITMAP *cena_eleven = load_bitmap("../assets/Cutscenes/Cena11.bmp", NULL);
-        BITMAP *arroww = load_bitmap(ARROW_PATH, NULL);
+            //BITMAPS
+            BITMAP *cena_one = load_bitmap("../assets/Cutscenes/Cena1.bmp", NULL);
+            BITMAP *cena_two = load_bitmap("../assets/Cutscenes/Cena2.bmp", NULL);
+            BITMAP *cena_three = load_bitmap("../assets/Cutscenes/Cena3.bmp", NULL);
+            BITMAP *cena_four = load_bitmap("../assets/Cutscenes/Cena4.bmp", NULL);
+            BITMAP *cena_five = load_bitmap("../assets/Cutscenes/Cena5.bmp", NULL);
+            BITMAP *cena_six = load_bitmap("../assets/Cutscenes/Cena6.bmp", NULL);
+            BITMAP *cena_seven = load_bitmap("../assets/Cutscenes/Cena7.bmp", NULL);
+            BITMAP *cena_eight = load_bitmap("../assets/Cutscenes/Cena8.bmp", NULL);
+            BITMAP *cena_nine = load_bitmap("../assets/Cutscenes/Cena9.bmp", NULL);
+            BITMAP *cena_ten = load_bitmap("../assets/Cutscenes/Cena10.bmp", NULL);
+            BITMAP *cena_eleven = load_bitmap("../assets/Cutscenes/Cena11.bmp", NULL);
+            BITMAP *arroww = load_bitmap(ARROW_PATH, NULL);
 
-        //SAMPLES
-        SAMPLE *selectt = load_sample(SELECT_SOUND);
+            //SAMPLES
+            SAMPLE *selectt = load_sample(SELECT_SOUND);
 
-        //INTRODUCTION SAMPLE
+            //INTRODUCTION SAMPLE
 
-        animation_frame = 0;
-        counter = 0;
-        fading_type = 1;
-        fading_progress = 1;
-        int scene_show = 1;
-        int aux = 1;
+            animation_frame = 0;
+            counter = 0;
+            fading_type = 1;
+            fading_progress = 1;
+            scene_show = 1;
+            aux = 1;
 
-        while (cutscene_one_on && !close_game)
-        {
-            if (last_level_played != 0)
+            while (cutscene_one_on && !close_game)
             {
-                stop_sample(intro);
-                switch (last_level_played)
+                if (fading_type == 0)
                 {
-                case 1:
-                    playing_first_level = 1;
-                    break;
-                case 2:
-                    playing_first_level_2 = 1;
-                    break;
-                case 3:
-                    playing_second_level = 1;
-                    break;
-                case 4:
-                    playing_second_level_2 = 1;
-                    break;
-                case 5:
-                    playing_second_level = 1;
-                    break;
+                    keyboard_input();
 
-                default:
-                    playing_first_level = 1;
-                    break;
-                }
-
-                fading_type = 2;
-                fading_progress = 0;
-                cutscene_one_on = 0;
-            }
-
-            if (fading_type == 0)
-            {
-                keyboard_input();
-
-                //INPUT
-                if (key_down(KEY_RIGHT))
-                {
-                    som = TRUE;
-                    if (scene_show == 2)
+                    //INPUT
+                    if (key_down(KEY_RIGHT))
                     {
-                        pschx = 623;
-                        pschy = 470;
+                        som = TRUE;
+                        if (scene_show == 2)
+                        {
+                            pschx = 623;
+                            pschy = 470;
+                        }
                     }
-                }
-                if (key_down(KEY_LEFT))
-                {
-                    som = TRUE;
-                    if (scene_show == 2)
+                    if (key_down(KEY_LEFT))
                     {
-                        pschx = 325;
-                        pschy = 473;
+                        som = TRUE;
+                        if (scene_show == 2)
+                        {
+                            pschx = 325;
+                            pschy = 473;
+                        }
                     }
-                }
 
-                if (key_down(KEY_DOWN) || key_down(KEY_UP))
-                {
-                    som = TRUE;
-                }
-
-                if (key_down(KEY_ENTER))
-                {
-                    som = TRUE;
-                    aux++;
-                    if (aux == 2)
+                    if (key_down(KEY_DOWN) || key_down(KEY_UP))
                     {
-                        pschx = 325;
-                        pschy = 473;
+                        som = TRUE;
                     }
-                    if (scene_show == 10)
-                    {
-                        stop_sample(intro);
 
-                        playing_first_level = 1;
-
-                        fading_type = 2;
-                        fading_progress = 0;
-                        cutscene_one_on = 0;
-                    }
-                    if (scene_show == 2)
+                    if (key_down(KEY_ENTER))
                     {
-                        if (pschx == 325)
+                        som = TRUE;
+                        aux++;
+                        if (aux == 2)
+                        {
+                            pschx = 325;
+                            pschy = 473;
+                        }
+                        if (scene_show == 10)
+                        {
+                            stop_sample(intro);
+
+                            playing_first_level = 1;
+
+                            fading_type = 2;
+                            fading_progress = 0;
+                            cutscene_one_on = 0;
+                        }
+                        if (scene_show == 2)
+                        {
+                            if (pschx == 325)
+                            {
+                                scene_show++;
+                            }
+                            else if (623)
+                            {
+                                scene_show = 11;
+                            }
+                        }
+                        else
                         {
                             scene_show++;
                         }
-                        else if (623)
+                        if (scene_show - 1 == 11)
                         {
-                            scene_show = 11;
+                            scene_show = 3;
                         }
                     }
-                    else
+
+                    if (key_down(KEY_ESC))
                     {
-                        scene_show++;
-                    }
-                    if (scene_show - 1 == 11)
-                    {
-                        scene_show = 3;
+                        menu_on = 1;
+                        cutscene_one_on = 0;
+                        last_level_played = 0;
+                        attempts = 2;
                     }
                 }
-
-                if (key_down(KEY_ESC))
+                while (counter > 0)
                 {
-                    menu_on = 1;
-                    cutscene_one_on = 0;
+                    if (animation_frame >= 0 && animation_frame <= 15)
+                    {
+                        if (game_timer % 2 == 0)
+                        {
+                            animation_frame++;
+                            animation_frame %= 16;
+                        }
+                    }
+
+                    int r_img_pos = animation_frame % ARROW_SPRITE_COLS;
+                    int c_img_pos = animation_frame / ARROW_SPRITE_COLS;
+
+                    r_img_pos *= ARROW_TILE_SIZE;
+                    c_img_pos *= ARROW_TILE_SIZE;
+
+                    if (som)
+                    {
+                        play_sample(select, 255, 128, 1000, 0);
+                        som = FALSE;
+                    }
+
+                    clear(buffer);
+
+                    if (scene_show == 1)
+                    {
+                        pschx = 665, pschy = 476;
+                        draw_sprite(buffer, cena_one, 0, 0);
+                    }
+                    else if (scene_show == 2)
+                    {
+                        draw_sprite(buffer, cena_two, 0, 0);
+                    }
+                    else if (scene_show == 3)
+                    {
+                        pschy = 476;
+                        pschx = 783;
+                        draw_sprite(buffer, cena_three, 0, 0);
+                    }
+                    else if (scene_show == 4)
+                    {
+                        pschy = 476;
+                        pschx = 783;
+                        draw_sprite(buffer, cena_four, 0, 0);
+                    }
+                    else if (scene_show == 5)
+                    {
+                        pschx = 782;
+                        pschy = 476;
+                        draw_sprite(buffer, cena_five, 0, 0);
+                    }
+                    else if (scene_show == 6)
+                    {
+                        pschx = 783;
+                        pschy = 476;
+                        draw_sprite(buffer, cena_six, 0, 0);
+                    }
+                    else if (scene_show == 7)
+                    {
+                        pschx = 783;
+                        pschy = 476;
+                        draw_sprite(buffer, cena_seven, 0, 0);
+                    }
+                    else if (scene_show == 8)
+                    {
+                        pschx = 783;
+                        pschy = 476;
+                        draw_sprite(buffer, cena_eight, 0, 0);
+                    }
+                    else if (scene_show == 9)
+                    {
+                        pschx = 783;
+                        pschy = 476;
+                        draw_sprite(buffer, cena_nine, 0, 0);
+                    }
+                    else if (scene_show == 10)
+                    {
+                        pschx = 783;
+                        pschy = 476;
+                        draw_sprite(buffer, cena_ten, 0, 0);
+                    }
+                    else if (scene_show == 11)
+                    {
+                        pschx = 783;
+                        pschy = 476;
+                        draw_sprite(buffer, cena_eleven, 0, 0);
+                    }
+                    //draw the a part of the sprite sheet to the screen and scales it
+                    masked_blit(arrow_sprite, buffer, r_img_pos, c_img_pos, pschx, pschy, 32, 32);
+
+                    if (fading_type == 1)
+                    {
+                        fading_progress -= 0.05f;
+                        set_trans_blender(255, 255, 255, fading_progress * 255);
+                        draw_sprite_ex(buffer, fade_black, 0, 0, DRAW_SPRITE_TRANS, DRAW_SPRITE_NO_FLIP);
+                        if (fading_progress <= 0)
+                        {
+                            fading_progress = 0;
+                            fading_type = 0;
+                        }
+                    }
+                    else if (fading_type == 2)
+                    {
+                        fading_progress += 0.05f;
+                        set_trans_blender(255, 255, 255, fading_progress * 255);
+                        draw_sprite_ex(buffer, fade_black, 0, 0, DRAW_SPRITE_TRANS, DRAW_SPRITE_NO_FLIP);
+                        if (fading_progress >= 1)
+                        {
+                            fading_progress = 0;
+                            fading_type = 0;
+                            cutscene_one_on = TRUE;
+                            // playing_first_level = 1;
+                        }
+                    }
+
+                    draw_sprite(screen, buffer, 0, 0);
+
+                    counter--;
                 }
             }
-            while (counter > 0)
+
+            destroy_bitmap(cena_one);
+            destroy_bitmap(cena_two);
+            destroy_bitmap(cena_three);
+            destroy_bitmap(cena_four);
+            destroy_bitmap(cena_five);
+            destroy_bitmap(cena_six);
+            destroy_bitmap(cena_seven);
+            destroy_bitmap(cena_eight);
+            destroy_bitmap(cena_nine);
+            destroy_bitmap(cena_ten);
+            destroy_bitmap(cena_eleven);
+            destroy_sample(intro);
+        }
+        else
+        {
+            switch (last_level_played)
             {
-                if (animation_frame >= 0 && animation_frame <= 15)
-                {
-                    if (game_timer % 2 == 0)
-                    {
-                        animation_frame++;
-                        animation_frame %= 16;
-                    }
-                }
+            case 1:
+                playing_first_level = 1;
+                break;
+            case 2:
+                playing_first_level_2 = 1;
+                break;
+            case 3:
+                playing_second_level = 1;
+                break;
+            case 4:
+                playing_second_level_2 = 1;
+                break;
+            case 5:
+                playing_second_level = 1;
+                break;
 
-                int r_img_pos = animation_frame % ARROW_SPRITE_COLS;
-                int c_img_pos = animation_frame / ARROW_SPRITE_COLS;
-
-                r_img_pos *= ARROW_TILE_SIZE;
-                c_img_pos *= ARROW_TILE_SIZE;
-
-                if (som)
-                {
-                    play_sample(select, 255, 128, 1000, 0);
-                    som = FALSE;
-                }
-
-                clear(buffer);
-
-                if (scene_show == 1)
-                {
-                    pschx = 665, pschy = 476;
-                    draw_sprite(buffer, cena_one, 0, 0);
-                }
-                else if (scene_show == 2)
-                {
-                    draw_sprite(buffer, cena_two, 0, 0);
-                }
-                else if (scene_show == 3)
-                {
-                    pschy = 476;
-                    pschx = 783;
-                    draw_sprite(buffer, cena_three, 0, 0);
-                }
-                else if (scene_show == 4)
-                {
-                    pschy = 476;
-                    pschx = 783;
-                    draw_sprite(buffer, cena_four, 0, 0);
-                }
-                else if (scene_show == 5)
-                {
-                    pschx = 782;
-                    pschy = 476;
-                    draw_sprite(buffer, cena_five, 0, 0);
-                }
-                else if (scene_show == 6)
-                {
-                    pschx = 783;
-                    pschy = 476;
-                    draw_sprite(buffer, cena_six, 0, 0);
-                }
-                else if (scene_show == 7)
-                {
-                    pschx = 783;
-                    pschy = 476;
-                    draw_sprite(buffer, cena_seven, 0, 0);
-                }
-                else if (scene_show == 8)
-                {
-                    pschx = 783;
-                    pschy = 476;
-                    draw_sprite(buffer, cena_eight, 0, 0);
-                }
-                else if (scene_show == 9)
-                {
-                    pschx = 783;
-                    pschy = 476;
-                    draw_sprite(buffer, cena_nine, 0, 0);
-                }
-                else if (scene_show == 10)
-                {
-                    pschx = 783;
-                    pschy = 476;
-                    draw_sprite(buffer, cena_ten, 0, 0);
-                }
-                else if (scene_show == 11)
-                {
-                    pschx = 783;
-                    pschy = 476;
-                    draw_sprite(buffer, cena_eleven, 0, 0);
-                }
-                //draw the a part of the sprite sheet to the screen and scales it
-                masked_blit(arrow_sprite, buffer, r_img_pos, c_img_pos, pschx, pschy, 32, 32);
-
-                if (fading_type == 1)
-                {
-                    fading_progress -= 0.05f;
-                    set_trans_blender(255, 255, 255, fading_progress * 255);
-                    draw_sprite_ex(buffer, fade_black, 0, 0, DRAW_SPRITE_TRANS, DRAW_SPRITE_NO_FLIP);
-                    if (fading_progress <= 0)
-                    {
-                        fading_progress = 0;
-                        fading_type = 0;
-                    }
-                }
-                else if (fading_type == 2)
-                {
-                    fading_progress += 0.05f;
-                    set_trans_blender(255, 255, 255, fading_progress * 255);
-                    draw_sprite_ex(buffer, fade_black, 0, 0, DRAW_SPRITE_TRANS, DRAW_SPRITE_NO_FLIP);
-                    if (fading_progress >= 1)
-                    {
-                        fading_progress = 0;
-                        fading_type = 0;
-                        cutscene_one_on = TRUE;
-                        // playing_first_level = 1;
-                    }
-                }
-
-                draw_sprite(screen, buffer, 0, 0);
-
-                counter--;
+            default:
+                playing_first_level = 1;
+                break;
             }
         }
-
-        destroy_bitmap(cena_one);
-        destroy_bitmap(cena_two);
-        destroy_bitmap(cena_three);
-        destroy_bitmap(cena_four);
-        destroy_bitmap(cena_five);
-        destroy_bitmap(cena_six);
-        destroy_bitmap(cena_seven);
-        destroy_bitmap(cena_eight);
-        destroy_bitmap(cena_nine);
-        destroy_bitmap(cena_ten);
-        destroy_bitmap(cena_eleven);
-        destroy_sample(intro);
 
 #pragma endregion
 
@@ -1076,9 +1075,9 @@ int main()
                     //USER INPUT
                     if (key_down(KEY_ESC))
                     {
-                        // playing_first_level = 0;
+                        last_level_played = 0;
+                        attempts = 2;
                         menu_on = 1;
-                        // break;
                         fading_type = 2;
                         fading_progress = 0;
                     }
@@ -1880,7 +1879,7 @@ int main()
 
 #pragma endregion
 
-            last_level_played++;
+            last_level_played = 2;
             fading_type = 1;
             fading_progress = 1;
             end_level = 0;
@@ -1923,9 +1922,9 @@ int main()
                         //USER INPUT
                         if (key_down(KEY_ESC))
                         {
-                            // playing_first_level_2 = 0;
+                            last_level_played = 0;
+                            attempts = 2;
                             menu_on = 1;
-                            // break;
                             fading_type = 2;
                             fading_progress = 0;
                         }
@@ -2409,6 +2408,8 @@ int main()
                 {
                     menu_on = 1;
                     cutscene_two_on = 0;
+                    last_level_played = 0;
+                    attempts = 2;
                 }
             }
             while (counter > 0)
@@ -2871,7 +2872,7 @@ int main()
             rbs_lvl2[rbs_size - 1] = &arrow_attack.rb;
 #pragma endregion
 
-            last_level_played++;
+            last_level_played = 3;
             fading_type = 1;
             fading_progress = 1;
             end_level = 0;
@@ -2912,9 +2913,9 @@ int main()
                         //USER INPUT
                         if (key_down(KEY_ESC))
                         {
-                            // playing_second_level = 0;
+                            last_level_played = 0;
+                            attempts = 2;
                             menu_on = 1;
-                            // break;
                             fading_type = 2;
                             fading_progress = 0;
                         }
@@ -3847,7 +3848,7 @@ int main()
 
 #pragma endregion
 
-            last_level_played++;
+            last_level_played = 4;
             fading_type = 1;
             fading_progress = 1;
             end_level = 0;
@@ -3877,11 +3878,8 @@ int main()
                         }
                         if (player.rb.cb.min.x > grounds_lvl2[ground_count - 1].rb.cb.max.x - 96)
                         {
-                            // playing_second_level = 0;
-                            // playing_boss_fight = 1;
                             cutscene_three_on = 1;
                             end_level = 1;
-                            // break;
                             fading_type = 2;
                             fading_progress = 0;
                         }
@@ -3889,11 +3887,11 @@ int main()
                         //USER INPUT
                         if (key_down(KEY_ESC))
                         {
-                            // playing_second_level_2 = 0;
                             menu_on = 1;
-                            // break;
                             fading_type = 2;
                             fading_progress = 0;
+                            last_level_played = 0;
+                            attempts = 2;
                         }
                         if (key_down(KEY_P))
                         {
@@ -4849,7 +4847,7 @@ int main()
             rbs_Boss[rbs_size - 1] = &arrow_attack.rb;
 #pragma endregion
 
-            last_level_played++;
+            last_level_played = 5;
             fading_type = 1;
             fading_progress = 1;
             end_level = 0;
@@ -4900,11 +4898,11 @@ int main()
 
                         if (key_down(KEY_ESC))
                         {
-                            // playing_boss_fight = 0;
                             menu_on = 1;
-                            // break;
                             fading_type = 2;
                             fading_progress = 0;
+                            last_level_played = 0;
+                            attempts = 2;
                         }
                         if (key_down(KEY_P))
                         {
@@ -5586,6 +5584,8 @@ int main()
                 {
                     menu_on = 1;
                     cutscene_final = 0;
+                    last_level_played = 0;
+                    attempts = 2;
                 }
             }
             while (counter > 0)
@@ -5736,6 +5736,8 @@ int main()
                 {
                     menu_on = 1;
                     congratulations_on = 0;
+                    last_level_played = 0;
+                    attempts = 2;
                 }
             }
 
@@ -5769,7 +5771,6 @@ int main()
                     fading_progress = 0;
                     fading_type = 0;
                     cutscene_final = 0;
-                    // playing_first_level = 1;
                 }
             }
 
@@ -5786,127 +5787,132 @@ int main()
 
 #pragma region death screen
         //VARIABLES
-        int shx = 290;
-        int shy = 417;
-        int snd = 0;
-
-        //BITMAPS
-        BITMAP *death = load_bitmap(DEATHSCREEN_PATH, NULL);
-
-        //SAMPLES
-        SAMPLE *sound_death = load_sample(DEATH_SOUND);
-
-        //DEATH SAMPLE
-        play_sample(sound_death, 255, 128, 1000, 1);
-
-        animation_frame = 0;
-
-        remove_int(increment_invulnerability);
-
-        fading_type = 1;
-        fading_progress = 1;
-        counter = 0;
-
-        if (death_on && !close_game)
+        if (death_on)
         {
-            attempts--;
-            if (attempts < 0)
-            {
-                last_level_played = 0;
-                attempts = 2;
-            }
-        }
+            int shx = 290;
+            int shy = 417;
+            int snd = 0;
 
-        while (death_on && !close_game)
-        {
-            if (fading_type == 0)
-            {
-                keyboard_input();
+            //BITMAPS
+            BITMAP *death = load_bitmap(DEATHSCREEN_PATH, NULL);
 
-                //INPUT
-                if (key_down(KEY_RIGHT) || key_down(KEY_LEFT) || key_down(KEY_DOWN) || key_down(KEY_UP))
+            //SAMPLES
+            SAMPLE *sound_death = load_sample(DEATH_SOUND);
+
+            //DEATH SAMPLE
+            play_sample(sound_death, 255, 128, 1000, 1);
+
+            animation_frame = 0;
+
+            remove_int(increment_invulnerability);
+
+            fading_type = 1;
+            fading_progress = 1;
+            counter = 0;
+
+            if (death_on && !close_game)
+            {
+                attempts--;
+                if (attempts < 0)
                 {
-                    snd = 1;
+                    last_level_played = 0;
+                    attempts = 2;
                 }
-
-                if (key_down(KEY_ENTER) || key_down(KEY_ESC))
+                else
                 {
-                    // death_on = 0;
-                    menu_on = 1;
-                    // break;
-                    fading_type = 2;
-                    fading_progress = 0;
+                    death_on = 0;
                 }
             }
 
-            while (counter > 0)
+            while (death_on && !close_game)
             {
-                if (animation_frame >= 0 && animation_frame <= 15)
+                if (fading_type == 0)
                 {
-                    if (game_timer % 2 == 0)
+                    keyboard_input();
+
+                    //INPUT
+                    if (key_down(KEY_RIGHT) || key_down(KEY_LEFT) || key_down(KEY_DOWN) || key_down(KEY_UP))
                     {
-                        animation_frame++;
-                        animation_frame %= 16;
+                        snd = 1;
                     }
-                }
 
-                int r_img_pos = animation_frame % ARROW_SPRITE_COLS;
-                int c_img_pos = animation_frame / ARROW_SPRITE_COLS;
-
-                r_img_pos *= ARROW_TILE_SIZE;
-                c_img_pos *= ARROW_TILE_SIZE;
-
-                if (snd)
-                {
-                    play_sample(select, 255, 128, 1000, 0);
-                    snd = 0;
-                }
-
-                clear(buffer);
-                draw_sprite(buffer, death, 0, 0);
-
-                //draw the a part of the sprite sheet to the screen and scales it
-                masked_blit(arrow_sprite, buffer, r_img_pos, c_img_pos, shx, shy, 32, 32);
-
-                if (fading_type == 1)
-                {
-                    fading_progress -= 0.05f;
-                    set_trans_blender(255, 255, 255, fading_progress * 255);
-                    draw_sprite_ex(buffer, fade_black, 0, 0, DRAW_SPRITE_TRANS, DRAW_SPRITE_NO_FLIP);
-
-                    if (fading_progress <= 0)
+                    if (key_down(KEY_ENTER) || key_down(KEY_ESC))
                     {
-                        fading_progress = 0;
-                        fading_type = 0;
-                    }
-                }
-                else if (fading_type == 2)
-                {
-                    fading_progress += 0.05f;
-                    set_trans_blender(255, 255, 255, fading_progress * 255);
-                    draw_sprite_ex(buffer, fade_black, 0, 0, DRAW_SPRITE_TRANS, DRAW_SPRITE_NO_FLIP);
-
-                    if (fading_progress >= 1)
-                    {
-                        fading_progress = 0;
-                        fading_type = 0;
-
-                        death_on = 0;
                         menu_on = 1;
-                        break;
+                        fading_type = 2;
+                        fading_progress = 0;
                     }
                 }
 
-                draw_sprite(screen, buffer, 0, 0);
+                while (counter > 0)
+                {
+                    if (animation_frame >= 0 && animation_frame <= 15)
+                    {
+                        if (game_timer % 2 == 0)
+                        {
+                            animation_frame++;
+                            animation_frame %= 16;
+                        }
+                    }
 
-                counter--;
+                    int r_img_pos = animation_frame % ARROW_SPRITE_COLS;
+                    int c_img_pos = animation_frame / ARROW_SPRITE_COLS;
+
+                    r_img_pos *= ARROW_TILE_SIZE;
+                    c_img_pos *= ARROW_TILE_SIZE;
+
+                    if (snd)
+                    {
+                        play_sample(select, 255, 128, 1000, 0);
+                        snd = 0;
+                    }
+
+                    clear(buffer);
+                    draw_sprite(buffer, death, 0, 0);
+
+                    //draw the a part of the sprite sheet to the screen and scales it
+                    masked_blit(arrow_sprite, buffer, r_img_pos, c_img_pos, shx, shy, 32, 32);
+
+                    if (fading_type == 1)
+                    {
+                        fading_progress -= 0.05f;
+                        set_trans_blender(255, 255, 255, fading_progress * 255);
+                        draw_sprite_ex(buffer, fade_black, 0, 0, DRAW_SPRITE_TRANS, DRAW_SPRITE_NO_FLIP);
+
+                        if (fading_progress <= 0)
+                        {
+                            fading_progress = 0;
+                            fading_type = 0;
+                        }
+                    }
+                    else if (fading_type == 2)
+                    {
+                        fading_progress += 0.05f;
+                        set_trans_blender(255, 255, 255, fading_progress * 255);
+                        draw_sprite_ex(buffer, fade_black, 0, 0, DRAW_SPRITE_TRANS, DRAW_SPRITE_NO_FLIP);
+
+                        if (fading_progress >= 1)
+                        {
+                            fading_progress = 0;
+                            fading_type = 0;
+
+                            death_on = 0;
+                            menu_on = 1;
+                            break;
+                        }
+                    }
+
+                    draw_sprite(screen, buffer, 0, 0);
+
+                    counter--;
+                }
             }
-        }
 
-        destroy_bitmap(death);
-        destroy_bitmap(arrow);
-        destroy_sample(select);
-        destroy_sample(sound_death);
+            destroy_bitmap(death);
+            destroy_bitmap(arrow);
+            destroy_sample(select);
+            destroy_sample(sound_death);
+        }
 #pragma endregion
     }
 
