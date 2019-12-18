@@ -336,6 +336,8 @@ int main()
                     if (key_down(KEY_ESC))
                     {
                         close_program();
+                        last_level_played = 0;
+                        attempts = 2;
                     }
                 }
                 while (counter > 0)
@@ -4446,6 +4448,8 @@ int main()
                 {
                     menu_on = 1;
                     cutscene_three_on = 0;
+                    last_level_played = 0;
+                    attempts = 2;
                 }
             }
             while (counter > 0)
@@ -5291,6 +5295,9 @@ int main()
                             jumper_boss.animation_frame = 10;
                             jumper_boss.stomp_on = 0;
                             jumper_boss.fire_on = 0;
+
+                            last_level_played = 0;
+                            attempts = 2;
                         }
                     }
                     else
